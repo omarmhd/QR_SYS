@@ -12,13 +12,12 @@ class PlanController extends Controller
     {
         if ($request->ajax()) {
             $plans =  Plan::query();
-
-            return DataTables::of($plans) 
+            return DataTables::of($plans)
                 ->editColumn('name', function ($row) {
                     return '<strong>' . e($row->name) . '</strong>';
                 })->addColumn('actions', function ($row) {
                     $acceptUrl = route('requests.changeStatus', ['id' => $row->id, 'status' => 'accepted']);
-                    $rejectUrl = route('requests.changeStatus', ['id' => $row->id, 'status' => 'rejected']);
+                     $rejectUrl = route('requests.changeStatus', ['id' => $row->id, 'status' => 'rejected']);
 
                     return '
         <span class="dropdown">

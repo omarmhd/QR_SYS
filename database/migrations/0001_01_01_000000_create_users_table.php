@@ -21,6 +21,7 @@ return new class extends Migration
             $table->foreignId("plan_id")->nullable()->constrained("plans");
             $table->string("plan_name")->nullable();
             $table->enum("approval_status",["pending","accepted","rejected"]);
+            $table->boolean("subscription_status")->default(0);
             $table->rememberToken();
             $table->timestamps();
         });

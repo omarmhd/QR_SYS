@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ApprovalMail;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Yajra\DataTables\DataTables;
 
 class MembershipRequests extends Controller
@@ -54,6 +56,8 @@ public function changeStatus($id, $status)
 
     $request = User::findOrFail($id); 
     $request->approval_status = $status;
+    Mail::to($request->email)->send(new ApprovalMail($request));
+
     $request->save();
 
     return redirect()->back()->with('success', 'Status updated to ' . $status);

@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\DeviceToken;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -36,39 +38,68 @@ class AuthController extends Controller
         $token = $user->createToken('api_token')->plainTextToken;
 
         return response()->json([
+            "status"=>true,
             'user' => $user,
             'token' => $token,
         ], 201);
     }
 
-    public function login(Request $request){
-        $fields=$request->validate([
-            'phone'=>"required"
-        ]);
+    public function login(Request $request)
+{
+    $fields = $request->validate([
+        'phone' => 'required|string',
+        'fcm_token' => 'required|string',
+        'device_id' => 'required|string',
+        'device_type' => 'nullable|string',
+    ]);
 
-    $user=User::where("approval_status","accepted")->where("phone",$fields["phone"])->first();
-        if (!$user) {
+    $user = User::where("phone", $fields["phone"])->first();
+
+    if (!$user) {
         return response()->json([
-            'message' => 'User not found or not approved'
+            "status"=>false,
+            'message' => 'User not found'
         ], 404);
     }
-    
+
     $token = $user->createToken('auth_token')->plainTextToken;
 
+    DeviceToken::updateOrCreate(
+        [
+            'user_id' => $user->id,
+            'device_id' => $fields['device_id'],
+        ],
+        [
+            'fcm_token' => $fields['fcm_token'],
+            'device_type' => $fields['device_type'] ?? null,
+        ]
+    );
+
     return response()->json([
+        "status"=>true,
         'message' => 'Login successful',
         'user' => $user,
         'token' => $token
     ]);
-
-    }
+}
 
 public function logout(Request $request)
 {
+    $request->validate([
+        'device_id' => 'required|string',
+    ]);
+
+    $user = Auth::user();
+
+    DeviceToken::where('user_id', $user->id)
+        ->where('device_id', $request->device_id)
+        ->delete();
+
     $request->user()->currentAccessToken()->delete();
 
     return response()->json([
-        'message' => 'Logged out successfully'
+        "status"=>true,
+        'message' => 'Logged out and device token removed'
     ]);
 }
 }
