@@ -36,11 +36,11 @@ class AuthController extends Controller
 
 
         $token = $user->createToken('api_token')->plainTextToken;
-
+        $user['token'] = $token;
         return response()->json([
             "status"=>true,
             'user' => $user,
-            'token' => $token,
+            'data'=>[]
         ], 201);
     }
 
@@ -58,6 +58,7 @@ class AuthController extends Controller
     if (!$user) {
         return response()->json([
             "status"=>false,
+            "data"=>[],
             'message' => 'User not found'
         ], 404);
     }
@@ -75,12 +76,13 @@ class AuthController extends Controller
         ]
     );
 
-    return response()->json([
-        "status"=>true,
-        'message' => 'Login successful',
-        'user' => $user,
-        'token' => $token
-    ]);
+        $user['token'] = $token;
+        return response()->json([
+            'status' => true,
+            "data"=>[],
+            'message' => 'Login successful',
+            'user' => $user
+        ]);
 }
 
 public function logout(Request $request)
@@ -99,6 +101,7 @@ public function logout(Request $request)
 
     return response()->json([
         "status"=>true,
+        "data"=>[],
         'message' => 'Logged out and device token removed'
     ]);
 }

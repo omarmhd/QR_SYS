@@ -13,7 +13,12 @@ class PublicController extends Controller
         $screens=OnboardingScreen::all();
 
         if($screens->isEmpty()){
-            return response()->json(["status"=>false,'message' => 'No screens found'], 404);
+            return response()->json([
+                "status"=>false,
+                "data"=>[],
+                'message' => 'No screens found',
+                
+            ], 404);
         }
         return response()->json(["status"=>true,"data"=>$screens]);
     }
@@ -23,9 +28,17 @@ class PublicController extends Controller
            $plans=Plan::all();
 
         if($plans->isEmpty()){
-            return response()->json(["status"=>false,'message' => 'No screens found'], 404);
+            return response()->json([
+                "status"=>false,
+                'message' => 'No screens found',
+                "data"=>[]
+
+            ], 404);
         }
-        return response()->json(["status"=>true,"data"=>$plans]);
+        return response()->json([
+            "status"=>true,
+            'message' => '',
+            "data"=>$plans]);
     }
 
 }
