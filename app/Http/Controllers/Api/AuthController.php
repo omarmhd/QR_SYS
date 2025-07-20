@@ -15,7 +15,6 @@ class AuthController extends Controller
         $fields = $request->validate([
             'name' => 'required|string',
             'email' => 'required|string|email|unique:users,email',
-            "airport"=>"required",
             'phone'=>"required",
             "dob"=>"required|date",
             "plan_id"=>"nullable",
@@ -26,7 +25,6 @@ class AuthController extends Controller
         $user = User::create([
             'name' => $fields['name'],
             'email' => $fields['email'],
-            'airport' => $fields['airport'],
             "phone"=>$fields['phone'],
             'dob' => $fields['dob'],
             'plan_id' => $fields['plan_id'],
@@ -39,8 +37,8 @@ class AuthController extends Controller
         $user['token'] = $token;
         return response()->json([
             "status"=>true,
-            'user' => $user,
-            'data'=>[]
+            'data'=>$user,
+            'message'=>"User created successfully"
         ], 201);
     }
 

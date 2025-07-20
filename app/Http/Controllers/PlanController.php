@@ -10,30 +10,68 @@ class PlanController extends Controller
 {
     public function index(Request $request)
     {
-        if ($request->ajax()) {
-            $plans =  Plan::query();
-            return DataTables::of($plans)
-                ->editColumn('name', function ($row) {
-                    return '<strong>' . e($row->name) . '</strong>';
-                })->addColumn('actions', function ($row) {
-                    $acceptUrl = route('requests.changeStatus', ['id' => $row->id, 'status' => 'accepted']);
-                     $rejectUrl = route('requests.changeStatus', ['id' => $row->id, 'status' => 'rejected']);
+        $plans=plan::all();
 
-                    return '
-        <span class="dropdown">
-            <button class="btn btn-sm btn-primary dropdown-toggle" data-bs-toggle="dropdown">Actions</button>
-            <div class="dropdown-menu">
-                <a class="dropdown-item" href="' . $acceptUrl . '">Accept</a>
-                <a class="dropdown-item" href="' . $rejectUrl . '">Reject</a>
-            </div>
-        </span>
-    ';
-                })
 
-                ->rawColumns(['name', 'actions'])
-                ->make(true);
-        }
 
-        return view('requests.index');
+        return view("plans.index",["plans"=>$plans]);
+      
     }
+
+    public function create(){
+        $plan=new Plan();
+        return view("plans.action",["plan"=>$plan]);
+    }
+
+    public function edit(Plan $plan){
+        return view("plans.action",compact("plan"));
+    }
+
+    public function store(Request $request){
+        $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'price' => 'required|numeric',
+        'guest_passes_per_year' => 'required|integer',
+        'currency' => 'required|in:EUR,USD',
+        'billing_type' => 'required|in:day,month,year',
+        'features' => 'required|array|min:1',
+        'features.*' => 'required|string|max:255',
+    ]);
+        $plan = new Plan();
+        $plan->name = $request->name;
+        $plan->price = $request->price;
+        $plan->guest_passes_per_year = $request->guest_passes_per_year;
+        $plan->currency = $request->currency;
+        $plan->billing_type = $request->billing_type;
+        $plan->is_popular = $request->has('is_popular');
+        $plan->features = json_encode($request->features); 
+        $plan->save();
+
+        return redirect()->back()->with('success', 'Plan created successfully');
+
+    }
+
+public function update(Request $request, Plan $plan)
+{
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'price' => 'required|numeric',
+        'guest_passes_per_year' => 'required|integer',
+        'currency' => 'required|in:EUR,USD',
+        'billing_type' => 'required|in:day,month,year',
+        'features' => 'required|array|min:1',
+        'features.*' => 'required|string|max:255',
+    ]);
+
+    $plan->name = $request->name;
+    $plan->price = $request->price;
+    $plan->guest_passes_per_year = $request->guest_passes_per_year;
+    $plan->currency = $request->currency;
+    $plan->billing_type = $request->billing_type;
+    $plan->is_popular = $request->has('is_popular');
+    $plan->features = json_encode($request->features); 
+    $plan->save();
+
+    return redirect()->back()->with('success', 'Plan updated successfully');
+}
 }
