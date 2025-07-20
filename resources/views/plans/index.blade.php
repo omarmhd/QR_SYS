@@ -90,8 +90,13 @@
               @endforeach
 
             </ul>
-            <div class="text-center mt-4">
+<div class="text-center mt-4 d-flex gap-2 justify-content-center">
               <a href="{{route('plans.edit',$plan)}}" class="btn btn-green w-100">Edit plan</a>
+                <form class="delete-form" action="{{ route('plans.destroy', $plan) }}" method="POST">
+        @csrf
+        @method('DELETE')
+        <button type="submit" class="btn btn-danger delete-btn">Delete Plan</button>
+    </form>
             </div>
           </div>
         </div>
@@ -106,3 +111,28 @@
 
 
 @endsection
+
+@push("js")
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  document.querySelectorAll('.delete-form').forEach(form => {
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "This action cannot be undone!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          form.submit();
+        }
+      });
+    });
+  });
+</script>
+@endpush

@@ -74,4 +74,12 @@ public function update(Request $request, Plan $plan)
 
     return redirect()->back()->with('success', 'Plan updated successfully');
 }
+
+    public function destroy(Plan $plan)
+{
+
+    $plan->delete();
+
+    return redirect()->route('plans.index')->with('success', 'plan deleted successfully.');
+}
 }
