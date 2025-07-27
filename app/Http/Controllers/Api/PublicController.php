@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\OnboardingScreenResource;
 use App\Models\OnboardingScreen;
 use App\Models\Plan;
 use Illuminate\Http\Request;
@@ -20,7 +21,7 @@ class PublicController extends Controller
                 
             ], 404);
         }
-        return response()->json(["status"=>true,"data"=>$screens]);
+        return response()->json(["status"=>true,"data"=>OnboardingScreenResource::collection($screens)]);
     }
 
 

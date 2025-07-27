@@ -8,15 +8,14 @@
             data-bs-target="#sidebar-menu"
             aria-controls="sidebar-menu"
             aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
+            aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
           <!-- END NAVBAR TOGGLER -->
           <!-- BEGIN NAVBAR LOGO -->
           <div class="navbar-brand navbar-brand-autodark">
             <a href=".">
-<img src="{{asset('/logo_white.png')}}" alt="" style="width: 100px;">
+              <img src="{{asset('/logo_white.png')}}" alt="" style="width: 100px;">
             </a>
           </div>
           <!-- END NAVBAR LOGO -->
@@ -35,11 +34,9 @@
                     stroke-width="2"
                     stroke-linecap="round"
                     stroke-linejoin="round"
-                    class="icon icon-2"
-                  >
+                    class="icon icon-2">
                     <path
-                      d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5"
-                    />
+                      d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
                   </svg>
                   Source code
                 </a>
@@ -55,8 +52,7 @@
                     stroke-width="2"
                     stroke-linecap="round"
                     stroke-linejoin="round"
-                    class="icon text-pink icon-2"
-                  >
+                    class="icon text-pink icon-2">
                     <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" />
                   </svg>
                   Sponsor
@@ -77,8 +73,7 @@
                     stroke-width="2"
                     stroke-linecap="round"
                     stroke-linejoin="round"
-                    class="icon icon-1"
-                  >
+                    class="icon icon-1">
                     <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
                   </svg>
                 </a>
@@ -94,8 +89,7 @@
                     stroke-width="2"
                     stroke-linecap="round"
                     stroke-linejoin="round"
-                    class="icon icon-1"
-                  >
+                    class="icon icon-1">
                     <path d="M12 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />
                     <path d="M3 12h1m8 -9v1m8 8h1m-9 8v1m-6.4 -15.4l.7 .7m12.1 -.7l-.7 .7m0 11.4l.7 .7m-12.1 -.7l-.7 .7" />
                   </svg>
@@ -114,8 +108,7 @@
                     stroke-width="2"
                     stroke-linecap="round"
                     stroke-linejoin="round"
-                    class="icon icon-1"
-                  >
+                    class="icon icon-1">
                     <path d="M10 5a2 2 0 1 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" />
                     <path d="M9 17v1a3 3 0 0 0 6 0v-1" />
                   </svg>
@@ -147,8 +140,7 @@
                                 stroke-width="2"
                                 stroke-linecap="round"
                                 stroke-linejoin="round"
-                                class="icon text-muted icon-2"
-                              >
+                                class="icon text-muted icon-2">
                                 <path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z" />
                               </svg>
                             </a>
@@ -175,8 +167,7 @@
                                 stroke-width="2"
                                 stroke-linecap="round"
                                 stroke-linejoin="round"
-                                class="icon text-yellow icon-2"
-                              >
+                                class="icon text-yellow icon-2">
                                 <path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z" />
                               </svg>
                             </a>
@@ -203,8 +194,7 @@
                                 stroke-width="2"
                                 stroke-linecap="round"
                                 stroke-linejoin="round"
-                                class="icon text-muted icon-2"
-                              >
+                                class="icon text-muted icon-2">
                                 <path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z" />
                               </svg>
                             </a>
@@ -231,8 +221,7 @@
                                 stroke-width="2"
                                 stroke-linecap="round"
                                 stroke-linejoin="round"
-                                class="icon text-muted icon-2"
-                              >
+                                class="icon text-muted icon-2">
                                 <path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z" />
                               </svg>
                             </a>
@@ -279,8 +268,7 @@
                       stroke-width="2"
                       stroke-linecap="round"
                       stroke-linejoin="round"
-                      class="icon icon-1"
-                    >
+                      class="icon icon-1">
                       <path d="M5 12l-2 0l9 -9l9 9l-2 0" />
                       <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
                       <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
@@ -289,7 +277,29 @@
                   <span class="nav-link-title"> Requests </span>
                 </a>
               </li>
-      <li class="nav-item">
+              <li class="nav-item">
+
+                <a class="nav-link" href="{{route('users.index')}}/">
+                  <span class="nav-link-icon d-md-none d-lg-inline-block">
+                    <!-- Download SVG icon from http://tabler.io/icons/icon/home -->
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="icon icon-1">
+                      <path d="M5 12l-2 0l9 -9l9 9l-2 0" />
+                      <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+                      <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+                    </svg>
+                  </span>
+                  <span class="nav-link-title"> Users </span>
+                </a>
                 <a class="nav-link" href="{{route('onboarding-screens.index')}}/">
                   <span class="nav-link-icon d-md-none d-lg-inline-block">
                     <!-- Download SVG icon from http://tabler.io/icons/icon/home -->
@@ -303,8 +313,7 @@
                       stroke-width="2"
                       stroke-linecap="round"
                       stroke-linejoin="round"
-                      class="icon icon-1"
-                    >
+                      class="icon icon-1">
                       <path d="M5 12l-2 0l9 -9l9 9l-2 0" />
                       <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
                       <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
@@ -314,7 +323,7 @@
                 </a>
               </li>
 
-                    <li class="nav-item">
+              <li class="nav-item">
                 <a class="nav-link" href="{{route('plans.index')}}/">
                   <span class="nav-link-icon d-md-none d-lg-inline-block">
                     <!-- Download SVG icon from http://tabler.io/icons/icon/home -->
@@ -328,8 +337,7 @@
                       stroke-width="2"
                       stroke-linecap="round"
                       stroke-linejoin="round"
-                      class="icon icon-1"
-                    >
+                      class="icon icon-1">
                       <path d="M5 12l-2 0l9 -9l9 9l-2 0" />
                       <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
                       <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
@@ -340,7 +348,7 @@
               </li>
             </ul>
 
-  
+
             <!-- END NAVBAR MENU -->
           </div>
         </div>

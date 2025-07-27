@@ -7,7 +7,7 @@
             <div class="row g-2 align-items-center">
               <div class="col">
                 <!-- Page pre-title -->
-                <div class="page-pretitle">Membership Requests</div>
+                <div class="page-pretitle">User Managment</div>
                 <h2 class="page-title"></h2>
               </div>
               <!-- Page title actions -->
@@ -76,7 +76,7 @@
             <div class="col-12">
                 <div class="card">
                   <div class="card-header">
-                    <h3 class="card-title">Requests</h3>
+                    <h3 class="card-title">Users</h3>
                   </div>
                   <div class="card-body border-bottom py-3">
                     <div class="d-flex">
@@ -118,28 +118,7 @@
                       </thead>
                       
                       <tbody>
-                        <!-- <tr>
-                          <td><input class="form-check-input m-0 align-middle table-selectable-check" type="checkbox" aria-label="Select invoice"></td>
-                          <td><span class="text-secondary">001401</span></td>
-                          <td><a href="i3nvoice.html" class="text-reset" tabindex="-1">Design Works</a></td>
-                          <td>
-                            <span class="flag flag-xs flag-country-us me-2"></span>
-                            Carlson Limited
-                          </td>
-                          <td>87956621</td>
-                          <td>15 Dec 2017</td>
-                          <td><span class="badge bg-success me-1"></span> Paid</td>
-                          <td>$887</td>
-                          <td class="text-end">
-                            <span class="dropdown">
-                              <button class="btn dropdown-toggle align-text-top" data-bs-boundary="viewport" data-bs-toggle="dropdown">Actions</button>
-                              <div class="dropdown-menu dropdown-menu-end">
-                                <a class="dropdown-item" href="#"> Action </a>
-                                <a class="dropdown-item" href="#"> Another action </a>
-                              </div>
-                            </span>
-                          </td>
-                        </tr> -->
+
 
                        
        
@@ -155,7 +134,7 @@
 
         @endsection
 
-
-      @push("js")
-      @include("requests._datatable")        
-      @endpush
+        @push("js")
+        @include("users._datatable")
+          
+        @endpush

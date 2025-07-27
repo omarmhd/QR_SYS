@@ -7,24 +7,32 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Yajra\DataTables\DataTables;
+use App\Services\FcmNotificationService;
 
 class MembershipRequests extends Controller
 {
+protected $firebaseService;
 
-function index(Request $request){
+    public function __construct(FcmNotificationService $firebaseService)
+    {
+        $this->firebaseService = $firebaseService;
+    }
 
-  if ($request->ajax()) {
-        $users = User::query();
+    function index(Request $request)
+    {
 
-        return DataTables::of($users)
-           
-            ->editColumn('name', function($row) {
-                return '<strong>' . e($row->name) . '</strong>';
-            })->addColumn('actions', function($row) {
-    $acceptUrl = route('requests.changeStatus', ['id' => $row->id, 'status' => 'accepted']);
-    $rejectUrl = route('requests.changeStatus', ['id' => $row->id, 'status' => 'rejected']);
+        if ($request->ajax()) {
+            $users = User::query();
 
-    return '
+            return DataTables::of($users)
+
+                ->editColumn('name', function ($row) {
+                    return '<strong>' . e($row->name) . '</strong>';
+                })->addColumn('actions', function ($row) {
+                    $acceptUrl = route('requests.changeStatus', ['id' => $row->id, 'status' => 'accepted']);
+                    $rejectUrl = route('requests.changeStatus', ['id' => $row->id, 'status' => 'rejected']);
+
+                    return '
         <span class="dropdown">
             <button class="btn btn-sm btn-primary dropdown-toggle" data-bs-toggle="dropdown">Actions</button>
             <div class="dropdown-menu">
@@ -33,32 +41,39 @@ function index(Request $request){
             </div>
         </span>
     ';
-})
+                })
 
-            
 
-            ->rawColumns(['name', 'actions'])
-            ->make(true);
+
+                ->rawColumns(['name', 'actions'])
+                ->make(true);
+        }
+
+        return view('requests.index');
     }
 
-    return view('requests.index'); 
 
+    public function changeStatus($id, $status)
+    {
+        $allowedStatuses = ['accepted', 'rejected'];
+
+        if (!in_array($status, $allowedStatuses)) {
+            return redirect()->back()->with('error', 'Invalid status value.');
+        }
+
+        $request = User::findOrFail($id);
+
+        
+        $request->approval_status = $status;
+        $tokens=$request->deviceTokens->pluck("fcm_token")->toArray();
+        $this->firebaseService->sendNotification($tokens,"TEST","TRSR",["test"=>"test"]);
+     
+
+
+        Mail::to($request->email)->send(new ApprovalMail($request));
+
+        $request->save();
+
+        return redirect()->back()->with('success', 'Status updated to ' . $status);
     }
-
-
-public function changeStatus($id, $status)
-{
-    $allowedStatuses = ['accepted', 'rejected'];
-
-    if (!in_array($status, $allowedStatuses)) {
-        return redirect()->back()->with('error', 'Invalid status value.');
-    }
-
-    $request = User::findOrFail($id); 
-    $request->approval_status = $status;
-    Mail::to($request->email)->send(new ApprovalMail($request));
-
-    $request->save();
-
-    return redirect()->back()->with('success', 'Status updated to ' . $status);
-}}
+}

@@ -4,6 +4,7 @@ use App\Http\Controllers\MembershipRequests;
 use App\Http\Controllers\OnboardingScreenController;
 use App\Http\Controllers\PlanController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserController;
 use App\Models\OnboardingScreen;
 use Illuminate\Support\Facades\Route;
 
@@ -14,7 +15,9 @@ Route::get('/', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
-
+    
+    Route::resource("/users",UserController::class);
+    
     Route::get("/",[MembershipRequests::class,'index'])->name("requests.index");
     Route::get('/requests/{id}/change-status/{status}', [MembershipRequests::class, 'changeStatus'])
     ->name('requests.changeStatus');

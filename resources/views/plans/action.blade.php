@@ -59,7 +59,7 @@
 
     <form action="{{ isset($plan->id) ? route('plans.update', $plan->id) : route('plans.store') }}" method="POST" enctype="multipart/form-data">
   @csrf
-  @if(isset($plan))
+  @if(isset($plan->id))
     @method('PUT')
   @endif
 

@@ -184,17 +184,28 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
     @stack("js")
-    <script>
-      $(document).ready(function() {
-            $('#users-table').DataTable({
-                processing: true,
-                serverSide: false,
-            
-            });
-        });
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  document.addEventListener('submit', function(e) {
+    if (e.target.classList.contains('delete-form')) {
+      e.preventDefault();
 
-
-    </script>
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "This action cannot be undone!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          e.target.submit();
+        }
+      });
+    }
+  });
+</script>
 @if(session('success'))
     <script>
         document.addEventListener("DOMContentLoaded", function () {
