@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Notification as ModelsNotification;
 use Google\Client;
 use Illuminate\Support\Str;
 use Modules\Notifications\Entities\Notification;
@@ -26,16 +27,19 @@ class FcmNotificationService
         return $token['access_token'];
     }
 
-   public function sendNotification(array $tokens, string $title, string $body, array $data = [], ?string $image = null)
+public function sendNotification(array|string $tokensOrTopic, string $title, string $body, array $data = [], ?string $image = null, string $type = 'tokens')
 {
     $accessToken = $this->getAccessToken();
 
+  if ($type === 'tokens') {
+
+
     $responses = [];
 
-    foreach ($tokens as $token) {
+    foreach ($tokensOrTopic as $token) {
         $payload = [
             'message' => [
-                'token' => $token->fcm_tk,
+                'token' => $token->fcm_token,
                 'notification' => [
                     'title' => $title,
                     'body' => $body,
@@ -51,7 +55,37 @@ class FcmNotificationService
         $response = $this->send($payload, $accessToken);
         $responses[] = json_decode($response, true);
     }
+    }else{
+          $payload = [
+            'message' => [
+                'topic' => $tokensOrTopic,
+                'notification' => [
+                    'title' => $title,
+                    'body' => $body,
+                ],
+                'data' => $data,
+            ],
+        ];
+                $response = $this->send($payload, $accessToken);
+        $responses[] = json_decode($response, true);
 
+    }
+
+    if (isset($responses['name'])) {
+
+
+    ModelsNotification::create([
+    'user_id' => $userId ?? null,
+    'title' => $title,
+    'body' => $body,
+    'type' => $type,
+    'target' => $token,
+    'data' => $data,
+    'sent_at' => now(),
+]);
+
+
+    }
     return $responses;
 }
     protected function send(array $payload, string $accessToken)

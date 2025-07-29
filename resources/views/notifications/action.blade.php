@@ -55,11 +55,8 @@
 
     <div class="row  row-cards">
       <div class="col-12">
-
-
-        <form action="route('notifications.store') }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('notifications.store') }}" method="POST" enctype="multipart/form-data">
           @csrf
- 
           <div class="card">
             <div class="card-body">
 
@@ -88,88 +85,24 @@
                 </div>
               </div>
               @endif
-
-              {{-- Name --}}
-
-
               <div class="row row-cards">
-                <div class="mb-3 col-sm-8 col-md-6">
+                <div class="mb-3 col-sm-8 col-md-12">
                   <label class="form-label required">Title</label>
                   <input name="title" type="text" class="form-control"
                     value="{{ old('title', $user->name ?? '') }}">
                 </div>
 
-                {{-- email --}}
-                <div class="mb-3 col-sm-8 col-md-6">
-                  <label class="form-label required">Email</label>
-                  <input type="text" name="email" class="form-control"
-                    value="{{ old('email', $user->email ?? '') }}">
+                <div class="mb-3 col-sm-8 col-md-12">
+                  <label class="form-label required">Body</label>
+                  <textarea name="body" id="" col="3" rows="3" class="form-control"></textarea>
+
                 </div>
 
 
-                {{-- phone --}}
-                <div class="mb-3 col-sm-8 col-md-6">
-                  <label class="form-label required">Phone</label>
-                  <input type="number" name="phone" class="form-control"
-                    value="{{ old('phone', $user->phone ?? '') }}">
-                </div>
-                <div class="mb-3 col-sm-8 col-md-6">
-                  <label class="form-label required">DOB</label>
-                  <input type="date" name="dob" class="form-control"
-                    value="{{ old('dob', $user->dob ?? '') }}">
-                </div>
-
-                {{-- Currency --}}
-                <div class="mb-3 col-sm-8 col-md-6">
-                  <label class="form-label required">Plans</label>
-                  <select name="plan_id" class="form-control">
-                    @foreach ($plans as $plan)
-                    <option value="{{$plan->id}}" {{old('plan_id', $user->plan_id ?? '') == $plan->id ? 'selected' : ''}}>{{$plan->name}}</option>
-
-                    @endforeach
-
-
-                  </select>
-                </div>
-
-
-
-                <div class="mb-3 col-sm-8 col-md-6">
-                  <label class="form-label required">Approval Status</label>
-                  <select name="approval_status" class="form-control">
-                    @foreach (\App\ApprovalStatus::cases() as $status )
-                            <option value="{{ $status->value }}" 
-                                {{ old('status', $user->approval_status ?? '') == $status->value ? 'selected' : '' }}>
-                                {{ ucfirst($status->name) }}
-                            </option>
-                              
-                    @endforeach
-                  </select>
-                </div>
-
-
-
-                <div class="mb-3 col-sm-8 col-md-6">
-                  <label class="form-label required">Subscription Status</label>
-                                      <select name="subscription_status" class="form-control">
-
-                            <option value="0" 
-                                {{ old('subscription_status', $user->subscription_status ?? '') == 1 ? 'selected' : '' }}>
-                              Yes
-                            </option>
-
-                                                        <option value="1" 
-                                {{ old('subscription_status', $user->subscription_status ?? '') == 0 ? 'selected' : '' }}>
-                                No
-                              </option>
-                                      </select>
-                    
-                </label>
-                </div>
           
                 <div class="card-footer text-end">
                   <button type="submit" class="btn btn-primary">
-                    {{ isset($user->id) ? 'Update User' : 'Create User' }}
+                    Send Notification
                   </button>
                 </div>
               </div>

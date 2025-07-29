@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\MembershipRequests;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OnboardingScreenController;
 use App\Http\Controllers\PlanController;
 use App\Http\Controllers\ProfileController;
@@ -21,8 +22,10 @@ Route::middleware('auth')->group(function () {
     Route::get("/",[MembershipRequests::class,'index'])->name("requests.index");
     Route::get('/requests/{id}/change-status/{status}', [MembershipRequests::class, 'changeStatus'])
     ->name('requests.changeStatus');
-
+ 
     Route::resource("onboarding-screens",OnboardingScreenController::class);
+
+    Route::resource("notifications",NotificationController::class);
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

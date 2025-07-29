@@ -55,25 +55,25 @@ protected $firebaseService;
 
     public function changeStatus($id, $status)
     {
-        $allowedStatuses = ['accepted', 'rejected'];
+            $allowedStatuses = ['accepted', 'rejected'];
 
-        if (!in_array($status, $allowedStatuses)) {
-            return redirect()->back()->with('error', 'Invalid status value.');
-        }
+            if (!in_array($status, $allowedStatuses)) {
+                return redirect()->back()->with('error', 'Invalid status value.');
+            }
 
-        $request = User::findOrFail($id);
+            $request = User::findOrFail($id);
 
+            
+            $request->approval_status = $status;
+            $tokens=$request->deviceTokens->pluck("fcm_token")->toArray();
+            $this->firebaseService->sendNotification($tokens,"TEST","TRSR",["test"=>"test"]);
         
-        $request->approval_status = $status;
-        $tokens=$request->deviceTokens->pluck("fcm_token")->toArray();
-        $this->firebaseService->sendNotification($tokens,"TEST","TRSR",["test"=>"test"]);
-     
 
 
-        Mail::to($request->email)->send(new ApprovalMail($request));
+            Mail::to($request->email)->send(new ApprovalMail($request));
 
-        $request->save();
+            $request->save();
 
-        return redirect()->back()->with('success', 'Status updated to ' . $status);
+            return redirect()->back()->with('success', 'Status updated to ' . $status);
     }
 }
