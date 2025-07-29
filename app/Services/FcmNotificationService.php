@@ -39,7 +39,7 @@ public function sendNotification(array|string $tokensOrTopic, string $title, str
     foreach ($tokensOrTopic as $token) {
         $payload = [
             'message' => [
-                'token' => $token->fcm_token,
+                'token' => $token,
                 'notification' => [
                     'title' => $title,
                     'body' => $body,
