@@ -66,7 +66,8 @@ protected $firebaseService;
             
             $request->approval_status = $status;
             $tokens=$request->deviceTokens->pluck("fcm_token")->toArray();
-            $this->firebaseService->sendNotification($tokens,"TEST","TRSR",["test"=>"test"]);
+            $response=$this->firebaseService->sendNotification($tokens, "tite", "test", ["type" => "token"], null, 'tokens');
+
         
 
 
