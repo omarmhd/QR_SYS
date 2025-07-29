@@ -75,6 +75,7 @@ protected $firebaseService;
             Mail::to($request->email)->send(new ApprovalMail($request));
 
             $request->save();
+            dd($response);
 
             return redirect()->back()->with('success', 'Status updated to ' . $status.$response);
     }
