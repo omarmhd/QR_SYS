@@ -30,6 +30,8 @@ class FcmNotificationService
 public function sendNotification(array|string $tokensOrTopic, string $title, string $body, array $data = [], ?string $image = null, string $type = 'tokens')
 {
     $accessToken = $this->getAccessToken();
+    
+
 
   if ($type === 'tokens') {
 
