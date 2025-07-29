@@ -13,6 +13,7 @@ class FcmNotificationService
     public function __construct()
     {
         $serviceAccountPath = storage_path('app/'.env('FIREBASE_CREDENTIALS_PATH'));
+        dd($serviceAccountPath);
 
         $this->client = new Client();
         $this->client->setAuthConfig($serviceAccountPath);
@@ -72,3 +73,4 @@ class FcmNotificationService
 
 
 }  
+ 
