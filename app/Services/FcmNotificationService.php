@@ -12,8 +12,13 @@ class FcmNotificationService
 
     public function __construct()
     {
-        $serviceAccountPath = storage_path('app/'.env('FIREBASE_CREDENTIALS_PATH'));
-        dd($serviceAccountPath);
+     $serviceAccountPath = storage_path('app/' . env('FIREBASE_CREDENTIALS_PATH'));
+
+if (!file_exists($serviceAccountPath)) {
+    dd('الملف غير موجود:', $serviceAccountPath);
+} else {
+    dd('المسار صحيح:', $serviceAccountPath);
+}
 
         $this->client = new Client();
         $this->client->setAuthConfig($serviceAccountPath);
