@@ -84,7 +84,7 @@ public function sendNotification(array|string $tokensOrTopic, string $title, str
     'title' => $title,
     'body' => $body,
     'type' => $type,
-    'data' => "",
+    'data' => null,
     "is_read"=>0,
     'sent_at' => now(),
 ]);
