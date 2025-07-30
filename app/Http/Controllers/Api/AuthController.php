@@ -19,6 +19,9 @@ class AuthController extends Controller
             "dob"=>"required|date",
             "plan_id"=>"nullable",
             "plan_name"=>"nullable",
+           'fcm_token' => 'required|string',
+           'device_id' => 'required|string',
+           'device_type' => 'nullable|string'
 
         ]);
 
@@ -28,10 +31,20 @@ class AuthController extends Controller
             "phone"=>$fields['phone'],
             'dob' => $fields['dob'],
             'plan_id' => $fields['plan_id'],
-            'plan_name' => $fields['plan_name'],
+            'plan_name' => $fields['plan_name']
 
         ]);
 
+        DeviceToken::updateOrCreate(
+            [
+                'user_id' => $user->id,
+                'device_id' => $fields['device_id'],
+            ],
+            [
+                'fcm_token' => $fields['fcm_token'],
+                'device_type' => $fields['device_type'] ?? null,
+            ]
+        );
 
         $token = $user->createToken('api_token')->plainTextToken;
         $user['token'] = $token;
@@ -60,6 +73,13 @@ class AuthController extends Controller
             'message' => 'User not found'
         ], 404);
     }
+    if ($this->hasExceededDeviceLimit($user->id)) {
+    return response()->json([
+        "status" => false,
+        "data" => [],
+        "message" => "You have reached the maximum number of allowed devices"
+    ], 403);
+}
 
     $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -102,5 +122,14 @@ public function logout(Request $request)
         "data"=>[],
         'message' => 'Logged out and device token removed'
     ]);
+}
+
+
+private function hasExceededDeviceLimit($user_id)
+{
+    $maxDevices = 1;
+    $deviceCount = DeviceToken::where('user_id', $user_id)->count();
+
+    return $deviceCount >= $maxDevices;
 }
 }
