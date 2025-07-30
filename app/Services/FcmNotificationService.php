@@ -74,11 +74,9 @@ public function sendNotification(array|string $tokensOrTopic, string $title, str
 
     }
 
-
-    dd($responses);
     
 
-    if (isset($responses['name'])) {
+    if (isset($responses[0]['name'])) {
 
 
     ModelsNotification::create([
