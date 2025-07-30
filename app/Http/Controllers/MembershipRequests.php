@@ -67,9 +67,11 @@ protected $firebaseService;
             $request->approval_status = $status;
             $tokens=$request->deviceTokens->pluck("fcm_token")->toArray();
 
+            dd($tokens);
+
             $response=$this->firebaseService->sendNotification($tokens, "tite", "test", ["type" => "token"], null,"tokens");
             
-        
+            
         
 
 
