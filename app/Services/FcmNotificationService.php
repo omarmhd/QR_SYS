@@ -70,6 +70,8 @@ public function sendNotification(array|string $tokensOrTopic, string $title, str
         ];
                 $response = $this->send($payload, $accessToken);
         $responses[] = json_decode($response, true);
+                    dd($responses);
+
 
     }
 
