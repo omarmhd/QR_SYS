@@ -73,6 +73,9 @@ public function sendNotification(array|string $tokensOrTopic, string $title, str
 
 
     }
+
+
+    dd($responses);
     
 
     if (isset($responses['name'])) {
@@ -83,8 +86,8 @@ public function sendNotification(array|string $tokensOrTopic, string $title, str
     'title' => $title,
     'body' => $body,
     'type' => $type,
-    'target' => $token,
     'data' => $data,
+    "is_read"=>0,
     'sent_at' => now(),
 ]);
 
