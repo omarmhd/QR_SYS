@@ -73,8 +73,7 @@ public function sendNotification(array|string $tokensOrTopic, string $title, str
 
 
     }
-                        dd($responses);
-
+    
 
     if (isset($responses['name'])) {
 
@@ -101,8 +100,9 @@ public function sendNotification(array|string $tokensOrTopic, string $title, str
             'Authorization: Bearer ' . $accessToken,
             'Content-Type: application/json',
         ]);
+
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(['message' => $payload]));
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
 
         $result = curl_exec($ch);
         curl_close($ch);
