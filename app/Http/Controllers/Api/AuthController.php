@@ -15,7 +15,7 @@ class AuthController extends Controller
         $fields = $request->validate([
             'name' => 'required|string',
             'email' => 'required|string|email|unique:users,email',
-            'phone'=>"required",
+            'phone'=>"required|unique:users,phone",
             "dob"=>"required|date",
             "plan_id"=>"nullable",
             "plan_name"=>"nullable",
@@ -34,6 +34,17 @@ class AuthController extends Controller
             'plan_name' => $fields['plan_name']
 
         ]);
+
+    $existing = DeviceToken::where('device_id', $fields['device_id'])
+    ->where('user_id', '!=', $user->id)
+    ->first();
+
+        if ($existing) {
+    return response()->json([
+        'status' => false,
+        'message' => 'This device is already registered with another email.',
+        ], 409); 
+}
 
         DeviceToken::updateOrCreate(
             [
@@ -73,7 +84,9 @@ class AuthController extends Controller
             'message' => 'User not found'
         ], 404);
     }
-    if ($this->hasExceededDeviceLimit($user->id)) {
+
+
+    if ($this->hasExceededDeviceLimit($user->id,$request->device_id)) {
     return response()->json([
         "status" => false,
         "data" => [],
@@ -125,11 +138,12 @@ public function logout(Request $request)
 }
 
 
-private function hasExceededDeviceLimit($user_id)
+private function hasExceededDeviceLimit($user_id,$device_id)
 {
     $maxDevices = 1;
+    $deviceExists = DeviceToken::where('device_id', $device_id)->exists();
     $deviceCount = DeviceToken::where('user_id', $user_id)->count();
 
-    return $deviceCount >= $maxDevices;
+    return $deviceCount >= $maxDevices and !$deviceExists ;
 }
 }
