@@ -12,6 +12,8 @@ Route::get('/user', function (Request $request) {
 
 Route::post("/register",[AuthController::class, "register"]); 
 Route::post("login",[AuthController::class, "login"]);
+Route::post("logout",[AuthController::class, "logout"])->middleware('auth:sanctum');
+
 Route::get("onboarding-screens",[PublicController::class, "onBoardingScreen"]);
 
 Route::get("plans",[PublicController::class, "plans"]);
