@@ -143,7 +143,6 @@ private function hasExceededDeviceLimit($user_id,$device_id)
     $maxDevices = 1;
     $deviceExists = DeviceToken::where('device_id', $device_id)->exists();
     $deviceCount = DeviceToken::where('user_id', $user_id)->count();
-
     return $deviceCount >= $maxDevices and !$deviceExists ;
 }
 }

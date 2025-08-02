@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\OnboardingScreenResource;
 use App\Models\OnboardingScreen;
 use App\Models\Plan;
+use App\Models\StaticContent;
 use Illuminate\Http\Request;
 
 class PublicController extends Controller
@@ -40,6 +41,23 @@ class PublicController extends Controller
             "status"=>true,
             'message' => '',
             "data"=>$plans]);
+    }
+
+    public function staticContent(){
+
+       $contents = StaticContent::select("key", "title", "content")
+    ->get()
+    ->mapWithKeys(function ($item) {
+        return [
+            $item->key => [
+                'title' => $item->title,
+                'content' => $item->content,
+            ]
+        ];
+    });
+
+        return response()->json(["status"=>true,"data"=>$contents]);
+
     }
 
 }

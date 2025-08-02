@@ -5,6 +5,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OnboardingScreenController;
 use App\Http\Controllers\PlanController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\StaticContentController;
 use App\Http\Controllers\UserController;
 use App\Models\OnboardingScreen;
 use Illuminate\Support\Facades\Route;
@@ -26,11 +27,16 @@ Route::middleware('auth')->group(function () {
     Route::resource("onboarding-screens",OnboardingScreenController::class);
 
     Route::resource("notifications",NotificationController::class);
+    Route::resource('/plans', PlanController::class);
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    Route::resource('/plans', PlanController::class);
+
+    Route::get("/static-contents",[StaticContentController::class,'edit'])->name("static_contents.edit");
+    Route::patch("/static-contents",[StaticContentController::class,'update'])->name("static_contents.update");
+
+
     
 
 });

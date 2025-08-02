@@ -15,5 +15,6 @@ Route::post("login",[AuthController::class, "login"]);
 Route::post("logout",[AuthController::class, "logout"])->middleware('auth:sanctum');
 
 Route::get("onboarding-screens",[PublicController::class, "onBoardingScreen"]);
+Route::get("static-contents",[PublicController::class, "staticContent"]);
 
 Route::get("plans",[PublicController::class, "plans"]);
