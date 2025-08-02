@@ -53,31 +53,38 @@ protected $firebaseService;
     }
 
 
-    public function changeStatus($id, $status)
-    {
-            $allowedStatuses = ['accepted', 'rejected'];
+public function changeStatus($id, $status)
+{
+    $allowedStatuses = ['accepted', 'rejected'];
 
-            if (!in_array($status, $allowedStatuses)) {
-                return redirect()->back()->with('error', 'Invalid status value.');
-            }
-
-            $request = User::findOrFail($id);
-
-            
-            $request->approval_status = $status;
-            $tokens=$request->deviceTokens->pluck("fcm_token")->toArray();
-            $message=$status=="accepted"?"":"";
-
-
-            $response=$this->firebaseService->sendNotification($tokens, "Your account status", "Congratulations, your application has been accepted.", ["type" => "token"], null,"tokens",$id);
-            
-            
-        
-
-
-            Mail::to($request->email)->send(new ApprovalMail($request));
-
-            $request->save();
-            return redirect()->back()->with('success', 'Status updated to ' . $status);
+    if (!in_array($status, $allowedStatuses)) {
+        return redirect()->back()->with('error', 'Invalid status value.');
     }
+
+    $user = User::findOrFail($id);
+    $user->approval_status = $status;
+
+    $notificationTitle = 'Your account status';
+    $notificationBody = $status === 'accepted'
+        ? 'Congratulations, your application has been accepted.'
+        : 'We’re sorry, your application has been rejected.';
+
+    $tokens = $user->deviceTokens->pluck('fcm_token')->toArray();
+    $this->firebaseService->sendNotification(
+        $tokens,
+        $notificationTitle,
+        $notificationBody,
+        ['type' => 'token'],
+        null,
+        'tokens',
+        $id
+    );
+
+    Mail::to($user->email)->send(new ApprovalMail($user));
+
+    $user->save();
+
+    return redirect()->back()->with('success', 'Status updated to ' . $status);
+}
+
 }
