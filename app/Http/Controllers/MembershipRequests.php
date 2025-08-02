@@ -69,7 +69,7 @@ protected $firebaseService;
             $message=$status=="accepted"?"":"";
 
 
-            $response=$this->firebaseService->sendNotification($tokens, "Your account status", "Congratulations, your application has been accepted.", ["type" => "token"], null,"tokens");
+            $response=$this->firebaseService->sendNotification($tokens, "Your account status", "Congratulations, your application has been accepted.", ["type" => "token"], null,"tokens",$id);
             
             
         

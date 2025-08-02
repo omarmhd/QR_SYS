@@ -27,7 +27,7 @@ class FcmNotificationService
         return $token['access_token'];
     }
 
-public function sendNotification(array|string $tokensOrTopic, string $title, string $body, array $data = [], ?string $image = null, string $type = 'tokens')
+public function sendNotification(array|string $tokensOrTopic, string $title, string $body, array $data = [], ?string $image = null, string $type = 'tokens',$user_id=null)
 {
     $accessToken = $this->getAccessToken();
     
@@ -80,7 +80,7 @@ public function sendNotification(array|string $tokensOrTopic, string $title, str
 
 
     ModelsNotification::create([
-    'user_id' => $userId ?? null,
+    'user_id' => $user_id ?? null,
     'title' => $title,
     'body' => $body,
     'type' => $type,
