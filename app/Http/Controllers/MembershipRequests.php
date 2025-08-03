@@ -53,6 +53,7 @@ protected $firebaseService;
     }
 
 
+
 public function changeStatus($id, $status)
 {
     $allowedStatuses = ['accepted', 'rejected'];
@@ -69,6 +70,7 @@ public function changeStatus($id, $status)
         ? 'Congratulations, your application has been accepted.'
         : 'We’re sorry, your application has been rejected.';
 
+    // Send push notification
     $tokens = $user->deviceTokens->pluck('fcm_token')->toArray();
     $this->firebaseService->sendNotification(
         $tokens,
@@ -80,7 +82,8 @@ public function changeStatus($id, $status)
         $id
     );
 
-    Mail::to($user->email)->send(new ApprovalMail($user));
+    // Send one mail class with status passed in
+    Mail::to($user->email)->send(new ApprovalMail($user, $status));
 
     $user->save();
 
