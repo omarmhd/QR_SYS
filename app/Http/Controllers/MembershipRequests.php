@@ -112,6 +112,8 @@ public function changeStatus($id, $status)
     $user=User::findorfail($id);
 
     $user->delete();
+    $user->deviceTokens()->delete();
+
 
     return redirect()->back()->with('success', 'request deleted successfully.');
 }
