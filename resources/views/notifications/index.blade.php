@@ -117,7 +117,6 @@
                           <th>Body / Message</th>
                           <th>Type</th>
                           <th>Sent At</th>
-                          <th>Action</th>
                          
                         </tr>
                       </thead>
