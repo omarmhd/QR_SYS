@@ -39,12 +39,12 @@ class AuthController extends Controller
     ->where('user_id', '!=', $user->id)
     ->first();
 
-        if ($existing) {
-    return response()->json([
-        'status' => false,
-        'message' => 'This device is already registered with another email.',
-        ], 409); 
-}
+//         if ($existing) {
+//     return response()->json([
+//         'status' => false,
+//         'message' => 'This device is already registered with another email.',
+//         ], 409); 
+// }
 
         DeviceToken::updateOrCreate(
             [
