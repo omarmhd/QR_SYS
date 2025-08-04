@@ -86,13 +86,13 @@ class AuthController extends Controller
     }
 
 
-    if ($this->hasExceededDeviceLimit($user->id,$request->device_id)) {
-    return response()->json([
-        "status" => false,
-        "data" => [],
-        "message" => "You have reached the maximum number of allowed devices"
-    ], 403);
-}
+//     if ($this->hasExceededDeviceLimit($user->id,$request->device_id)) {
+//     return response()->json([
+//         "status" => false,
+//         "data" => [],
+//         "message" => "You have reached the maximum number of allowed devices"
+//     ], 403);
+// }
 
     $token = $user->createToken('auth_token')->plainTextToken;
 
