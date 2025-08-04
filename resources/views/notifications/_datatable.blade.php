@@ -23,10 +23,6 @@
                    {
                        data: 'sent_at',
                        name: "sent_at"
-                   },
-                   {
-                       data: 'action',
-                       name: "action"
                    }
 
 
