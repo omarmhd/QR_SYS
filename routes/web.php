@@ -23,6 +23,8 @@ Route::middleware('auth')->group(function () {
     Route::get("/",[MembershipRequests::class,'index'])->name("requests.index");
     Route::get('/requests/{id}/change-status/{status}', [MembershipRequests::class, 'changeStatus'])
     ->name('requests.changeStatus');
+
+    Route::delete("requests/{id}",[MembershipRequests::class,"destroy"])->name("requests.destroy");
  
     Route::resource("onboarding-screens",OnboardingScreenController::class);
 
