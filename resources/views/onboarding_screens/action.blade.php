@@ -61,6 +61,9 @@
           @if($screen->id)
           @method('PUT')
           @endif
+        @php
+            $locales = \App\LocaleEnum::cases();
+        @endphp
 
           <div class="card">
             <div class="card-header">
@@ -69,19 +72,68 @@
               </h3>
             </div>
             <div class="card-body">
-              <div class="row row-cards">
+
+
+                  @if  ($errors->any())
+        <div class="alert alert-danger" role="alert">
+          <div class="alert-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round"
+              class="icon alert-icon icon-2">
+              <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" />
+              <path d="M12 8v4" />
+              <path d="M12 16h.01" />
+            </svg>
+          </div>
+          <div>
+            <h4 class="alert-heading">Please fix the following:</h4>
+            <div class="alert-description">
+              <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                  <li>{{ $error }}</li>
+                @endforeach
+              </ul>
+            </div>
+          </div>
+        </div>
+      @endif
+                      <ul class="nav nav-tabs" role="tablist">
+            @foreach($locales as $locale)
+                <li class="nav-item">
+                    <a class="nav-link @if ($loop->first) active @endif"
+                       data-bs-toggle="tab"
+                       href="#features-{{ $locale->value }}">
+                        {{ $locale->label() }}
+                    </a>
+                </li>
+            @endforeach
+        </ul>
+        <div class="tab-content">
+
+
+            @foreach($locales as $locale)
+                             <div class="tab-pane fade @if ($loop->first) show active @endif" id="features-{{ $locale->value }}" role="tabpanel">
+                    <div id="features-wrapper-{{ $locale->value }}">
+                              <div class="row row-cards">
                 <div class="mb-3 col-sm-8 col-md-10">
-                  <label class="form-label required">Title</label>
-                  <input name="title" type="text" class="form-control"
-                    value="{{ old('title', $screen->title) }}">
+                  <label class="form-label required">Title({{ $locale->value }})</label>
+                  <input name="title[{{ $locale->value }}]" type="text" class="form-control"
+                    value="{{ old('title.'.$locale->value, $screen->title[$locale->value] ?? '') }}" required>
                 </div>
               </div>
               <div class="row row-cards">
                 <div class="mb-3 col-sm-8 col-md-10">
-                  <label class="form-label required">Description</label>
-                  <textarea name="description" class="form-control">{{ old('description', $screen->description) }}</textarea>
+
+                  <label class="form-label required">Description({{ $locale->value }})</label>
+                  <textarea name="description[{{$locale->value}}]" class="form-control" required>{{ old('description.'.$locale->value, $screen->description[$locale->value]??"") }}</textarea>
                 </div>
               </div>
+                    </div>
+                             </div>
+            @endforeach
+        </div>
+
               <div class="row row-cards">
 
 

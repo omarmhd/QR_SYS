@@ -60,23 +60,54 @@
 
   <div class="row row-cards">
 
-    @foreach($contents as $key => $value)
-      <div class="col-12">
-        <div class="card mb-3">
-          <div class="card-header">
-            <h3 class="card-title text-capitalize">{{ str_replace('_', ' ', $key) }}</h3>
-          </div>
-          <div class="card-body">
-          <label class="form-label required">Title</label>
-            <input class="form-control" type="text" name="titles[{{$key}}]" value="{{$value['title']}}" id="">
-            <br>
-            <label class="form-label required">Content</label>
+      @php
+          $locales = \App\LocaleEnum::cases();
+      @endphp
 
-            <textarea class="form-control" name="pages[{{ $key }}]" rows="6">{{$value["content"]}}</textarea>
-          </div>
-        </div>
+      <ul class="nav nav-tabs" role="tablist">
+          @foreach($locales as $locale)
+              <li class="nav-item">
+                  <a class="nav-link @if ($loop->first) active @endif"
+                     data-bs-toggle="tab"
+                     href="#tab-{{ $locale->value }}">
+                      {{ $locale->label() }}
+                  </a>
+              </li>
+          @endforeach
+      </ul>
+
+      <div class="tab-content mt-3">
+          @foreach($locales as $locale)
+              <div class="tab-pane fade @if ($loop->first) show active @endif"
+                   id="tab-{{ $locale->value }}" role="tabpanel">
+
+                  @foreach($contents as $key => $value)
+
+                      <div class="col-12">
+                          <div class="card mb-3">
+                              <div class="card-header">
+                                  <h3 class="card-title text-capitalize">{{ str_replace('_', ' ', $key) }}</h3>
+                              </div>
+                              <div class="card-body">
+                                  <label class="form-label required">Title ({{ $locale->value }})</label>
+                                  <input class="form-control" type="text"
+                                         name="titles[{{$key}}][{{ $locale->value }}]"
+                                         value="{{ $value['title'][$locale->value] ?? '' }}">
+
+                                  <br>
+
+                                  <label class="form-label required">Content ({{ $locale->value }})</label>
+                                  <textarea class="form-control"
+                                            name="pages[{{ $key }}][{{ $locale->value }}]"
+                                            rows="6">{{ $value['content'][$locale->value] ?? '' }}</textarea>
+                              </div>
+                          </div>
+                      </div>
+                  @endforeach
+
+              </div>
+          @endforeach
       </div>
-    @endforeach
   </div>
 
   <div class="card-footer text-end">

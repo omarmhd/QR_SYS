@@ -47,11 +47,9 @@ class AuthController extends Controller
 // }
 
         DeviceToken::updateOrCreate(
+            ['user_id' => $user->id],
             [
-                'user_id' => $user->id,
                 'device_id' => $fields['device_id'],
-            ],
-            [
                 'fcm_token' => $fields['fcm_token'],
                 'device_type' => $fields['device_type'] ?? null,
             ]
@@ -97,11 +95,9 @@ class AuthController extends Controller
     $token = $user->createToken('auth_token')->plainTextToken;
 
     DeviceToken::updateOrCreate(
+        ['user_id' => $user->id],
         [
-            'user_id' => $user->id,
             'device_id' => $fields['device_id'],
-        ],
-        [
             'fcm_token' => $fields['fcm_token'],
             'device_type' => $fields['device_type'] ?? null,
         ]

@@ -11,11 +11,8 @@ class PlanController extends Controller
     public function index(Request $request)
     {
         $plans=plan::all();
-
-
-
         return view("plans.index",["plans"=>$plans]);
-      
+
     }
 
     public function create(){
@@ -29,38 +26,40 @@ class PlanController extends Controller
 
     public function store(Request $request){
         $validated = $request->validate([
-        'name' => 'required|string|max:255',
+        'name.*' => 'required',
         'price' => 'required|numeric',
         'guest_passes_per_year' => 'required|integer',
         'currency' => 'required|in:EUR,USD',
         'billing_type' => 'required|in:day,month,year',
         'features' => 'required|array|min:1',
-        'features.*' => 'required|string|max:255',
+        'features.*' => 'required',
     ]);
+
+
         $plan = new Plan();
-        $plan->name = $request->name;
+        $plan->name = $request->name;;
         $plan->price = $request->price;
         $plan->guest_passes_per_year = $request->guest_passes_per_year;
         $plan->currency = $request->currency;
         $plan->billing_type = $request->billing_type;
         $plan->is_popular = $request->has('is_popular');
-        $plan->features = json_encode($request->features); 
+        $plan->features = $request->features;
         $plan->save();
 
         return redirect()->back()->with('success', 'Plan created successfully');
 
     }
 
-public function update(Request $request, Plan $plan)
-{
+    public function update(Request $request, Plan $plan)
+    {
     $validated = $request->validate([
-        'name' => 'required|string|max:255',
+        'name.*' => 'required',
         'price' => 'required|numeric',
         'guest_passes_per_year' => 'required|integer',
         'currency' => 'required|in:EUR,USD',
         'billing_type' => 'required|in:day,month,year',
         'features' => 'required|array|min:1',
-        'features.*' => 'required|string|max:255',
+        'features.*' => 'required',
     ]);
 
     $plan->name = $request->name;
@@ -69,7 +68,7 @@ public function update(Request $request, Plan $plan)
     $plan->currency = $request->currency;
     $plan->billing_type = $request->billing_type;
     $plan->is_popular = $request->has('is_popular');
-    $plan->features = json_encode($request->features); 
+    $plan->features = $request->features;
     $plan->save();
 
     return redirect()->back()->with('success', 'Plan updated successfully');

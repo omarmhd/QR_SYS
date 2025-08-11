@@ -234,6 +234,54 @@
     </script>
 @endif
 
+<script src="https://unpkg.com/just-validate@latest/dist/just-validate.production.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    document.querySelectorAll('form').forEach(form => {
+
+        const validator = new JustValidate(form, {
+            errorFieldCssClass: 'is-invalid',
+            errorLabelStyle: {
+                color: '#d63939',
+                fontSize: '0.85rem',
+                marginTop: '4px'
+            }
+        });
+
+        form.querySelectorAll('[required]').forEach(field => {
+            const selector = field.name ? `[name="${field.name}"]` : `#${field.id}`;
+            validator.addField(selector, [
+                { rule: 'required', errorMessage: field.dataset.error || 'This field is required' }
+            ]);
+        });
+
+validator.onFail(function () {
+        const firstErrorField = form.querySelector('.is-invalid');
+        if (!firstErrorField) return;
+
+        const tabPane = firstErrorField.closest('.tab-pane');
+        if (tabPane) {
+            const tabLink = document.querySelector(`.nav-tabs a[href="#${tabPane.id}"]`);
+            if (tabLink) {
+                new bootstrap.Tab(tabLink).show();
+            }
+        }
+
+        setTimeout(() => firstErrorField.focus(), 200);
+    });
+
+
+        validator.onSuccess(function () {
+            form.submit();
+        });
+
+    });
+
+});
+</script>
+
+
     <!-- END PAGE SCRIPTS -->
   </body>
 </html>

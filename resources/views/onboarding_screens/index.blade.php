@@ -108,12 +108,12 @@
                     <span>No image</span>
                     @endif
                   </td>
-                  <td>{{$screen->title}}</td>
-                  <td>{{$screen->description}} </td>
+                  <td>{{$screen->title["en"]}}</td>
+                  <td>{{$screen->description["en"]}} </td>
                   <td>
                     {{-- Edit Button --}}
-                    <a href="{{ route('onboarding-screens.edit', $screen->id) }}" class="btn btn-sm btn-primary">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-edit">
+                    <a href="{{ route('onboarding-screens.edit', $screen->id) }}" class="btn btn-bg btn-primary">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="25" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-edit">
                         <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                         <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1" />
                         <path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z" />
@@ -123,7 +123,7 @@
                     <form action="{{ route('onboarding-screens.destroy', $screen->id) }}" method="POST" style="display:inline;" class="delete-form">
                       @csrf
                       @method('DELETE')
-                      <button type="submit" class="btn btn-sm btn-danger delete-btn">
+                      <button type="submit" class="btn btn-bg btn-danger delete-btn">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-trash">
                           <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                           <path d="M4 7l16 0" />

@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\OnboardingScreenResource;
+use App\Http\Resources\PlanResource;
+use App\Http\Resources\StaticContentResource;
 use App\Models\OnboardingScreen;
 use App\Models\Plan;
 use App\Models\StaticContent;
@@ -11,7 +13,10 @@ use Illuminate\Http\Request;
 
 class PublicController extends Controller
 {
-    public function onBoardingScreen(){
+    public function onBoardingScreen(Request $request){
+
+        $language = $request->header('Accept-Language', 'en');
+
         $screens=OnboardingScreen::all();
 
         if($screens->isEmpty()){
@@ -19,7 +24,7 @@ class PublicController extends Controller
                 "status"=>false,
                 "data"=>[],
                 'message' => 'No screens found',
-                
+
             ], 404);
         }
         return response()->json(["status"=>true,"data"=>OnboardingScreenResource::collection($screens)]);
@@ -37,26 +42,27 @@ class PublicController extends Controller
 
             ], 404);
         }
-        return response()->json([
-            "status"=>true,
-            'message' => '',
-            "data"=>$plans]);
+
+
+        return response()->json(["status"=>true,"data"=>PlanResource::collection($plans)]);
+
     }
 
     public function staticContent(){
+        $contents = StaticContent::all();
 
-       $contents = StaticContent::select("key", "title", "content")
-    ->get()
-    ->mapWithKeys(function ($item) {
-        return [
-            $item->key => [
-                'title' => $item->title,
-                'content' => $item->content,
-            ]
-        ];
-    });
+//       $contents = StaticContent::select("key", "title", "content")
+//    ->get()
+//    ->mapWithKeys(function ($item) {
+//        return [
+//            $item->key => [
+//                'title' => $item->title,
+//                'content' => $item->content,
+//            ]
+//        ];
+//    });
 
-        return response()->json(["status"=>true,"data"=>$contents]);
+        return response()->json(["status"=>true,"data"=>StaticContentResource::collection($contents)]);
 
     }
 

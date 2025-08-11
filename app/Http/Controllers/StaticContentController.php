@@ -19,14 +19,16 @@ class StaticContentController extends Controller
             ]
         ];
     });
-   
+
 
 ;
         return view("static_content.action",["contents"=>$contents]);
-    
+
     }
 
     public function update(Request $request){
+
+
 
         foreach($request->pages as $key=>$content){
 
@@ -37,7 +39,7 @@ class StaticContentController extends Controller
         }
        return back()->with('success', 'Pages updated successfully');
 
-        
-        
+
+
     }
 }

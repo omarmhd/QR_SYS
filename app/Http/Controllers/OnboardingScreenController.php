@@ -33,8 +33,8 @@ class OnboardingScreenController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
+            'title.*' => 'required|max:255',
+            'description.*' => 'required',
             'image' => 'required|image|max:2048',
         ]);
 
@@ -60,8 +60,8 @@ class OnboardingScreenController extends Controller
         $screen = OnboardingScreen::findOrFail($id);
 
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
+            'title.*' => 'required|max:255',
+            'description.*' => 'required',
             'image' => 'nullable|image|max:2048',
         ]);
 

@@ -67,14 +67,12 @@
           </div>
           @endif
           <div class="card-body text-center">
-            <div class="text-uppercase text-secondary font-weight-medium">{{$plan->name}}</div>
+            <div class="text-uppercase text-secondary font-weight-medium">{{$plan->name["en"]}}</div>
             <div class="display-5 fw-bold my-3">{{$plan->price}}</div>
             <ul class="list-unstyled lh-lg">
               <li><strong>{{$plan->guest_passes_per_year}}</strong> Users</li>
-              @php
-              $features = json_decode($plan->features);
-              @endphp
-              @foreach ($features as $feature)
+      
+              @foreach ($plan->features["en"] as $feature)
               <li>
 
                 <!-- Icon -->

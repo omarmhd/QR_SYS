@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class OnboardingScreenResource extends JsonResource
+class StaticContentResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -14,13 +14,11 @@ class OnboardingScreenResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+
         $language = $request->header('Accept-Language', 'en');
 
         return [
-            "title"=>$this->title[$language],
-            "description"=>$this->description[$language],
-            "image"=> asset('storage/'.$this->image)
-
-        ];
+            $this->key=> ["title"=> $this->title[$language],
+                    "content"=>$this->content[$language]]];
     }
 }
