@@ -12,8 +12,9 @@ class KapriEventController extends Controller
     public function handle(Request $request)
     {
         $event = $request->json()->all();
-        Log::info('QR Scan received',"before type");
-
+        Log::info('QR Scan received - before type', [
+            'event' => "test"
+        ]);
         if (!empty($event['msgType']) && $event['msgType'] === 'on_uart_receive') {
 
             $token = $event['msgArg']['sData'] ?? null;
