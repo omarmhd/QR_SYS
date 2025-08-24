@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class KapriEventController extends Controller
 {
@@ -12,21 +13,21 @@ class KapriEventController extends Controller
     {
         $event = $request->json()->all();
 
-        if ($event['msgType'] === 'on_qr_read') {
-            $token = $event['msgArg']['data'] ?? null;
+        if (!empty($event['msgType']) && $event['msgType'] === 'on_uart_receive') {
 
-            if ($token && $order = Order::where('qr_token', $token)->where('used', false)->first()) {
-                $order->update(['used' => true]);
+            $token = $event['msgArg']['sData'] ?? null;
 
-                $this->openGate();
+            $extraUid = $event['msgArg']['oExtra']['lblmgr']['uid'] ?? null;
 
-                return response()->json(['status' => 'success', 'action' => 'gate opened']);
-            }
+            Log::info('QR Scan received', [
+                'token' => $token,
+                'extra_uid' => $extraUid
+            ]);
+
         }
 
         return response()->json(['status' => 'denied']);
     }
-
     private function openGate()
     {
         $deviceIp = "192.168.1.100";
