@@ -25,7 +25,7 @@ Route::get('/', function () {
 
 Route::middleware('auth')->group(function () {
 
-    Route::resource("/users",UserController::class);
+    Route::resource("users",UserController::class);
 
     Route::get("/requests",[MembershipRequests::class,'index'])->name("requests.index");
     Route::get('/requests/{id}/change-status/{status}', [MembershipRequests::class, 'changeStatus'])
