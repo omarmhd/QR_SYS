@@ -7,7 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 
-class UserController extends Controller
+class  UserController extends Controller
 {
 
     public function index(Request $request)

@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\LoungesResource;
 use App\Http\Resources\OnboardingScreenResource;
 use App\Http\Resources\PlanResource;
 use App\Http\Resources\StaticContentResource;
+use App\Models\Lounge;
 use App\Models\OnboardingScreen;
 use App\Models\Plan;
+use App\Models\ServiceRequest;
 use App\Models\StaticContent;
 use Illuminate\Http\Request;
 
@@ -63,6 +66,28 @@ class PublicController extends Controller
 //    });
 
         return response()->json(["status"=>true,"data"=>StaticContentResource::collection($contents)]);
+
+    }
+
+    public function lounges(){
+        $lounges=Lounge::all();
+        return response()->json(["status"=>true,"data"=>LoungesResource::collection($lounges)]);
+
+    }
+
+    public function storePrivateService(Request $request){
+        $fields = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'service_id' => 'required|exists:services,id',
+            'full_name'=>"required|string",
+            "booking_date"=>"required|date",
+            "guest_number"=>"required",
+            "cigar_type"=>"nullable",
+            'notes' => 'nullable'
+
+        ]);
+        ServiceRequest::create($fields);
+        return response()->json(["status"=>true,"message"=>"Your request has been sent successfully"]);
 
     }
 

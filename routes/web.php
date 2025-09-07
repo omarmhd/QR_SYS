@@ -45,6 +45,11 @@ Route::middleware('auth')->group(function () {
     Route::get("/static-contents",[StaticContentController::class,'edit'])->name("static_contents.edit");
     Route::patch("/static-contents",[StaticContentController::class,'update'])->name("static_contents.update");
 
+    Route::resource("/lounges",\App\Http\Controllers\LoungeController::class);
+    Route::resource("/features",\App\Http\Controllers\FeatureController::class);
+    Route::resource("/services",\App\Http\Controllers\ServiceController::class);
+    Route::resource("service-requests",\App\Http\Controllers\ServiceRequestController::class);
+
 
 
 

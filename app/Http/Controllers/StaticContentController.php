@@ -9,9 +9,7 @@ class StaticContentController extends Controller
 {
     public function edit(){
 
-        $contents=StaticContent::select("key", "title", "content")
-    ->get()
-    ->mapWithKeys(function ($item) {
+    $contents=StaticContent::select("key", "title", "content")->get()->mapWithKeys(function ($item) {
         return [
             $item->key => [
                 'title' => $item->title,
@@ -19,27 +17,17 @@ class StaticContentController extends Controller
             ]
         ];
     });
-
-
-;
         return view("static_content.action",["contents"=>$contents]);
-
     }
 
     public function update(Request $request){
 
-
-
         foreach($request->pages as $key=>$content){
-
             StaticContent::where("key",$key)->update([
                 "title"=>$request->titles[$key],
                 "content"=>$content
             ]);
         }
-       return back()->with('success', 'Pages updated successfully');
-
-
-
+           return back()->with('success', 'Pages updated successfully');
     }
 }

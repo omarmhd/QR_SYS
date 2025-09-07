@@ -119,7 +119,7 @@
         </ul>
         <div class="tab-content">
             @foreach($locales as $locale)
-        
+
                 <div class="tab-pane fade @if ($loop->first) show active @endif" id="name-{{ $locale->value }}" role="tabpanel">
                     <input name="name[{{ $locale->value }}]" type="text" class="form-control"
                           value="{{ old('name.'.$locale->value, $plan->name[$locale->value] ?? '') }}" required>
@@ -191,16 +191,16 @@
                         @php
                             $features = old('features.'.$locale->value,$plan->features[$locale->value] ?? ['']);
                             @endphp
-                        
+
                         @foreach ($features as $feature)
                             <div class="input-group mb-2">
-                                <input type="text" name="features[{{ $locale->value }}][]" class="form-control" 
+                                <input type="text" name="features[{{ $locale->value }}][]" class="form-control"
                                       placeholder="" value="{{ $feature }}" required>
                                 <button type="button" class="btn btn-danger" onclick="this.parentElement.remove()">❌</button>
                             </div>
                         @endforeach
                     </div>
-                    <button type="button" class="btn btn-outline-primary btn-sm" 
+                    <button type="button" class="btn btn-outline-primary btn-sm"
                             onclick="addFeatureField('{{ $locale->value }}')">➕ Add</button>
                 </div>
             @endforeach
@@ -208,7 +208,7 @@
     </div>
 </div>
 
-  
+
   <div class="card-footer text-end">
       <button type="submit" class="btn btn-primary">
           {{ isset($plan) ? 'Update Plan' : 'Create Plan' }}
@@ -217,18 +217,6 @@
 
 </form>
 
-<script>
-    function addFeatureField(locale) {
-        const wrapper = document.getElementById(`features-wrapper-${locale}`);
-        const newField = document.createElement('div');
-        newField.className = 'input-group mb-2';
-        newField.innerHTML = `
-            <input type="text" name="features[${locale}][]" class="form-control" placeholder="" required>
-            <button type="button" class="btn btn-danger" onclick="this.parentElement.remove()">❌</button>
-        `;
-        wrapper.appendChild(newField);
-    }
-</script>
 
 
       </div>
@@ -263,7 +251,6 @@
     wrapper.appendChild(div);
   });
 </script>
-
 
 
 

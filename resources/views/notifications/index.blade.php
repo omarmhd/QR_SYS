@@ -1,7 +1,7 @@
-@extends("layouts.app")   
+@extends("layouts.app")
 
 @section("content")
-      
+
       <div class="page-header d-print-none">
           <div class="container-xl">
             <div class="row g-2 align-items-center">
@@ -20,7 +20,7 @@
               <path d="M12 5l0 14"></path>
               <path d="M5 12l14 0"></path>
             </svg>
-            Add Notification 
+            Add Notification
           </a>                  </span>
                     <!--
                   <a href="#" class="btn btn-primary btn-5 d-none d-sm-inline-block" data-bs-toggle="modal" data-bs-target="#modal-report">
@@ -117,19 +117,19 @@
                           <th>Body / Message</th>
                           <th>Type</th>
                           <th>Sent At</th>
-                         
+
                         </tr>
                       </thead>
-                      
+
                       <tbody>
 
 
-                       
-       
+
+
                       </tbody>
                     </table>
                   </div>
-        
+
                 </div>
               </div>
           </div>
@@ -140,5 +140,5 @@
 
         @push("js")
         @include("notifications._datatable")
-          
+
         @endpush

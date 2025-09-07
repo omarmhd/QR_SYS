@@ -16,7 +16,9 @@ Route::post("logout",[AuthController::class, "logout"])->middleware('auth:sanctu
 
 Route::get("onboarding-screens",[PublicController::class, "onBoardingScreen"]);
 Route::get("static-contents",[PublicController::class, "staticContent"]);
+Route::get("lounges",[PublicController::class,"lounges"]);
 
 Route::get("plans",[PublicController::class, "plans"]);
+Route::post("private-requests",[PublicController::class, "storePrivateService"]);
 
 Route::post('/kapri/event', [\App\Http\Controllers\Api\KapriEventController::class, 'handle']);

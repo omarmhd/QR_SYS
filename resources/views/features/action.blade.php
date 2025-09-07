@@ -8,7 +8,7 @@
     <div class="row g-2 align-items-center">
       <div class="col">
         <!-- Page pre-title -->
-        <div class="page-pretitle">Onboarding Screens</div>
+        <div class="page-pretitle">features</div>
         <h2 class="page-title"></h2>
       </div>
       <!-- Page title actions -->
@@ -56,19 +56,17 @@
     <div class="row  row-cards">
       <div class="col-12">
 
-        <form action="{{ $screen->id ? route('onboarding-screens.update', $screen->id) : route('onboarding-screens.store') }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ $feature->id ? route('features.update', $feature->id) : route('features.store') }}" method="POST" enctype="multipart/form-data">
           @csrf
-          @if($screen->id)
+          @if($feature->id)
           @method('PUT')
           @endif
-        @php
-            $locales = \App\LocaleEnum::cases();
-        @endphp
+
 
           <div class="card">
             <div class="card-header">
               <h3 class="card-title">
-                {{ $screen->id ? 'Edit OnBoarding Screen' : 'Add New OnBoarding Screen' }}
+                {{ $feature->id ? 'Edit Feature' : 'Add New Feature' }}
               </h3>
             </div>
             <div class="card-body">
@@ -113,22 +111,16 @@
 
 
             @foreach($locales as $locale)
-                             <div class="tab-pane fade @if ($loop->first) show active @endif" id="features-{{ $locale->value }}" role="tabpanel">
+                <div class="tab-pane fade @if ($loop->first) show active @endif" id="features-{{ $locale->value }}" role="tabpanel">
                     <div id="features-wrapper-{{ $locale->value }}">
-                              <div class="row row-cards">
+                        <div class="row row-cards">
                 <div class="mb-3 col-sm-8 col-md-10">
-                  <label class="form-label required">Title({{ $locale->value }})</label>
-                  <input name="title[{{ $locale->value }}]" type="text" class="form-control"
-                    value="{{ old('title.'.$locale->value, $screen->title[$locale->value] ?? '') }}" required>
+                  <label class="form-label required">Name ({{ $locale->value }})</label>
+                  <input name="name[{{ $locale->value }}]" type="text" class="form-control"
+                    value="{{ old('name.'.$locale->value, $feature->name[$locale->value] ?? '') }}" required>
                 </div>
               </div>
-              <div class="row row-cards">
-                <div class="mb-3 col-sm-8 col-md-10">
 
-                  <label class="form-label required">Description({{ $locale->value }})</label>
-                  <textarea name="description[{{$locale->value}}]" class="form-control" required>{{ old('description.'.$locale->value, $screen->description[$locale->value]??"") }}</textarea>
-                </div>
-              </div>
                     </div>
                              </div>
             @endforeach
@@ -137,12 +129,11 @@
               <div class="row row-cards">
 
 
-
                 <div class="mb-3">
-                  <label class="form-label">Upload Image</label>
-                  <input type="file" name="image" class="form-control" id="imageInput" accept="image/*">
+                  <label class="form-label">Upload Icon</label>
+                  <input type="file" name="icon" class="form-control" id="imageInput" accept="image/*">
                   <div class="mt-3">
-                    <img id="imagePreview" src="{{ isset($screen->image) ? asset('storage/' . $screen->image) : '#' }}"
+                    <img id="imagePreview" src="{{ isset($feature->icon) ? asset('storage/' . $feature->icon) : '#' }}"
                       style="max-height: 200px; display: {{ isset($screen->image) ? 'block' : 'none' }};">
                   </div>
                 </div>
@@ -150,7 +141,7 @@
             </div>
             <div class="card-footer text-end">
               <button type="submit" class="btn btn-primary">
-                {{ $screen->id ? 'Update' : 'Save' }}
+                {{ $feature->id ? 'Update' : 'Save' }}
               </button>
             </div>
           </div>
