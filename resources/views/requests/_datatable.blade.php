@@ -5,6 +5,8 @@
                serverSide: false,
                ajax: "{{route('requests.index')}}",
                columns: [{
+                   data:"checkbox",
+                   name:"checkbox"},{
                        data: 'id',
                        name: 'id'
                    },

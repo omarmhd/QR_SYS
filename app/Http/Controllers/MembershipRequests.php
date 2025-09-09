@@ -28,6 +28,18 @@ protected $firebaseService;
 
                 ->editColumn('name', function ($row) {
                     return '<strong>' . e($row->name) . '</strong>';
+                })->editColumn("approval_status",function ($row){
+                    if ($row->approval_status=="pending"){
+                        return '<span class="badge bg-warning me-1"></span> <strong>' . strtoupper($row->approval_status) . '</strong>';
+                    }else if ($row->approval_status=="rejected"){
+                        return '<span class="badge bg-danger me-1"></span> <strong>' . strtoupper($row->approval_status) . '</strong>';
+                    }else{
+                        return '<span class="badge bg-success me-1"></span> <strong>' . strtoupper($row->approval_status) . '</strong>';
+
+                    }
+
+                })->addColumn('checkbox', function ($row) {
+                    return '<input type="checkbox" name="selected_users[]" value="' . $row->id . '" class="form-check-input m-0 align-middle">';
                 })->addColumn('actions', function ($row) {
                     $acceptUrl = route('requests.changeStatus', ['id' => $row->id, 'status' => 'accepted']);
                     $rejectUrl = route('requests.changeStatus', ['id' => $row->id, 'status' => 'rejected']);
@@ -36,7 +48,7 @@ protected $firebaseService;
 
                     return '
         <span class="dropdown">
-            <button class="btn btn-sm btn-primary dropdown-toggle" data-bs-toggle="dropdown">Actions</button>
+            <button class="btn btn-primary btn-5 d-none d-sm-inline-block  dropdown-toggle" data-bs-toggle="dropdown">Actions</button>
             <div class="dropdown-menu">
                 <a class="dropdown-item" href="' . $acceptUrl . '">Accept</a>
                 <a class="dropdown-item" href="' . $rejectUrl . '">Reject</a>
@@ -62,7 +74,7 @@ protected $firebaseService;
 
 
 
-                ->rawColumns(['name', 'actions'])
+                ->rawColumns(['name',"approval_status", 'actions','checkbox'])
                 ->make(true);
         }
 

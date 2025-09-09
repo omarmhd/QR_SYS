@@ -11,6 +11,18 @@ class KapriEventController extends Controller
 {
     public function handle(Request $request)
     {
+        $response = Http::withHeaders([
+            'Content-Type' => 'application/json',
+        ])->post('http://192.168.0.248:9445/api/instruction', [
+            "msgType" => "ins_inout_buzzer_operate",
+            "msgArg" => [
+                "sPosition" => "main",
+                "sMode" => "on",
+                "ucTime_ds" => 30
+            ]
+        ]);
+        $data = $response->json(); // إذا كانت الاستجابة JSON
+        return $data;
         $event = $request->json()->all();
             Log::info('QR Scan received - before type', [
                 'event' => "test"

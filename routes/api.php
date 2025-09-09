@@ -21,4 +21,4 @@ Route::get("lounges",[PublicController::class,"lounges"]);
 Route::get("plans",[PublicController::class, "plans"]);
 Route::post("private-requests",[PublicController::class, "storePrivateService"]);
 
-Route::post('/kapri/event', [\App\Http\Controllers\Api\KapriEventController::class, 'handle']);
+Route::match(['get', 'post'], '/kapri/event', [\App\Http\Controllers\Api\KapriEventController::class, 'handle']);

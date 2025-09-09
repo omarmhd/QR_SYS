@@ -1,7 +1,7 @@
-@extends("layouts.app")   
+@extends("layouts.app")
 
 @section("content")
-      
+
       <div class="page-header d-print-none">
           <div class="container-xl">
             <div class="row g-2 align-items-center">
@@ -99,7 +99,7 @@
                     <table id="users-table" class="table table-selectable card-table table-vcenter text-nowrap datatable">
                            <thead>
                         <tr>
-                          <!-- <th class="w-1"><input class="form-check-input m-0 align-middle" type="checkbox" aria-label="Select all invoices"></th> -->
+                         <th class="w-1"><input class="form-check-input m-0 align-middle" type="checkbox" aria-label="Select all invoices"></th>
                           <th class="w-1">
                            #
                             <!-- Download SVG icon from http://tabler.io/icons/icon/chevron-up -->
@@ -116,7 +116,7 @@
                           <th>Action </th>
                         </tr>
                       </thead>
-                      
+
                       <tbody>
                         <!-- <tr>
                           <td><input class="form-check-input m-0 align-middle table-selectable-check" type="checkbox" aria-label="Select invoice"></td>
@@ -141,12 +141,12 @@
                           </td>
                         </tr> -->
 
-                       
-       
+
+
                       </tbody>
                     </table>
                   </div>
-        
+
                 </div>
               </div>
           </div>
@@ -157,5 +157,5 @@
 
 
       @push("js")
-      @include("requests._datatable")        
+      @include("requests._datatable")
       @endpush
