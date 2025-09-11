@@ -59,7 +59,7 @@ class LoungeController extends Controller
 
         $lounge->features()->attach($validated["features"]);
 
-        return redirect()->back()->with('success', 'Lounges created successfully');
+        return redirect()->route('lounges.index')->with('success', 'Lounges created successfully');
 
 
     }
