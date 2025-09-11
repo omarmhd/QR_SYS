@@ -1,6 +1,6 @@
    <script>
        $(document).ready(function() {
-           $('#users-table').DataTable({
+           var table=$('#users-table').DataTable({
                processing: true,
                serverSide: false,
                ajax: "{{route('requests.index')}}",
@@ -45,5 +45,23 @@
                ]
 
            });
+
+           $('#check-all').on('click', function () {
+
+
+               var rows = table.rows({ 'page': 'current' }).nodes();
+               $('input[type="checkbox"].row-check', rows).prop('checked', this.checked);
+           });
+           $('#users-table tbody').on('change', 'input.row-check', function () {
+               if (!this.checked) {
+                   var el = $('#checkAll').get(0);
+                   if (el && el.checked) {
+                       el.checked = false;
+                   }
+               }
+           });
+
        });
+
+
    </script>

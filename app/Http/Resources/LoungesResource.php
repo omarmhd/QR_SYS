@@ -21,7 +21,7 @@ class LoungesResource extends JsonResource
         return [
             "name"=>$this->name[$language],
             "excerpt"=>$this->excerpt[$language],
-            "description"=> asset('storage/'.$this->image),
+            "description"=> $this->description[$language],
             "open_time"=> $this->open_time,
             "close_time"=> $this->close_time,
             "image"=> asset('storage/'.$this->image),

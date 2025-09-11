@@ -39,7 +39,7 @@ protected $firebaseService;
                     }
 
                 })->addColumn('checkbox', function ($row) {
-                    return '<input type="checkbox" name="selected_users[]" value="' . $row->id . '" class="form-check-input m-0 align-middle">';
+                    return '<input type="checkbox" name="selected_users[]" value="' . $row->id . '" class="form-check-input m-0 align-middle row-check">';
                 })->addColumn('actions', function ($row) {
                     $acceptUrl = route('requests.changeStatus', ['id' => $row->id, 'status' => 'accepted']);
                     $rejectUrl = route('requests.changeStatus', ['id' => $row->id, 'status' => 'rejected']);
