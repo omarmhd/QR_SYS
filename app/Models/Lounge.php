@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Lounge extends Model
 {
+
+    protected $guarded=[''];
     protected $casts  = [
         'name' => 'array',
         "description"=>'array',
