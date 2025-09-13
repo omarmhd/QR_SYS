@@ -193,7 +193,14 @@
                                         <div class="font-weight-medium">{{$feature->name[$locale->value]}}</div>
 
                                     </div>
+
                                 </div>
+                            </div>
+                            <div style="margin-top:10px;">
+                                <span>Don't see your feature?</span>
+                                <a href="{{ route('features.create') }}" style="color:blue; text-decoration:underline;">
+                                    Add new Feature
+                                </a>
                             </div>
                         </label>
 
