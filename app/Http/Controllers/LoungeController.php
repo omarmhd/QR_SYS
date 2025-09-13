@@ -104,7 +104,7 @@ class LoungeController extends Controller
         $lounge->close_time = $request->close_time;
         $lounge->longitude = $request->longitude;
         $lounge->latitude = $request->latitude;
-
+        $lounge->features()->sync($validated["features"]);
         $lounge->save();
         return redirect()->route('lounges.index')->with('success', 'lounge updated successfully');
 
