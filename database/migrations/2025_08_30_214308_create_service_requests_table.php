@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId("user_id")->constrained("users");
             $table->string("full_name")->nullable();
             $table->string("booking_date");
+            $table->string("booking_time");
             $table->integer("guest_number");
             $table->string("cigar_type")->nullable();
             $table->text("notes")->nullable();

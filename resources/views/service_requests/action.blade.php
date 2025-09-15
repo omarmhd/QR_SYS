@@ -72,7 +72,7 @@
             <div class="card-body">
 
 
-                  @if  ($errors->any())
+       @if  ($errors->any())
         <div class="alert alert-danger" role="alert">
           <div class="alert-icon">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -96,7 +96,7 @@
           </div>
         </div>
       @endif
-                      <ul class="nav nav-tabs" role="tablist">
+        <ul class="nav nav-tabs" role="tablist">
             @foreach($locales as $locale)
                 <li class="nav-item">
                     <a class="nav-link @if ($loop->first) active @endif"

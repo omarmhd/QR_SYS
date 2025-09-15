@@ -26,6 +26,10 @@
                        name: "booking_date"
                    },
                    {
+                       data: 'booking_time',
+                       name: "booking_time"
+                   },
+                   {
                        data: 'guest_number',
                        name: "guest_number"
                    },

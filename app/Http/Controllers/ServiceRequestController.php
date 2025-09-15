@@ -12,11 +12,12 @@ class ServiceRequestController extends Controller
 {
 
     public function index(Request $request){
-
-
+        $service=Service::findOrFail($request->service_id);
+        $service_name=$service->name;
         if ($request->ajax()) {
 
             $service_requests = ServiceRequest::where("service_id", $request->service_id);
+
 
             return DataTables::of($service_requests)
            ->addColumn('actions', function ($row) {
@@ -44,7 +45,9 @@ class ServiceRequestController extends Controller
         }
 
 
-        return view("service_requests.index");
+
+
+        return view("service_requests.index",["service_name"=>$service_name]);
 
 
 

@@ -8,11 +8,14 @@ use App\Http\Resources\OnboardingScreenResource;
 use App\Http\Resources\PlanResource;
 use App\Http\Resources\StaticContentResource;
 use App\Models\Lounge;
+use App\Models\Notification;
 use App\Models\OnboardingScreen;
 use App\Models\Plan;
 use App\Models\ServiceRequest;
 use App\Models\StaticContent;
+use App\Models\ContactMessage;
 use Illuminate\Http\Request;
+use function Pest\ArchPresets\name;
 
 class PublicController extends Controller
 {
@@ -75,12 +78,18 @@ class PublicController extends Controller
 
     }
 
+    public function notifications(){
+
+        return response()->json(auth()->user()->notifications);
+    }
+
     public function storePrivateService(Request $request){
         $fields = $request->validate([
             'user_id' => 'required|exists:users,id',
             'service_id' => 'required|exists:services,id',
             'full_name'=>"required|string",
             "booking_date"=>"required|date",
+            "booking_time"=>"required",
             "guest_number"=>"required",
             "cigar_type"=>"nullable",
             'notes' => 'nullable'
@@ -90,6 +99,35 @@ class PublicController extends Controller
         return response()->json(["status"=>true,"message"=>"Your request has been sent successfully"]);
 
     }
+    public function storeContactMessages(Request $request){
+        $validated = $request->validate([
+            'title' => 'required',
+            'message' => 'required',
+
+        ]);
+        $user=auth()->user();
+
+
+        $contactMessage=new ContactMessage();
+        $contactMessage->user_id=$user->id;
+        $contactMessage->user_name=$user->name;
+        $contactMessage->title=$validated["title"];
+        $contactMessage->message=$validated["message"];
+        $contactMessage->save();
+
+
+
+
+        return response()->json(["status"=>true,"message"=>"Your request has been sent successfully"]);
+
+
+
+
+    }
+
+
+
+
 
 }
 

@@ -10,15 +10,27 @@ Route::get('/user', function (Request $request) {
 
 })->middleware('auth:sanctum');
 
-Route::post("/register",[AuthController::class, "register"]);
-Route::post("login",[AuthController::class, "login"]);
-Route::post("logout",[AuthController::class, "logout"])->middleware('auth:sanctum');
 
-Route::get("onboarding-screens",[PublicController::class, "onBoardingScreen"]);
-Route::get("static-contents",[PublicController::class, "staticContent"]);
-Route::get("lounges",[PublicController::class,"lounges"]);
 
-Route::get("plans",[PublicController::class, "plans"]);
-Route::post("private-requests",[PublicController::class, "storePrivateService"]);
+    Route::post("/register",[AuthController::class, "register"]);
+    Route::post("login",[AuthController::class, "login"]);
+    Route::post("logout",[AuthController::class, "logout"])->middleware('auth:sanctum');
+    Route::group(["middleware"=>"auth:sanctum"],function (){
+    Route::get("onboarding-screens",[PublicController::class, "onBoardingScreen"]);
+    Route::get("static-contents",[PublicController::class, "staticContent"]);
+    Route::get("lounges",[PublicController::class,"lounges"]);
 
-Route::match(['get', 'post'], '/kapri/event', [\App\Http\Controllers\Api\KapriEventController::class, 'handle']);
+    Route::get("plans",[PublicController::class, "plans"]);
+    Route::post("private-requests",[PublicController::class, "storePrivateService"]);
+
+    Route::match(['get', 'post'], '/kapri/event', [\App\Http\Controllers\Api\KapriEventController::class, 'handle']);
+
+
+    Route::get("profile",[\App\Http\Controllers\Api\ProfileController::class, 'show']);
+    Route::post("profile",[\App\Http\Controllers\Api\ProfileController::class, 'update']);
+
+
+    Route::get("notifications",[PublicController::class, "notifications"]);
+    Route::post("contact-message",[PublicController::class, "storeContactMessages"]);
+
+});

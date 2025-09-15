@@ -8,7 +8,7 @@
     <div class="row g-2 align-items-center">
       <div class="col">
         <!-- Page pre-title -->
-        <div class="page-pretitle">Services</div>
+        <div class="page-pretitle">{{$service_name["en"]}} Requests</div>
         <h2 class="page-title"></h2>
       </div>
       <!-- Page title actions -->
@@ -72,7 +72,7 @@
       <div class="col-12">
         <div class="card">
           <div class="card-header">
-            <h3 class="card-title">Table</h3>
+            <h3 class="card-title">{{$service_name["en"]}} Requests Table</h3>
           </div>
           <div class="card-body border-bottom py-3">
                  <div class="table-responsive">
@@ -89,6 +89,7 @@
                   </th>
                   <th>Full Name</th>
                   <th>Booking Date</th>
+                  <th>Booking Time</th>
                   <th>Guest Numbers </th>
                   <th>Cigar Type</th>
                   <th>Notes</th>

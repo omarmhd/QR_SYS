@@ -26,7 +26,7 @@ class NotificationController extends Controller
         }
 
         return view('notifications.index');
-     
+
     }
 
     public function create(){
@@ -40,16 +40,14 @@ class NotificationController extends Controller
             'title' => 'required|string|max:255',
             'body' => 'required|string'
         ]);
-
-
-    $response=$this->firebaseService->sendNotification('general', $validated["title"], $validated["body"], ["type" => "topic"], null, 'topic');
-     if(!isset($response["name"])){
-        return redirect()->back()->with("error","error in send notification");
-     } 
+        $response=$this->firebaseService->sendNotification('general', $validated["title"], $validated["body"], ["type" => "topic"], null, 'topic');
+         if(!isset($response["name"])){
+            return redirect()->back()->with("error","Error in send notification");
+         }
 
         return redirect()->route("notifications.index")->with("success","");
 
-     } 
+     }
 
 
 
@@ -57,9 +55,9 @@ class NotificationController extends Controller
 
     }
 
-    
 
-  
+
+
 
 
 

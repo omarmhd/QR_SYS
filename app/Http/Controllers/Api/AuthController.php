@@ -7,6 +7,7 @@ use App\Models\DeviceToken;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
@@ -19,12 +20,15 @@ class AuthController extends Controller
             "dob"=>"required|date",
             "plan_id"=>"nullable",
             "plan_name"=>"nullable",
-           'fcm_token' => 'required|string',
+           'fcm_token' => 'required|string|unique:device_tokens,fcm_token',
            'device_id' => 'required|string',
            'device_type' => 'nullable|string'
 
         ]);
 
+
+        try {
+        DB::beginTransaction();
         $user = User::create([
             'name' => $fields['name'],
             'email' => $fields['email'],
@@ -35,15 +39,15 @@ class AuthController extends Controller
 
         ]);
 
-    $existing = DeviceToken::where('device_id', $fields['device_id'])
-    ->where('user_id', '!=', $user->id)
-    ->first();
+//    $existing = DeviceToken::where('device_id', $fields['device_id'])
+//    ->where('user_id', '!=', $user->id)
+//    ->first();
 
 //         if ($existing) {
 //     return response()->json([
 //         'status' => false,
 //         'message' => 'This device is already registered with another email.',
-//         ], 409); 
+//         ], 409);
 // }
 
         DeviceToken::updateOrCreate(
@@ -57,11 +61,23 @@ class AuthController extends Controller
 
         $token = $user->createToken('api_token')->plainTextToken;
         $user['token'] = $token;
+
+        DB::commit();
         return response()->json([
             "status"=>true,
             'data'=>$user,
             'message'=>"User created successfully"
         ], 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                "status"  => false,
+                "message" => "Registration failed",
+                "error"   => $e->getMessage()
+            ], 500);
+        }
+
+
     }
 
     public function login(Request $request)
@@ -108,30 +124,29 @@ class AuthController extends Controller
             'status' => true,
             "data"=>$user,
             'message' => 'Login successful'
-         
+
         ]);
 }
 
-public function logout(Request $request)
-{
-    $request->validate([
-        'device_id' => 'required|string',
-    ]);
+    public function logout(Request $request)
+    {
+        $request->validate([
+            'device_id' => 'required|string',
+        ]);
 
-    $user = Auth::user();
+        $user = Auth::user();
 
-    DeviceToken::where('user_id', $user->id)
-        ->where('device_id', $request->device_id)
-        ->delete();
+        DeviceToken::where('user_id', $user->id)
+            ->delete();
 
-    $request->user()->currentAccessToken()->delete();
+        $request->user()->currentAccessToken()->delete();
 
-    return response()->json([
-        "status"=>true,
-        "data"=>[],
-        'message' => 'Logged out and device token removed'
-    ]);
-}
+        return response()->json([
+            "status"=>true,
+            "data"=>[],
+            'message' => 'Logged out and device token removed'
+        ]);
+    }
 
 
 private function hasExceededDeviceLimit($user_id,$device_id)

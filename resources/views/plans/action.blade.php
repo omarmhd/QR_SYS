@@ -200,7 +200,7 @@
                             </div>
                         @endforeach
                     </div>
-                    <button type="button" class="btn btn-outline-primary btn-sm"
+                    <button type="button" class="btn btn-outline-primary btn-sm" id="add-feature-btn"
                             onclick="addFeatureField('{{ $locale->value }}')">➕ Add</button>
                 </div>
             @endforeach
@@ -211,7 +211,7 @@
 
   <div class="card-footer text-end">
       <button type="submit" class="btn btn-primary">
-          {{ isset($plan) ? 'Update Plan' : 'Create Plan' }}
+          {{ isset($plan) ? 'Update' : 'Save' }}
       </button>
   </div>
 
@@ -238,20 +238,19 @@
     }
   });
 </script>
-<script>
-  document.getElementById('add-feature-btn').addEventListener('click', function() {
-    const wrapper = document.getElementById('features-wrapper');
 
-    const div = document.createElement('div');
-    div.classList.add('input-group', 'mb-2');
-    div.innerHTML = `
-        <input type="text" name="features[]" class="form-control" placeholder="" required>
-        <button type="button" class="btn btn-danger" onclick="this.parentElement.remove()">❌</button>
-    `;
-    wrapper.appendChild(div);
-  });
-</script>
-
+        <script>
+            function addFeatureField(locale) {
+                const wrapper = document.getElementById('features-wrapper-' + locale);
+                const div = document.createElement('div');
+                div.className = "input-group mb-2";
+                div.innerHTML = `
+            <input type="text" name="features[${locale}][]" class="form-control" required>
+            <button type="button" class="btn btn-danger" onclick="this.parentElement.remove()">❌</button>
+        `;
+                wrapper.appendChild(div);
+            }
+        </script>
 
 
 

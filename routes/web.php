@@ -50,6 +50,7 @@ Route::middleware('auth')->group(function () {
     Route::resource("/services",\App\Http\Controllers\ServiceController::class);
     Route::resource("service-requests",\App\Http\Controllers\ServiceRequestController::class);
 
+    Route::resource("contact-messages",\App\Http\Controllers\ContactMessageController::class)->only(["index","destroy"]);
 
 
 
