@@ -34,3 +34,6 @@ Route::get('/user', function (Request $request) {
     Route::post("contact-message",[PublicController::class, "storeContactMessages"]);
 
 });
+Route::get("plans",[PublicController::class, "plans"]);
+Route::get("static-contents",[PublicController::class, "staticContent"]);
+Route::get("onboarding-screens",[PublicController::class, "onBoardingScreen"]);
