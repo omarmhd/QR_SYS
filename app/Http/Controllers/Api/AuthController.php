@@ -130,9 +130,7 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        $request->validate([
-            'device_id' => 'required|string',
-        ]);
+
 
         $user = Auth::user();
 
