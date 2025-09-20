@@ -44,6 +44,13 @@ class User extends Authenticatable
         ];
     }
 
+    public function getImageAttribute()
+    {
+        if ($this->image) {
+            return asset('storage/' . $this->image);
+        }
+    }
+
     public function deviceTokens()
 {
     return $this->hasMany(DeviceToken::class);
