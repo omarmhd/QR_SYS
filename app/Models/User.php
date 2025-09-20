@@ -44,10 +44,10 @@ class User extends Authenticatable
         ];
     }
 
-    public function getImageAttribute()
+    public function getImageAttribute($value)
     {
-        if ($this->image) {
-            return asset('storage/' . $this->image);
+        if ($value) {
+            return asset('storage/' .$value);
         }
     }
 
