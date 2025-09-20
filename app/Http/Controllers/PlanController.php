@@ -27,7 +27,7 @@ class PlanController extends Controller
     public function store(Request $request){
         $validated = $request->validate([
         'name.*' => 'required',
-        'price' => 'required|numeric',
+         'price' => 'required_if:is_price_hidden,0|numeric|nullable',
         'guest_passes_per_year' => 'required|integer',
         'currency' => 'required|in:EUR,USD',
         'billing_type' => 'required|in:day,month,year',
@@ -38,11 +38,12 @@ class PlanController extends Controller
 
         $plan = new Plan();
         $plan->name = $request->name;;
-        $plan->price = $request->price;
+        $plan->price = $request->price??0;
         $plan->guest_passes_per_year = $request->guest_passes_per_year;
         $plan->currency = $request->currency;
         $plan->billing_type = $request->billing_type;
         $plan->is_popular = $request->has('is_popular');
+        $plan->is_price_hidden=$request->has('is_price_hidden');
         $plan->features = $request->features;
         $plan->save();
 
@@ -54,8 +55,9 @@ class PlanController extends Controller
     {
     $validated = $request->validate([
         'name.*' => 'required',
-        'price' => 'required|numeric',
+        'price' => 'required_if:is_price_hidden,0|numeric|nullable',
         'guest_passes_per_year' => 'required|integer',
+
         'currency' => 'required|in:EUR,USD',
         'billing_type' => 'required|in:day,month,year',
         'features' => 'required|array|min:1',
@@ -68,6 +70,7 @@ class PlanController extends Controller
     $plan->currency = $request->currency;
     $plan->billing_type = $request->billing_type;
     $plan->is_popular = $request->has('is_popular');
+    $plan->is_price_hidden=$request->has('is_price_hidden');
     $plan->features = $request->features;
     $plan->save();
 

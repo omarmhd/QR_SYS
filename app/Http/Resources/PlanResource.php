@@ -19,7 +19,8 @@ class PlanResource extends JsonResource
         return [
             "id"=>$this->id,
             "name"=>$this->name[$language],
-            "price"=>$this->price,
+            "price"=>$this->price??0,
+            "is_price_hidden"=>$this->is_price_hidden?true:false,
             "currency"=>$this->currency,
             "billing_type"=>$this->billing_type,
             "is_popular"=>$this->is_popular,

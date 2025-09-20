@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('contact_messages', function (Blueprint $table) {
             $table->id();
-            $table->foreignId("user_id")->constrained("users")->nullOnDelete();
+            $table->foreignId("user_id")->nullable()->constrained("users")->nullOnDelete();
             $table->string("user_name");
             $table->string("title");
             $table->text("message");

@@ -129,21 +129,17 @@
     </div>
 
     <!-- Price Field (Single) -->
-    <div class="mb-3 col-sm-8 col-md-6">
-        <label class="form-label required">Price</label>
-        <input type="text" name="price" class="form-control"
-              value="{{ old('price', $plan->price ?? 0) }}" required>
-    </div>
+
 
     <!-- Guest Passes Field (Single) -->
-    <div class="mb-3 col-sm-8 col-md-6">
+    <div class="mb-3 col-sm-8 col-md-4">
         <label class="form-label required">Guest Passes</label>
         <input type="number" name="guest_passes_per_year" class="form-control"
               value="{{ old('guest_passes_per_year', $plan->guest_passes_per_year ?? '') }}" required>
     </div>
 
     <!-- Currency Field (Single) -->
-    <div class="mb-3 col-sm-8 col-md-6">
+    <div class="mb-3 col-sm-8 col-md-4">
         <label class="form-label required">Currency</label>
         <select name="currency" class="form-control">
             <option value="EUR" {{ old('currency', $plan->currency ?? '') == 'EUR' ? 'selected' : '' }}>EUR</option>
@@ -152,7 +148,7 @@
     </div>
 
     <!-- Billing Type Field (Single) -->
-    <div class="mb-3 col-sm-8 col-md-6">
+    <div class="mb-3 col-sm-8 col-md-4">
         <label class="form-label required">Billing Type</label>
         <select name="billing_type" class="form-control">
             <option value="day" {{ old('billing_type', $plan->billing_type ?? '') == 'day' ? 'selected' : '' }}>Day</option>
@@ -164,13 +160,35 @@
     <!-- Is Popular Field (Single) -->
     <div class="mb-3 col-sm-8 col-md-2">
         <label class="form-label required">Is Popular</label>
-        <label class="form-check form-check-single form-switch">
-            <input name="is_popular" class="form-check-input" type="checkbox" style="width:70px; height: 31px;"
+        <label class="form-check form-check-single form-switch" style="padding: 0px">
+            <input name="is_popular" class="form-check-input" type="checkbox" style="width:50px; height: 20px;"
                   {{ old('is_popular', $plan->is_popular ?? false) ? 'checked' : '' }}>
         </label>
     </div>
 
-    <!-- Features Field (Multi-language) -->
+
+
+      <div class="mb-3 col-sm-8 col-md-2">
+          <label class="form-label required">Hide Price</label>
+          <label class="form-check form-check-single form-switch" style="padding: 0px">
+
+              <input name="is_price_hidden" class="form-check-input" type="checkbox" style="width:50px; height: 20px;"
+              {{ old('is_price_hidden', $plan->is_price_hidden ?? false) ? 'checked' : '' }}
+          </label>
+      </div>
+
+      <div class="mb-3 col-sm-8 col-md-4 {{ $plan->is_price_hidden ? 'd-none' : '' }}">
+          <label class="form-label">Price</label>
+          <input type="text"
+                 name="price"
+                 class="form-control"
+                 value="{{ old('price', $plan->price ?? 0) }}"
+              {{ $plan->is_price_hidden ? '' : 'required' }}>
+      </div>
+
+
+
+      <!-- Features Field (Multi-language) -->
     <div class="mb-3 col-sm-8 col-md-12">
         <label class="form-label required">Features / Fonctionnalités</label>
         <ul class="nav nav-tabs" role="tablist">
@@ -250,7 +268,19 @@
         `;
                 wrapper.appendChild(div);
             }
-        </script>
+
+
+            $("input[name=is_price_hidden]").on("change", function () {
+                let priceField = $("input[name=price]").closest(".mb-3");
+                if ($(this).is(":checked")) {
+                    priceField.addClass("d-none");
+                    $("input[name=price]").prop("required", false);
+                } else {
+                    priceField.removeClass("d-none");
+                    $("input[name=price]").prop("required", true);
+                }
+            });
+</script>
 
 
 

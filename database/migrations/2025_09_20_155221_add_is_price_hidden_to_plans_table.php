@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string("location")->nullable()->after("phone");
+        Schema::table('plans', function (Blueprint $table) {
+            $table->boolean('is_price_hidden')->default(true)->after('price');
+
         });
     }
 
@@ -21,8 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn("location");
+        Schema::table('plans', function (Blueprint $table) {
+            $table->dropColumn('is_price_hidden');
         });
     }
 };

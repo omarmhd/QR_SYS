@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
@@ -20,10 +21,17 @@ class ProfileController extends Controller
             'name' => 'required|max:255',
             'email' => 'required|unique:users,email,'.$user->id,
             'phone' => 'required|unique:users,phone,'.$user->id,
+            "image"=>"nullable",
             'location'=>'required'
 
         ]);
+        if ($request->hasFile('image')) {
+            if ($user->image) {
+                Storage::disk('public')->delete($user->image);
+            }
 
+            $user->image = $request->file('image')->store('profile', 'public');
+        }
 
         $user->name=$validated["name"];
         $user->email=$validated["email"];
