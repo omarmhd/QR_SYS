@@ -126,8 +126,8 @@
                 <div class="mb-3 col-sm-8 col-md-6">
                   <label class="form-label required">Plans</label>
                   <select name="plan_id" class="form-control">
-                    @foreach ($plans["en"] as $plan)
-                    <option value="{{$plan->id}}" {{old('plan_id', $user->plan_id ?? '') == $plan->id ? 'selected' : ''}}>{{$plan->name}}</option>
+                    @foreach ($plans as $plan)
+                    <option value="{{$plan->id}}" {{old('plan_id', $user->plan_id ?? '') == $plan->id ? 'selected' : ''}}>{{$plan->name["en"]}}</option>
 
                     @endforeach
 
