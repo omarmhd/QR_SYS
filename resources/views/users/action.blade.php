@@ -126,7 +126,7 @@
                 <div class="mb-3 col-sm-8 col-md-6">
                   <label class="form-label required">Plans</label>
                   <select name="plan_id" class="form-control">
-                    @foreach ($plans as $plan)
+                    @foreach ($plans["en"] as $plan)
                     <option value="{{$plan->id}}" {{old('plan_id', $user->plan_id ?? '') == $plan->id ? 'selected' : ''}}>{{$plan->name}}</option>
 
                     @endforeach
@@ -141,11 +141,11 @@
                   <label class="form-label required">Approval Status</label>
                   <select name="approval_status" class="form-control">
                     @foreach (\App\ApprovalStatus::cases() as $status )
-                            <option value="{{ $status->value }}" 
+                            <option value="{{ $status->value }}"
                                 {{ old('status', $user->approval_status ?? '') == $status->value ? 'selected' : '' }}>
                                 {{ ucfirst($status->name) }}
                             </option>
-                              
+
                     @endforeach
                   </select>
                 </div>
@@ -156,20 +156,20 @@
                   <label class="form-label required">Subscription Status</label>
                                       <select name="subscription_status" class="form-control">
 
-                            <option value="0" 
+                            <option value="0"
                                 {{ old('subscription_status', $user->subscription_status ?? '') == 1 ? 'selected' : '' }}>
                               Yes
                             </option>
 
-                                                        <option value="1" 
+                                                        <option value="1"
                                 {{ old('subscription_status', $user->subscription_status ?? '') == 0 ? 'selected' : '' }}>
                                 No
                               </option>
                                       </select>
-                    
+
                 </label>
                 </div>
-          
+
                 <div class="card-footer text-end">
                   <button type="submit" class="btn btn-primary">
                     {{ isset($user->id) ? 'Update User' : 'Create User' }}
