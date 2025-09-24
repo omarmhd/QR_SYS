@@ -3,12 +3,40 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\QRCode;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
-class KapriEventController extends Controller
+class QRController extends Controller
 {
+
+    public function storeQR(Request $request){
+        $validated = $request->validate([
+            "qr_token" => "required"]);
+
+        $qr = QRCode::updateOrCreate(
+            [
+                'user_id' => auth()->id(),
+                'type'    => 'member',
+            ],
+            [
+                'qr_token'   => $validated['qr_token'],
+                'guests'     => $validated['guests'] ?? 0,
+                'status'     => 'pending',
+                'created_by' => auth()->id(),
+                'expires_at' => now()->addDay(),
+            ]
+        );
+
+        return response()->json([
+            'message' => 'QR code saved successfully',
+            'data'    => $qr
+        ]);
+    }
+
+
+
     public function handle(Request $request)
     {
         $response = Http::withHeaders([

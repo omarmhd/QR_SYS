@@ -23,7 +23,7 @@ Route::get('/user', function (Request $request) {
     Route::get("plans",[PublicController::class, "plans"]);
     Route::post("private-requests",[PublicController::class, "storePrivateService"]);
 
-    Route::match(['get', 'post'], '/kapri/event', [\App\Http\Controllers\Api\KapriEventController::class, 'handle']);
+    Route::match(['get', 'post'], '/kapri/event', [\App\Http\Controllers\Api\QRController::class, 'handle']);
 
 
     Route::get("profile",[\App\Http\Controllers\Api\ProfileController::class, 'show']);
@@ -32,6 +32,8 @@ Route::get('/user', function (Request $request) {
 
     Route::get("notifications",[PublicController::class, "notifications"]);
     Route::post("contact-message",[PublicController::class, "storeContactMessages"]);
+
+    Route::post("generate-qr",[\App\Http\Controllers\Api\QRController::class, "storeQR"]);
 
 });
 Route::get("plans",[PublicController::class, "plans"]);
