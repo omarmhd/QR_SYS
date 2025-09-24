@@ -39,36 +39,61 @@ class QRController extends Controller
 
     public function handle(Request $request)
     {
-        $response = Http::withHeaders([
-            'Content-Type' => 'application/json',
-        ])->post('http://192.168.0.248:9445/api/instruction', [
-            "msgType" => "ins_inout_buzzer_operate",
-            "msgArg" => [
-                "sPosition" => "main",
-                "sMode" => "on",
-                "ucTime_ds" => 30
-            ]
-        ]);
-        $data = $response->json(); // إذا كانت الاستجابة JSON
-        return $data;
-        $event = $request->json()->all();
-            Log::info('QR Scan received - before type', [
-                'event' => "test"
-            ]);
-        if (!empty($event['msgType']) && $event['msgType'] === 'on_uart_receive') {
+        $event = $request->all();
+        \Log::info('Kapri Event Received:', $event);
 
-            $token = $event['msgArg']['sData'] ?? null;
-
-            $extraUid = $event['msgArg']['oExtra']['lblmgr']['uid'] ?? null;
-
-            Log::info('QR Scan received', [
-                'token' => $token,
-                'extra_uid' => $extraUid
-            ]);
-
+// 1) Token check
+        if (($event['msgArg']['sToken'] ?? '') !== 'test-123456789') {
+            return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        return response()->json(['status' => 'denied']);
+// 2) Build a proper ins_cloud_batch reply
+        $listBatch = [];
+
+// Trigger on QR scans (UART)
+        if (($event['msgType'] ?? '') === 'on_uart_receive') {
+
+            // If you configured an instruction password on the device (interface_ins_pwd),
+//  you MUST include it in each instruction's msgArg as "sInsPwd": "<your_password>".
+//  Remove the line if you didn’t set that parameter.
+            $sInsPwd = env('KAPRI_INS_PWD'); // or null if not used
+
+            // 3 sec buzzer
+            $buzzer = [
+                'msgType' => 'ins_inout_buzzer_operate',
+                'msgArg'  => array_filter([
+                    'sPosition' => 'main',
+                    'sMode'     => 'on',     // or 'beep_50'
+                    'ucTime_ds' => 30,       // 3.0 s
+                    'sInsPwd'   => $sInsPwd, // include only if set
+                ], fn($v) => $v !== null),
+            ];
+            $listBatch[] = $buzzer;
+
+            // (Optional) show QR data
+            if (!empty($event['msgArg']['sData'])) {
+                $safe = e($event['msgArg']['sData']);
+                $html = "<html><body><h2>welcome omar : {$safe}</h2></body></html>";
+                $listBatch[] = [
+                    'msgType' => 'ins_screen_html_document_write',
+                    'msgArg'  => array_filter([
+                        'sHtml'   => $html,
+                        'sInsPwd' => $sInsPwd,
+                    ], fn($v) => $v !== null),
+                ];
+            }
+        }
+
+// Always return a valid ins_cloud_batch
+        $response = [
+            'msgType' => 'ins_cloud_batch',
+            'msgArg'  => [
+                'bReply'    => true,       // ask Kapri to POST back ans_cloud_batch
+                'listBatch' => $listBatch, // a list (can be empty)
+            ],
+        ];
+
+        return response()->json($response);
     }
     private function openGate()
     {
