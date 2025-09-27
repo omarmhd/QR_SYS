@@ -37,20 +37,41 @@ class QRController extends Controller
 
 
 
+
+
     public function handle(Request $request)
     {
         $event = $request->all();
         \Log::info('Kapri Event Received:', $event);
 
-// 1) Token check
+
         if (($event['msgArg']['sToken'] ?? '') !== 'test-123456789') {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
+        $qrToken = $event['msgArg']['sData'] ?? null;
 
-// 2) Build a proper ins_cloud_batch reply
+        if (!$qrToken) {
+            return response()->json(['error' => 'QR token missing'], 400);
+        }
+
+        $qr = QrCode::where('qr_token', $qrToken)
+            ->where('status', 'pending')
+            ->where(function($q) {
+                $q->whereNull('expires_at')
+                    ->orWhere('expires_at', '>', now());
+            })
+            ->first();
+
+        if (!$qr) {
+            return response()->json(['error' => 'QR not valid or expired'], 401);
+        }
+
         $listBatch = [];
 
-// Trigger on QR scans (UART)
+        $qr->update(['status' => 'checked_in']);
+
+        auth()->user()->visitHistories()->create([]);
+
         if (($event['msgType'] ?? '') === 'on_uart_receive') {
 
             // If you configured an instruction password on the device (interface_ins_pwd),

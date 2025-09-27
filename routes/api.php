@@ -34,6 +34,7 @@ Route::get('/user', function (Request $request) {
     Route::post("contact-message",[PublicController::class, "storeContactMessages"]);
 
     Route::post("generate-qr",[\App\Http\Controllers\Api\QRController::class, "storeQR"]);
+    Route::get("visit-histories",[PublicController::class, "visitHistories"]);
 
 });
 Route::get("plans",[PublicController::class, "plans"]);

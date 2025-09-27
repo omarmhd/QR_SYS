@@ -14,6 +14,7 @@ use App\Models\Plan;
 use App\Models\ServiceRequest;
 use App\Models\StaticContent;
 use App\Models\ContactMessage;
+use App\Models\VisitHistory;
 use Illuminate\Http\Request;
 use function Pest\ArchPresets\name;
 
@@ -31,7 +32,7 @@ class PublicController extends Controller
                 "data"=>[],
                 'message' => 'No screens found',
 
-            ], 404);
+            ], 200);
         }
         return response()->json(["status"=>true,"data"=>OnboardingScreenResource::collection($screens)]);
     }
@@ -46,7 +47,7 @@ class PublicController extends Controller
                 'message' => 'No screens found',
                 "data"=>[]
 
-            ], 404);
+            ], 200);
         }
 
 
@@ -56,7 +57,14 @@ class PublicController extends Controller
 
     public function staticContent(){
         $contents = StaticContent::all();
+        if($contents->isEmpty()){
+            return response()->json([
+                "status"=>false,
+                "data"=>[],
+                'message' => 'No contents found',
 
+            ], 200);
+        }
 //       $contents = StaticContent::select("key", "title", "content")
 //    ->get()
 //    ->mapWithKeys(function ($item) {
@@ -74,13 +82,29 @@ class PublicController extends Controller
 
     public function lounges(){
         $lounges=Lounge::all();
+        if($lounges->isEmpty()){
+            return response()->json([
+                "status"=>false,
+                "data"=>[],
+                'message' => 'No lounges found',
+
+            ], 200);
+        }
         return response()->json(["status"=>true,"data"=>LoungesResource::collection($lounges)]);
 
     }
 
     public function notifications(){
+        $notifications=auth()->user()->notifications;
+        if($notifications->isEmpty()){
+            return response()->json([
+                "status"=>false,
+                "data"=>[],
+                'message' => 'No notifications found',
 
-        return response()->json(auth()->user()->notifications);
+            ], 200);
+        }
+        return response()->json(["status"=>true,"data"=>$notifications]);
     }
 
     public function storePrivateService(Request $request){
@@ -124,7 +148,18 @@ class PublicController extends Controller
 
 
     }
+    public function visitHistories(){
+        $histories=auth()->user()->visitHistories;
+        if($histories->isEmpty()){
+            return response()->json([
+                "status"=>false,
+                "data"=>[],
+                'message' => 'No histories found',
 
+            ], 200);
+        }
+        return response()->json(["status"=>true,"data"=>$histories]);
+    }
 
 
 
