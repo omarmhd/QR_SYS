@@ -167,8 +167,9 @@
                             paginationEl.classList.add('d-none');
                         } else {
                             paginationEl.classList.remove('d-none');
-                            renderPagination(res);
                         }
+                        renderPagination(res);
+
                     })
                     .catch(err => console.error());
             };
@@ -195,7 +196,7 @@
                 noResults.classList.add('d-none');
 
                 membersToRender.forEach(member => {
-                    const subscriptionStatus = "6";
+                    // const subscriptionStatus = "6";
 
                     const card = document.createElement('div');
                     card.className = 'col-md-3 col-lg-3';
@@ -207,9 +208,9 @@
                                 <div class="flex-grow-1">
                                     <h3 class="card-title mb-1">${member.name}</h3>
                                     <div>
-  <span class="badge ${member.subscription_status ? "bg-green-lt" : "bg-red-lt"}">
-    ${member.subscription_status ? "Active" : "Inactive"}
-  </span></div>
+                                          <span class="badge ${member.subscription_status ? "bg-green-lt" : "bg-red-lt"}">
+                                            ${member.subscription_status ? "Active" : "Inactive"}
+                                          </span></div>
                                 </div>
                             </div>
                             <div class="mb-3">

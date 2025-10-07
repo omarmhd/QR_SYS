@@ -29,9 +29,9 @@ class MembershipController extends Controller
             });
         }
 
-        $users = $users->paginate(4);
-        return json_encode($users);
+        $users = $users->paginate(5);
 
+        return json_encode($users);
 
     }
 

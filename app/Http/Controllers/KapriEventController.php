@@ -22,12 +22,12 @@ class KapriEventController extends Controller
 // 2) Build a proper ins_cloud_batch reply
         $listBatch = [];
 
-// Trigger on QR scans (UART)
+        // Trigger on QR scans (UART)
         if (($event['msgType'] ?? '') === 'on_uart_receive') {
 
             // If you configured an instruction password on the device (interface_ins_pwd),
-//  you MUST include it in each instruction's msgArg as "sInsPwd": "<your_password>".
-//  Remove the line if you didn’t set that parameter.
+            //  you MUST include it in each instruction's msgArg as "sInsPwd": "<your_password>".
+            //  Remove the line if you didn’t set that parameter.
             $sInsPwd = env('KAPRI_INS_PWD'); // or null if not used
 
             // 3 sec buzzer
@@ -56,7 +56,7 @@ class KapriEventController extends Controller
             }
         }
 
-// Always return a valid ins_cloud_batch
+    // Always return a valid ins_cloud_batch
         $response = [
             'msgType' => 'ins_cloud_batch',
             'msgArg'  => [
