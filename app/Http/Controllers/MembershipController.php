@@ -47,7 +47,7 @@ class MembershipController extends Controller
         $user = User::with('subscription')->find($id);
 
         $canUseVisitOrInvite=$usageCheckerService->canUseVisitOrInvite($user);
-        dd("e");
+        dd($canUseVisitOrInvite['allowed']);
 
 
         if (!$canUseVisitOrInvite['allowed']){
