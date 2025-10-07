@@ -47,6 +47,7 @@ class MembershipController extends Controller
         $user = User::with('subscription')->find($id);
 
         $canUseVisitOrInvite=$usageCheckerService->canUseVisitOrInvite($user);
+        dd("e");
 
 
         if (!$canUseVisitOrInvite['allowed']){
@@ -56,7 +57,6 @@ class MembershipController extends Controller
             ]);
 
         }
-        dd($user->current_subscription);
         if ($user->subscription) {
             $user->subscription->increment('used_guests');
         }
