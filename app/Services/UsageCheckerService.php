@@ -18,7 +18,7 @@ Class UsageCheckerService{
         $max_limit=$user->plan->guest_passes_per_year;
         $used_guests=$subscription->used_guests;
 
-        if ( $max_limit>=$used_guests ) {
+        if ($used_guests >=$max_limit) {
             return [
                 'allowed' => false,
                 'message' => 'You have exceeded the allowed number of guests for this subscription.'
