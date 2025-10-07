@@ -167,6 +167,7 @@
                             paginationEl.classList.add('d-none');
                         } else {
                             paginationEl.classList.remove('d-none');
+                            alert("e")
                             renderPagination(res);
                         }
                     })
