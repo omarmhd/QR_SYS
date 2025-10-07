@@ -56,6 +56,7 @@ class MembershipController extends Controller
             ]);
 
         }
+        dd($user->current_subscription,$user->subscription);
         if ($user->subscription) {
             $user->subscription->increment('used_guests');
         }
