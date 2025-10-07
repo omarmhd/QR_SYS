@@ -167,9 +167,8 @@
                             paginationEl.classList.add('d-none');
                         } else {
                             paginationEl.classList.remove('d-none');
+                            renderPagination(res);
                         }
-                        renderPagination(res);
-
                     })
                     .catch(err => console.error());
             };
