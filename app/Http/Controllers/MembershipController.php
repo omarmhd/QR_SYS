@@ -29,6 +29,8 @@ class MembershipController extends Controller
             });
         }
 
+        $users->where("status","active");
+
         $users = $users->paginate(5);
 
         return json_encode($users);

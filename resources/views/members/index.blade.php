@@ -167,7 +167,6 @@
                             paginationEl.classList.add('d-none');
                         } else {
                             paginationEl.classList.remove('d-none');
-                            alert("e")
                             renderPagination(res);
                         }
                     })
@@ -208,9 +207,9 @@
                                 <div class="flex-grow-1">
                                     <h3 class="card-title mb-1">${member.name}</h3>
                                     <div>
-                                          <span class="badge ${member.subscription_status ? "bg-green-lt" : "bg-red-lt"}">
-                                            ${member.subscription_status ? "Active" : "Inactive"}
-                                          </span></div>
+                                  <span class="badge ${member.subscription_status ? "bg-green-lt" : "bg-red-lt"}">
+                                    ${member.subscription_status ? "Active" : "Inactive"}
+                                  </span></div>
                                 </div>
                             </div>
                             <div class="mb-3">
