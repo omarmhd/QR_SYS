@@ -44,7 +44,7 @@ class MembershipController extends Controller
 
         $renderer = new GDLibRenderer(200);
         $writer = new Writer($renderer);
-        $user=User::find($id);
+        $user = User::with('subscription')->find($id);
 
         $canUseVisitOrInvite=$usageCheckerService->canUseVisitOrInvite($user);
 
@@ -57,7 +57,6 @@ class MembershipController extends Controller
 
         }
         if ($user->subscription) {
-            dd("#");
             $user->subscription->increment('used_guests');
         }
         for ($i = 0; $i < $count; $i++) {
