@@ -26,6 +26,9 @@ Class UsageCheckerService{
         }
 
 
-
+        return [
+            'allowed' => true,
+            'message' => ''
+        ];
     }
 }
