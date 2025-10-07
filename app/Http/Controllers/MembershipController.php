@@ -57,6 +57,7 @@ class MembershipController extends Controller
 
         }
         if ($user->subscription) {
+            dd("#");
             $user->subscription->increment('used_guests');
         }
         for ($i = 0; $i < $count; $i++) {
