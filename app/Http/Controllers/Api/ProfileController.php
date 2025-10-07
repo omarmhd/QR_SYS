@@ -18,11 +18,11 @@ class ProfileController extends Controller
         $user=auth()->user();
 
         $validated = $request->validate([
-            'name' => 'required|max:255',
-            'email' => 'required|unique:users,email,'.$user->id,
-            'phone' => 'required|unique:users,phone,'.$user->id,
+            'name' => 'sometimes|max:255',
+            'email' => 'sometimes|unique:users,email,'.$user->id,
+            'phone' => 'sometimes|unique:users,phone,'.$user->id,
             "image"=>"nullable",
-            'location'=>'required'
+            'location'=>'sometimes|string'
 
         ]);
         if ($request->hasFile('image')) {

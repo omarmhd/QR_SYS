@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\QRCode;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -54,28 +55,35 @@ class QRController extends Controller
             return response()->json(['error' => 'QR token missing'], 400);
         }
 
+
+        $hours = getSetting('qr_expiration_hours', 12);
+
+
+
         $qr = QrCode::where('qr_token', $qrToken)
             ->where('status', 'pending')
-            ->where(function($q) {
-                $q->whereNull('expires_at')
-                    ->orWhere('expires_at', '>', now());
-            })
+            ->WhereRaw('TIMESTAMPADD(HOUR, ?, created_at) > NOW()', [$hours])
             ->first();
+
 
         if (!$qr) {
             return response()->json(['error' => 'QR not valid or expired'], 401);
         }
+        $user=$qr->user;
+        if(is_null($user->current_subscription)){
+            return response()->json(['error' => 'Subscription Expired'], 401);
 
-        $listBatch = [];
+        }
 
         $qr->update(['status' => 'checked_in']);
+        $user->visitHistories()->create([]);
 
-        auth()->user()->visitHistories()->create([]);
+        $listBatch = [];
 
         if (($event['msgType'] ?? '') === 'on_uart_receive') {
 
             // If you configured an instruction password on the device (interface_ins_pwd),
-//  you MUST include it in each instruction's msgArg as "sInsPwd": "<your_password>".
+        //  you MUST include it in each instruction's msgArg as "sInsPwd": "<your_password>".
 //  Remove the line if you didn’t set that parameter.
             $sInsPwd = env('KAPRI_INS_PWD'); // or null if not used
 
@@ -94,7 +102,7 @@ class QRController extends Controller
             // (Optional) show QR data
             if (!empty($event['msgArg']['sData'])) {
                 $safe = e($event['msgArg']['sData']);
-                $html = "<html><body><h2>welcome omar : {$safe}</h2></body></html>";
+                $html = "<html><body><h2>welcome {$user->name} : {$safe}</h2></body></html>";
                 $listBatch[] = [
                     'msgType' => 'ins_screen_html_document_write',
                     'msgArg'  => array_filter([
@@ -130,5 +138,4 @@ class QRController extends Controller
         ];
 
         Http::post($url, $instruction);
-    }
-}
+    } }

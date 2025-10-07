@@ -52,6 +52,11 @@ Route::middleware('auth')->group(function () {
 
     Route::resource("contact-messages",\App\Http\Controllers\ContactMessageController::class)->only(["index","destroy"]);
 
+    Route::view("members","members.index");
+    Route::get('/memberships', [\App\Http\Controllers\MembershipController::class, 'index'])->name('memberships.index');
+// web.php
+    Route::post('/memberships/{id}/generate-qr', [\App\Http\Controllers\MembershipController::class, 'generateQr']);
+    Route::get('/memberships/{id}/history', [\App\Http\Controllers\MembershipController::class, 'history']);
 
 
 });

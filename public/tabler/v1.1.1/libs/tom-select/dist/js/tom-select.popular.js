@@ -331,7 +331,7 @@
 	    unicode_map = generateMap(code_points);
 	};
 	/**
-	 * Helper method for normalize a string
+	 * Helpers method for normalize a string
 	 * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize
 	 */
 	const normalize = (str, form = 'NFKD') => str.normalize(form);
@@ -1062,7 +1062,7 @@
 	};
 
 	/**
-	 * use setTimeout if timeout > 0 
+	 * use setTimeout if timeout > 0
 	 */
 	const timeout = (fn, timeout) => {
 	  if (timeout > 0) {
@@ -4391,5 +4391,5 @@
 	return TomSelect;
 
 }));
-var tomSelect=function(el,opts){return new TomSelect(el,opts);} 
+var tomSelect=function(el,opts){return new TomSelect(el,opts);}
 //# sourceMappingURL=tom-select.popular.js.map

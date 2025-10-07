@@ -23,7 +23,7 @@
             <div class="nav-item d-none d-lg-flex me-3">
               <div class="btn-list">
                 <a href="https://github.com/tabler/tabler" class="btn btn-5" target="_blank" rel="noreferrer">
-                  <!-- Download SVG icon from http://tabler.io/icons/icon/brand-github -->
+
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="24"
@@ -41,7 +41,6 @@
                   Source code
                 </a>
                 <a href="https://github.com/sponsors/codecalm" class="btn btn-6" target="_blank" rel="noreferrer">
-                  <!-- Download SVG icon from http://tabler.io/icons/icon/heart -->
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="24"
@@ -62,7 +61,6 @@
             <div class="d-none d-lg-flex">
               <div class="nav-item">
                 <a href="?theme=dark" class="nav-link px-0 hide-theme-dark" title="Enable dark mode" data-bs-toggle="tooltip" data-bs-placement="bottom">
-                  <!-- Download SVG icon from http://tabler.io/icons/icon/moon -->
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="24"
@@ -78,7 +76,6 @@
                   </svg>
                 </a>
                 <a href="?theme=light" class="nav-link px-0 hide-theme-light" title="Enable light mode" data-bs-toggle="tooltip" data-bs-placement="bottom">
-                  <!-- Download SVG icon from http://tabler.io/icons/icon/sun -->
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="24"
@@ -97,7 +94,7 @@
               </div>
               <div class="nav-item dropdown d-none d-md-flex me-3">
                 <a href="#" class="nav-link px-0" data-bs-toggle="dropdown" tabindex="-1" aria-label="Show notifications">
-                  <!-- Download SVG icon from http://tabler.io/icons/icon/bell -->
+
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="24"
@@ -129,7 +126,6 @@
                           </div>
                           <div class="col-auto">
                             <a href="#" class="list-group-item-actions">
-                              <!-- Download SVG icon from http://tabler.io/icons/icon/star -->
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 width="24"
@@ -156,7 +152,6 @@
                           </div>
                           <div class="col-auto">
                             <a href="#" class="list-group-item-actions show">
-                              <!-- Download SVG icon from http://tabler.io/icons/icon/star -->
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 width="24"
@@ -287,6 +282,17 @@
                 </a>
 
               </li>
+                <li class="nav-item">
+
+                    <a class="nav-link" href="/members">
+                  <span class="nav-link-icon d-md-none d-lg-inline-block">
+                    <!-- Download SVG icon from http://tabler.io/icons/icon/home -->
+                  <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-users"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" /><path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /><path d="M21 21v-2a4 4 0 0 0 -3 -3.85" /></svg>
+                  </span>
+                        <span class="nav-link-title"> Members</span>
+                    </a>
+
+                </li>
 
               <li class="nav-item">
                 <a class="nav-link" href="{{route('plans.index')}}">
@@ -325,13 +331,13 @@
                     </a>
                 </li>
 
-                <li class="nav-item active dropdown">
-                    <a class="nav-link dropdown-toggle show" href="#navbar-layout" data-bs-toggle="dropdown" data-bs-auto-close="false" role="button" aria-expanded="true">
+                <li class="nav-item  dropdown">
+                    <a class="nav-link dropdown-toggle" href="#navbar-layout" data-bs-toggle="dropdown" data-bs-auto-close="false" role="button" aria-expanded="false">
                   <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler.io/icons/icon/layout-2 -->
 <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-stars"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M17.8 19.817l-2.172 1.138a.392 .392 0 0 1 -.568 -.41l.415 -2.411l-1.757 -1.707a.389 .389 0 0 1 .217 -.665l2.428 -.352l1.086 -2.193a.392 .392 0 0 1 .702 0l1.086 2.193l2.428 .352a.39 .39 0 0 1 .217 .665l-1.757 1.707l.414 2.41a.39 .39 0 0 1 -.567 .411l-2.172 -1.138z" /><path d="M6.2 19.817l-2.172 1.138a.392 .392 0 0 1 -.568 -.41l.415 -2.411l-1.757 -1.707a.389 .389 0 0 1 .217 -.665l2.428 -.352l1.086 -2.193a.392 .392 0 0 1 .702 0l1.086 2.193l2.428 .352a.39 .39 0 0 1 .217 .665l-1.757 1.707l.414 2.41a.39 .39 0 0 1 -.567 .411l-2.172 -1.138z" /><path d="M12 9.817l-2.172 1.138a.392 .392 0 0 1 -.568 -.41l.415 -2.411l-1.757 -1.707a.389 .389 0 0 1 .217 -.665l2.428 -.352l1.086 -2.193a.392 .392 0 0 1 .702 0l1.086 2.193l2.428 .352a.39 .39 0 0 1 .217 .665l-1.757 1.707l.414 2.41a.39 .39 0 0 1 -.567 .411l-2.172 -1.138z" /></svg></span>
                             <span class="nav-link-title"> Private Requests</span>
                     </a>
-                    <div class="dropdown-menu show" data-bs-popper="static">
+                    <div class="dropdown-menu" data-bs-popper="static">
                         <div class="dropdown-menu-columns">
                             <div class="dropdown-menu-column">
                                 @foreach(\App\Models\Service::all() as $service)
@@ -369,8 +375,8 @@
                   <span class="nav-link-title">Notifications </span>
                 </a>
               </li>
-              <li class="nav-item active dropdown">
-                <a class="nav-link dropdown-toggle show" href="#navbar-layout" data-bs-toggle="dropdown" data-bs-auto-close="false" role="button" aria-expanded="true">
+              <li class="nav-item  dropdown">
+                <a class="nav-link dropdown-toggle" href="#navbar-layout" data-bs-toggle="dropdown" data-bs-auto-close="false" role="button" aria-expanded="false">
                   <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler.io/icons/icon/layout-2 -->
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-1">
                       <path d="M4 4m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v1a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z"></path>
@@ -379,7 +385,7 @@
                       <path d="M14 15m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v1a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z"></path></svg></span>
                   <span class="nav-link-title"> App Settings </span>
                 </a>
-                <div class="dropdown-menu show" data-bs-popper="static">
+                <div class="dropdown-menu" data-bs-popper="static">
                   <div class="dropdown-menu-columns">
                     <div class="dropdown-menu-column">
                       <a class="dropdown-item" href="{{route('static_contents.edit')}}"> Static Contents  </a>

@@ -9,4 +9,7 @@ class QRCode extends Model
     protected $table="qr_codes";
     protected $guarded=[''];
 
+    public function user(){
+        return $this->belongsTo(User::class);
+    }
 }

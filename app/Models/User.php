@@ -65,5 +65,13 @@ class User extends Authenticatable
         return $this->hasMany(VisitHistory::class);
     }
 
+    public function plan(){
+        return $this->belongsTo(Plan::class);
+    }
+
+    public function subscription(){
+        return $this->belongsTo(Subscription::class,"current_subscription");
+    }
+
 
 }
