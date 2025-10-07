@@ -70,7 +70,7 @@ class User extends Authenticatable
     }
 
     public function subscription(){
-        return $this->belongsTo(Subscription::class,"current_subscription");
+        return $this->belongsTo(Subscription::class,"current_subscription","id");
     }
 
 
