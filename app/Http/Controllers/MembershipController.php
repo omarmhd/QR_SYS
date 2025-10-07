@@ -29,7 +29,7 @@ class MembershipController extends Controller
             });
         }
 
-        $users->where("status","active");
+        $users->where("approval_status","accepted");
 
         $users = $users->paginate(5);
 
