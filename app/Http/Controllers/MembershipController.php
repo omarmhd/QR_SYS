@@ -31,7 +31,7 @@ class MembershipController extends Controller
 
         $users->where("approval_status","accepted");
 
-        $users = $users->paginate(5);
+        $users = $users->paginate(10);
 
         return json_encode($users);
 
