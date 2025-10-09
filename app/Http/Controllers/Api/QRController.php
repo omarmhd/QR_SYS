@@ -93,6 +93,7 @@ class QRController extends Controller
                 'msgArg'  => [
                     'sPosition' => 'main',   // ريليه الجهاز الرئيسي
                     'sMode'     => 'on',     // تشغيل (يمكن استخدام 'off' لإيقافه)
+                    "ucRelayNum"=> 0,
                     'ucTime_ds' => 30,       // المدة (3 ثوانٍ)
                 ]
             ];
