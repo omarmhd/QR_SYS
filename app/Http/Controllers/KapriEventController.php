@@ -32,7 +32,7 @@ class KapriEventController extends Controller
 
             // 3 sec buzzer
             $buzzer = [
-                'msgType' => 'ins_inout_buzzer_operate',
+                'msgType' => 'ins_inout_relay_operate',
                 'msgArg'  => array_filter([
                     'sPosition' => 'main',
                     'sMode'     => 'on',     // or 'beep_50'
