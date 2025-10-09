@@ -106,7 +106,7 @@ class QRController extends Controller
                 ], fn($v) => $v !== null),
             ];
             ;
-//            $listBatch[] = $buzzer;
+            $listBatch[] = $buzzer;
 
             // (Optional) show QR data
             if (!empty($event['msgArg']['sData'])) {
