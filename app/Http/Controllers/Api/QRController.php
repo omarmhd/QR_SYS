@@ -101,10 +101,8 @@ class QRController extends Controller
             $listBatch[] = [
                 'msgType' => 'ins_inout_relay_operate',
                 'msgArg'  => array_filter([
-                    'sPosition' => 'relay1',
-                    'sMode'     => 'on',
-                    'ucTime_ds' => 50,
-                    'sInsPwd'   => $sInsPwd,
+                    'relay_id' => 1,
+                    'time_ms'  => 5000
                 ], fn($v) => $v !== null),
             ];
             ;
