@@ -89,16 +89,24 @@ class QRController extends Controller
 
             // 3 sec buzzer
             $buzzer = [
-                'msgType' => 'ins_inout_relay_operate',
+                'msgType' => 'ins_inout_buzzer_operate',
                 'msgArg'  => array_filter([
-                    'relay_id' => 1,
-                    'time_ms'  => 5000,
                     'sPosition' => 'main',
                     'sMode'     => 'on',     // or 'beep_50'
                     'ucTime_ds' => 30,       // 3.0 s
                     'sInsPwd'   => $sInsPwd, // include only if set
                 ], fn($v) => $v !== null),
             ];
+
+            $listBatch[] =  [
+                'msgType' => 'ins_inout_relay_operate',
+                'msgArg'  => array_filter([
+                    'relay_id' => 1,
+                    'time_ms'  => 5000,
+                    'sInsPwd'  => $sInsPwd,
+                ], fn($v) => $v !== null),
+            ];
+            ;
             $listBatch[] = $buzzer;
 
             // (Optional) show QR data
