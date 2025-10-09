@@ -109,7 +109,7 @@ class QRController extends Controller
                 ], fn($v) => $v !== null),
             ];
 
-//            $listBatch[] = $buzzer;
+            $listBatch[] = $buzzer;
 
 
 
