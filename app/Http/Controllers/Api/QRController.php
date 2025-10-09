@@ -99,12 +99,8 @@ class QRController extends Controller
             ];
 
             $listBatch[] = [
-                'msgType' => 'ins_inout_relay_operate',
-                'msgArg'  => array_filter([
-                    'sPosition' => 'main',   // موقع الريليه: غالباً 'main' أو 'aux' حسب الجهاز
-                    'sMode'     => 'on',     // التشغيل
-                    'ucTime_ds' => 30,       // المدة بوحدة 0.1 ثانية → 3.0 ثانية
-                    'sInsPwd'   => $sInsPwd, // كلمة المرور إذا محددة في الجهاز
+                "msgType"=> "ins_inout_relay_operate",
+                "msgArg"=>array_filter([ "relay_id"=> 1,"time_ms"=> 5000
                 ], fn($v) => $v !== null),
             ];
             ;            $listBatch[] = $buzzer;
