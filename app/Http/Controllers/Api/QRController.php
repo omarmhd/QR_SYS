@@ -70,10 +70,10 @@ class QRController extends Controller
             return response()->json(['error' => 'QR not valid or expired'], 401);
         }
         $user=$qr->user;
-        if(is_null($user->current_subscription)){
-            return response()->json(['error' => 'Subscription Expired'], 401);
-
-        }
+//        if(is_null($user->current_subscription)){
+//            return response()->json(['error' => 'Subscription Expired'], 401);
+//
+//        }
 
         $qr->update(['status' => 'checked_in']);
         $user->visitHistories()->create([]);
