@@ -45,6 +45,68 @@ class QRController extends Controller
         $event = $request->all();
         \Log::info('Kapri Event Received:', $event);
 
+        // 1️⃣ Validate token (security)
+        if (($event['msgArg']['sToken'] ?? '') !== 'test-123456789') {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        // 2️⃣ Extract data
+        $qrToken = $event['msgArg']['sData'] ?? null;
+        $msgType = $event['msgType'] ?? '';
+        $sInsPwd = env('KAPRI_INS_PWD'); // optional password (if you configured it in Kapri)
+
+        // 3️⃣ Initialize instruction list
+        $instructions = [];
+
+        // 4️⃣ Handle trigger events (QR / UART / Card / Keyboard)
+        if (in_array($msgType, ['on_uart_receive', 'on_mifare_track', 'on_keyboard_echo'])) {
+
+            // ✅ A) Activate relay 1 for 5 seconds (5000 ms)
+            $instructions[] = [
+                'msgType' => 'ins_inout_relay_operate',
+                'msgArg'  => array_filter([
+                    'relay_id' => 1,
+                    'time_ms'  => 5000,
+                    'sInsPwd'  => $sInsPwd,
+                ], fn($v) => $v !== null),
+            ];
+
+            // ✅ B) Turn on buzzer for 0.3 seconds (300 ms)
+            $instructions[] = [
+                'msgType' => 'ins_inout_buzzer_operate',
+                'msgArg'  => array_filter([
+                    'time_ms' => 300,     // buzzer duration in milliseconds
+                    'sInsPwd' => $sInsPwd,
+                ], fn($v) => $v !== null),
+            ];
+
+            // ✅ C) Show welcome message on Kapri screen
+            $safe = e($qrToken ?? 'Guest');
+            $html = "<html><body style='font-family:sans-serif;text-align:center;'>
+                    <h2>Welcome {$safe}</h2>
+                 </body></html>";
+
+            $instructions[] = [
+                'msgType' => 'ins_screen_html_document_write',
+                'msgArg'  => array_filter([
+                    'html'    => $html,
+                    'sInsPwd' => $sInsPwd,
+                ], fn($v) => $v !== null),
+            ];
+        }
+
+        // 5️⃣ Always reply with ins_cloud_batch (even if empty)
+        $response = [
+            'msgType' => 'ins_cloud_batch',
+            'msgArg'  => ['instructions' => $instructions],
+        ];
+
+        return response()->json($response);
+
+        /*
+        $event = $request->all();
+        \Log::info('Kapri Event Received:', $event);
+
 
         if (($event['msgArg']['sToken'] ?? '') !== 'test-123456789') {
             return response()->json(['error' => 'Unauthorized'], 401);
@@ -91,6 +153,8 @@ class QRController extends Controller
             $buzzer = [
                 'msgType' => 'ins_inout_relay_operate',
                 'msgArg'  => array_filter([
+                    'relay_id' => 1,
+                    'time_ms'  => 5000,
                     'sPosition' => 'main',
                     'sMode'     => 'on',     // or 'beep_50'
                     'ucTime_ds' => 30,       // 3.0 s
@@ -137,5 +201,5 @@ class QRController extends Controller
             ]
         ];
 
-        Http::post($url, $instruction);
+        Http::post($url, $instruction);*/
     } }
