@@ -94,7 +94,7 @@ class QRController extends Controller
                     'sPosition' => 'main',   // ريليه الجهاز الرئيسي
                     'sMode'     => 'on',     // تشغيل (يمكن استخدام 'off' لإيقافه)
                     "ucRelayNum"=> 0,
-                    'ucTime_ds' => 30,       // المدة (3 ثوانٍ)
+                    'ucTime_ds' => 50,       // المدة (3 ثوانٍ)
                 ]
             ];
 
@@ -109,7 +109,7 @@ class QRController extends Controller
                 ], fn($v) => $v !== null),
             ];
 
-//            $listBatch[] = $buzzer;
+            $listBatch[] = $buzzer;
 
 
 
