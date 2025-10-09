@@ -104,7 +104,7 @@ class QRController extends Controller
                 'msgArg'  => array_filter([
                     'sPosition' => 'main',
                     'sMode'     => 'on',     // أو 'beep_50' لنبضات متقطعة
-                    'ucTime_ds' => 30,       // 3.0 ثوانٍ
+                    'ucTime_ds' => 10,       // 3.0 ثوانٍ
                     'sInsPwd'   => $sInsPwd, // فقط لو عندك كلمة مرور للأوامر
                 ], fn($v) => $v !== null),
             ];
