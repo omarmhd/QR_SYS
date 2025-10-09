@@ -88,16 +88,6 @@ class QRController extends Controller
             $sInsPwd = env('KAPRI_INS_PWD'); // or null if not used
 
             // 3 sec buzzer
-            $buzzer = [
-                'msgType' => 'ins_inout_buzzer_operate',
-                'msgArg'  => array_filter([
-                    'sPosition' => 'main',
-                    'sMode'     => 'on',     // or 'beep_50'
-                    'ucTime_ds' => 30,       // 3.0 s
-                    'sInsPwd'   => $sInsPwd, // include only if set
-                ], fn($v) => $v !== null),
-            ];
-
             $listBatch[] = [
                 'msgType' => 'ins_inout_relay_operate',
                 'msgArg'  => [
@@ -106,7 +96,20 @@ class QRController extends Controller
                     'ucTime_ds' => 30,       // المدة (3 ثوانٍ)
                 ]
             ];
-           $listBatch[] = $buzzer;
+
+// تشغيل البازر (الصافرة)
+            $buzzer = [
+                'msgType' => 'ins_inout_buzzer_operate',
+                'msgArg'  => array_filter([
+                    'sPosition' => 'main',
+                    'sMode'     => 'on',     // أو 'beep_50' لنبضات متقطعة
+                    'ucTime_ds' => 30,       // 3.0 ثوانٍ
+                    'sInsPwd'   => $sInsPwd, // فقط لو عندك كلمة مرور للأوامر
+                ], fn($v) => $v !== null),
+            ];
+
+            $listBatch[] = $buzzer;
+
 
 
             // (Optional) show QR data
