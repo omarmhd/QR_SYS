@@ -117,14 +117,14 @@ class QRController extends Controller
             if (!empty($event['msgArg']['sData'])) {
                 $safe = e($event['msgArg']['sData']);
                 $html = <<<HTML
-<html>
-  <body style="background-color:#000; text-align:center; font-family:Arial, sans-serif;">
-    <div style="margin-top:40px;">
-      <img src="https://elunicolounge.com/logo_white.png" alt="Elunico Logo" style="width:150px; height:auto; margin-bottom:20px;">
-      <h2 style="color:#333;">Welcome {$user->name}</h2>
-    </div>
-  </body>
-</html>
+            <html>
+              <body style="background-color:#000; text-align:center; font-family:Arial, sans-serif;">
+                <div style="margin-top:40px;">
+                  <img src="https://elunicolounge.com/logo_white.png" alt="Elunico Logo" style="width:150px; height:auto; margin-bottom:20px;">
+                  <h2 style="color:#333;">Welcome {$user->name}</h2>
+                </div>
+              </body>
+            </html>
 HTML;
 
                 $listBatch[] = [
