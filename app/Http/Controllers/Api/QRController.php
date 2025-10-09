@@ -99,11 +99,14 @@ class QRController extends Controller
             ];
 
             $listBatch[] = [
-                "msgType"=> "ins_inout_relay_operate",
-                "msgArg"=>array_filter([ "relay_id"=> 1,"time_ms"=> 5000
-                ], fn($v) => $v !== null),
+                'msgType' => 'ins_inout_relay_operate',
+                'msgArg'  => [
+                    'sPosition' => 'main',   // ريليه الجهاز الرئيسي
+                    'sMode'     => 'on',     // تشغيل (يمكن استخدام 'off' لإيقافه)
+                    'ucTime_ds' => 30,       // المدة (3 ثوانٍ)
+                ]
             ];
-            ;            $listBatch[] = $buzzer;
+           $listBatch[] = $buzzer;
 
 
             // (Optional) show QR data
