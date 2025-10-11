@@ -117,17 +117,27 @@ class QRController extends Controller
 
 
 
-
-            $listBatch[]  = [
-                'msgType' => 'ins_screen_html_document_write',
+            $listBatch[] = [
+                'msgType' => 'ins_screen_image_store',
                 'msgArg'  => [
-                    'html' => "<html><body style='margin:0;background-color:black;text-align:center;'>
-                                 <img src='https://elunicolounge.com/logo_white.png' width='160' style='margin-top:40px;'/>
-                                 <div id='id_dt_hhmm' style='color:white;font-size:24px;'></div>
-                                 <div id='id_dt_ddmmyyyy' style='color:gray;font-size:18px;'></div>
-                               </body></html>"
+                    'image_name' => 'boot.jpg',   // ريليه الجهاز الرئيسي
+                    'image_base64'     => base64_encode(file_get_contents('https://elunicolounge.com/logo_white.png'))
+            ,     // تشغيل (يمكن استخدام 'off' لإيقافه)
+               // المدة (3 ثوانٍ)
                 ]
             ];
+            $listBatch[] = [
+                'msgType' => 'ins_screen_html_document_write',
+                'msgArg'  => [
+                    'html' =>"<html><body style='margin:0;background-color:black;text-align:center;'>
+                     <img src='boot.jpg' width='160' style='margin-top:40px;'/>
+                     <div id='id_dt_hhmm' style='color:white;font-size:24px;'></div>
+                     <div id='id_dt_ddmmyyyy' style='color:gray;font-size:18px;'></div>
+                   </body></html>"  // ريليه الجهاز الرئيسي
+                    // المدة (3 ثوانٍ)
+                ]
+            ];
+
             // 3 sec buzzer
             $listBatch[] = [
                 'msgType' => 'ins_inout_relay_operate',
