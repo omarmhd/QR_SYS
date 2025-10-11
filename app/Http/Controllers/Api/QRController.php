@@ -126,7 +126,7 @@ class QRController extends Controller
                             'msgType' => 'ins_screen_html_document_write',
                             'msgArg'  => [
                                 'html' => "<html><body style='margin:0;background-color:black;text-align:center;'>
-                                 <img src='boot.jpg' width='160' style='margin-top:40px;'/>
+                                 <img src='https://elunicolounge.com/logo_white.png' width='160' style='margin-top:40px;'/>
                                  <div id='id_dt_hhmm' style='color:white;font-size:24px;'></div>
                                  <div id='id_dt_ddmmyyyy' style='color:gray;font-size:18px;'></div>
                                </body></html>"
