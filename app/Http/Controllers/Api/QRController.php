@@ -120,14 +120,14 @@ class QRController extends Controller
             $listBatch[] = [
                 'msgType' => 'ins_screen_image_store',
                 'msgArg'  => [
-                    'image_name' => 'boot.jpg',   // ريليه الجهاز الرئيسي
-                    'image_base64'     => base64_encode(file_get_contents('https://elunicolounge.com/logo_white.png'))
+                    'sImgName' => 'boot.jpg',   // ريليه الجهاز الرئيسي
+                    'sImgB64'  => base64_encode(file_get_contents('https://elunicolounge.com/logo_white.png'))
                 ]
             ];
             $listBatch[] = [
                 'msgType' => 'ins_screen_html_document_write',
                 'msgArg'  => [
-                    'html' =>"<html><body style='margin:0;background-color:black;text-align:center;'>
+                    'sHtml' =>"<html><body style='margin:0;background-color:black;text-align:center;'>
                      <img src='boot.jpg' width='160' style='margin-top:40px;'/>
                      <div id='id_dt_hhmm' style='color:white;font-size:24px;'></div>
                      <div id='id_dt_ddmmyyyy' style='color:gray;font-size:18px;'></div>
