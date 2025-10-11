@@ -36,17 +36,32 @@ class QRController extends Controller
             'data'    => $qr
         ]);
     }
-    public function storeNumGuests(Request $request){
+    public function storeNumGuests(Request $request)
+    {
         $validated = $request->validate([
-            "guests_count" => "required|numeric"]);
+            'guests_count' => 'required|numeric|min:0',
+        ]);
 
-        $user=auth()->user;
+        $user = auth()->user();
+
         if ($user->subscription) {
             $user->subscription->update([
-                'last_quests_limit' => $request->guests_count
+                'last_visit_guests_limit' => $validated['guests_count']
             ]);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Guests limit updated successfully.',
+                'data' => [
+                    'last_visit_guests_limit' => $validated['guests_count']
+                ]
+            ], 200);
         }
 
+        return response()->json([
+            'status' => false,
+            'message' => 'No subscription found for this user.'
+        ], 404);
     }
 
 
