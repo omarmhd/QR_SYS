@@ -41,7 +41,7 @@ class NotificationController extends Controller
             'body' => 'required|string'
         ]);
         $response=$this->firebaseService->sendNotification('general', $validated["title"], $validated["body"], ["type" => "topic"], null, 'topic');
-         if(!isset($response["name"])){
+         if(!isset($response[0]['name'])){
             return redirect()->back()->with("error","Error in send notification");
          }
 
