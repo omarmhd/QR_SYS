@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\QRCode;
+use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -34,6 +35,18 @@ class QRController extends Controller
             'message' => 'QR code saved successfully',
             'data'    => $qr
         ]);
+    }
+    public function storeNumGuests(Request $request){
+        $validated = $request->validate([
+            "guests_count" => "required|numeric"]);
+
+        $user=auth()->user;
+        if ($user->subscription) {
+            $user->subscription->update([
+                'last_quests_limit' => $request->guests_count
+            ]);
+        }
+
     }
 
 
