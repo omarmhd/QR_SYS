@@ -122,8 +122,6 @@ class QRController extends Controller
                 'msgArg'  => [
                     'image_name' => 'boot.jpg',   // ريليه الجهاز الرئيسي
                     'image_base64'     => base64_encode(file_get_contents('https://elunicolounge.com/logo_white.png'))
-            ,     // تشغيل (يمكن استخدام 'off' لإيقافه)
-               // المدة (3 ثوانٍ)
                 ]
             ];
             $listBatch[] = [
