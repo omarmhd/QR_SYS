@@ -84,78 +84,39 @@ class QRController extends Controller
         }
 
 
-
-        $listBatch = [];
-
-        if (($event['msgType'] ?? '') === 'on_cloud_keep_alive') {
-
-            $imageUrl = 'https://elunicolounge.com/logo_white.png';
-            $imagePath = storage_path('app/public/logo_white.png');
-
-            // تحميل الصورة محليًا لتفادي مشاكل الاتصال الخارجي
-            if (!file_exists($imagePath)) {
-                try {
-                    file_put_contents($imagePath, file_get_contents($imageUrl));
-                } catch (\Exception $e) {
-                    \Log::error('Failed to download logo: ' . $e->getMessage());
-                }
-            }
+        $hours = getSetting('qr_expiration_hours', 12);
 
 
-            $listBatch[] = [
-                'msgType' => 'ins_screen_image_store',
-                'msgArg'  => [
-                    'sImgName' => 'boot.jpg',
-                    'sImgB64'  => base64_encode(file_get_contents($imagePath)),
-                ],
-            ];
 
-            // ✅ عرض صفحة HTML على الشاشة
-            $listBatch[] = [
-                'msgType' => 'ins_screen_html_document_write',
-                'msgArg'  => [
-                    'sHtml' => "
-                    <html>
-                      <body style='margin:0;background-color:black;text-align:center;'>
-                        <img src='boot.jpg' width='160' style='margin-top:40px;'/>
-                        <div id='id_dt_hhmm' style='color:white;font-size:24px;'></div>
-                        <div id='id_dt_ddmmyyyy' style='color:gray;font-size:18px;'></div>
-                      </body>
-                    </html>",
-                ]
-            ];
+        $qr = QrCode::where('qr_token', $qrToken)
+            ->where('status', 'pending')
+            ->WhereRaw('TIMESTAMPADD(HOUR, ?, created_at) > NOW()', [$hours])
+            ->first();
 
-            \Log::info('Kapri Event Received:', "in if");
 
+        if (!$qr) {
+            return response()->json(['error' => 'QR not valid or expired'], 401);
         }
-
-        if (($event['msgType'] ?? '') === 'on_uart_receive') {
-
-            $hours = getSetting('qr_expiration_hours', 12);
-
-
-
-            $qr = QrCode::where('qr_token', $qrToken)
-                ->where('status', 'pending')
-                ->WhereRaw('TIMESTAMPADD(HOUR, ?, created_at) > NOW()', [$hours])
-                ->first();
-
-
-            if (!$qr) {
-                return response()->json(['error' => 'QR not valid or expired'], 401);
-            }
-            $user=$qr->user;
+        $user=$qr->user;
 //        if(is_null($user->current_subscription)){
 //            return response()->json(['error' => 'Subscription Expired'], 401);
 //
 //        }
 
-            $qr->update(['status' => 'checked_in']);
-            $user->visitHistories()->create([]);
+        $qr->update(['status' => 'checked_in']);
+        $user->visitHistories()->create([]);
+
+        $listBatch = [];
+
+        if (($event['msgType'] ?? '') === 'on_uart_receive') {
+
             // If you configured an instruction password on the device (interface_ins_pwd),
         //  you MUST include it in each instruction's msgArg as "sInsPwd": "<your_password>".
 //  Remove the line if you didn’t set that parameter.
             $sInsPwd = env('KAPRI_INS_PWD'); // or null if not used
+
+
+
 
             // 3 sec buzzer
             $listBatch[] = [
