@@ -46,7 +46,7 @@ class QRController extends Controller
 
         if ($user->subscription) {
             $user->subscription->update([
-                'last_visit_guests_limit' => $validated['guests_count']
+                'last_guests_limit' => $validated['guests_count']
             ]);
 
             return response()->json([
