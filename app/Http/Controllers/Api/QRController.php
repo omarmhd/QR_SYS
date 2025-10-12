@@ -177,7 +177,7 @@ HTML;
                         'sInsPwd' => $sInsPwd,
                     ], fn($v) => $v !== null),
                 ];
-                sleep(2);
+                sleep(20);
 
                 $restoreHtml = <<<HTML
             <html>
