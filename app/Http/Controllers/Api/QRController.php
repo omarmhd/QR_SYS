@@ -114,28 +114,41 @@ class QRController extends Controller
         //  you MUST include it in each instruction's msgArg as "sInsPwd": "<your_password>".
 //  Remove the line if you didn’t set that parameter.
             $sInsPwd = env('KAPRI_INS_PWD'); // or null if not used
+            $imageUrl = 'https://elunicolounge.com/logo_white.png';
+            $imagePath = storage_path('app/public/logo_white.png');
 
+            // تحميل الصورة محليًا لتفادي مشاكل الاتصال الخارجي
+            if (!file_exists($imagePath)) {
+                try {
+                    file_put_contents($imagePath, file_get_contents($imageUrl));
+                } catch (\Exception $e) {
+                    \Log::error('Failed to download logo: ' . $e->getMessage());
+                }
+            }
 
 
             $listBatch[] = [
                 'msgType' => 'ins_screen_image_store',
                 'msgArg'  => [
-                    'sImgName' => 'boot.jpg',   // ريليه الجهاز الرئيسي
-                    'sImgB64'  => base64_encode(file_get_contents('https://elunicolounge.com/logo_white.png'))
-                ]
+                    'sImgName' => 'boot.jpg',
+                    'sImgB64'  => base64_encode(file_get_contents($imagePath)),
+                ],
             ];
+
+            // ✅ عرض صفحة HTML على الشاشة
             $listBatch[] = [
                 'msgType' => 'ins_screen_html_document_write',
                 'msgArg'  => [
-                    'sHtml' =>"<html><body style='margin:0;background-color:black;text-align:center;'>
-                     <img src='boot.jpg' width='160' style='margin-top:40px;'/>
-                     <div id='id_dt_hhmm' style='color:white;font-size:24px;'></div>
-                     <div id='id_dt_ddmmyyyy' style='color:gray;font-size:18px;'></div>
-                   </body></html>"  // ريليه الجهاز الرئيسي
-                    // المدة (3 ثوانٍ)
-                ]
+                    'sHtml' => "
+                    <html>
+                      <body style='margin:0;background-color:black;text-align:center;'>
+                        <img src='boot.jpg' width='160' style='margin-top:40px;'/>
+                        <div id='id_dt_hhmm' style='color:white;font-size:24px;'></div>
+                        <div id='id_dt_ddmmyyyy' style='color:gray;font-size:18px;'></div>
+                      </body>
+                    </html>",
+                ],
             ];
-
             // 3 sec buzzer
             $listBatch[] = [
                 'msgType' => 'ins_inout_relay_operate',
