@@ -108,12 +108,8 @@ class QRController extends Controller
 
         $listBatch = [];
 
-        if (($event['msgType'] ?? '') === 'on_uart_receive') {
+        if (($event['msgType'] ?? '') === 'on_cloud_keep_alive') {
 
-            // If you configured an instruction password on the device (interface_ins_pwd),
-        //  you MUST include it in each instruction's msgArg as "sInsPwd": "<your_password>".
-//  Remove the line if you didn’t set that parameter.
-            $sInsPwd = env('KAPRI_INS_PWD'); // or null if not used
             $imageUrl = 'https://elunicolounge.com/logo_white.png';
             $imagePath = storage_path('app/public/logo_white.png');
 
@@ -147,8 +143,17 @@ class QRController extends Controller
                         <div id='id_dt_ddmmyyyy' style='color:gray;font-size:18px;'></div>
                       </body>
                     </html>",
-                ],
+                ]
             ];
+        }
+
+        if (($event['msgType'] ?? '') === 'on_uart_receive') {
+
+            // If you configured an instruction password on the device (interface_ins_pwd),
+        //  you MUST include it in each instruction's msgArg as "sInsPwd": "<your_password>".
+//  Remove the line if you didn’t set that parameter.
+            $sInsPwd = env('KAPRI_INS_PWD'); // or null if not used
+
             // 3 sec buzzer
             $listBatch[] = [
                 'msgType' => 'ins_inout_relay_operate',
