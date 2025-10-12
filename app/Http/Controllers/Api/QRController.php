@@ -53,7 +53,7 @@ class QRController extends Controller
                 'status' => true,
                 'message' => 'Guests limit updated successfully.',
                 'data' => [
-                    'last_visit_guests_limit' => $validated['guests_count']
+                    'last_guests_limit' => $validated['guests_count']
                 ]
             ], 200);
         }
@@ -101,7 +101,12 @@ class QRController extends Controller
 //
 //        }
 
-        $qr->update(['status' => 'checked_in']);
+        $updated=$qr->update(['status' => 'checked_in']);
+
+        if($updated){
+            $user->subscription->increment('used_guests');
+
+        }
 
         $user->visitHistories()->create([]);
 

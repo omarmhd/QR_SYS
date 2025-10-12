@@ -56,13 +56,13 @@ class MembershipController extends Controller
             ]);
 
         }
-//        if ($user->subscription) {
-//            $user->subscription->increment('used_guests');
-//        }
+        if ($user->subscription) {
+            $user->subscription->increment('used_guests');
+        }
         for ($i = 0; $i < $count; $i++) {
             $token = bin2hex(random_bytes(16));
             $image = $writer->writeString($token);
-
+            $user->subscription->decrement('last_guests_limit');
 //            $image = $writer->writeString("Member $id - guest $i ".time());
             QRCode::create([
                 "user_id"=>$id,
