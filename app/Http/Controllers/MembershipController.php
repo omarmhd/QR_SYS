@@ -62,7 +62,7 @@ class MembershipController extends Controller
         for ($i = 0; $i < $count; $i++) {
             $token = bin2hex(random_bytes(16));
             $image = $writer->writeString($token);
-            $user->subscription->decrement('last_guests_limit');
+//            $user->subscription->decrement('last_guests_limit');
 //            $image = $writer->writeString("Member $id - guest $i ".time());
             QRCode::create([
                 "user_id"=>$id,
@@ -79,8 +79,7 @@ class MembershipController extends Controller
                 'qr'   => 'data:image/png;base64,' . base64_encode($image)
             ];
         }
-        $last_guests_limit=$user->subscription->decrement('last_guests_limit');
-        return json_encode(['qr_codes' => $qrCodes,"last_guests_limit"=>$last_guests_limit]);
+        return json_encode(['qr_codes' => $qrCodes]);
     }
 
     public function history($id){
