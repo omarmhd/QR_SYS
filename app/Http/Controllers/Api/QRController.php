@@ -145,6 +145,9 @@ class QRController extends Controller
                     </html>",
                 ]
             ];
+
+            \Log::info('Kapri Event Received:', "in if");
+
         }
 
         if (($event['msgType'] ?? '') === 'on_uart_receive') {
