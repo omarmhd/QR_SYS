@@ -166,7 +166,7 @@ class QRController extends Controller
                 <div style="margin-top:20px;">
                 <img src="boot.jpg" width="160" style="margin-top:20px;"/>
                   <h2 style="color:#333;">Welcome {$user->name}</h2>
-                  <div id="id_dt_hhmm" style="color:white; margin-top:20px; font-size:24px;"></div>
+                  <div id="id_dt_hhmm" style="color:white; margin-top:5px; font-size:24px;"></div>
                 </div>
               </body>
             </html>
