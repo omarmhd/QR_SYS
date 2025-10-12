@@ -192,7 +192,7 @@ HTML;
                     'msgArg'  => array_filter([
                         'sHtml'      => $restoreHtml,
                         'sInsPwd'    => $sInsPwd,
-                        'ucDelay_ds' => 30, // تأخير 3 ثواني (كل وحدة = 0.1 ثانية)
+                        'ucDelay_ds' => 100,
                     ], fn($v) => $v !== null),
                 ];
             }
