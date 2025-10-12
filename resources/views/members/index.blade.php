@@ -228,9 +228,9 @@
                                            <div class="mt-2">
                                 <h4 class="subheader mb-2">guests information</h4>
 
-                                <div class="mb-2"><span class="text-muted">Number : ${member.plan.guest_passes_per_year}</span></div>
-                                <div class="mb-2"><span class="text-muted">Coming:  ${member.subscription?.last_guests_limit ?? 0}</span></div>
-                                <div class="mb-2"><span class="text-muted">Remaining: ${member.plan.guest_passes_per_year-(member.subscription?.used_guests ?? 0)}</span></div>
+                                <div class="mb-2"><span class="text-muted text-yellow">total : ${member.plan.guest_passes_per_year}</span></div>
+                                <div class="mb-2"><span class="text-muted  text-yellow">Coming:  ${member.subscription?.last_guests_limit ?? 0}</span></div>
+                                <div class="mb-2"><span class="text-muted  text-yellow">Remaining: ${member.plan.guest_passes_per_year-(member.subscription?.used_guests ?? 0)}</span></div>
 
                             </div>
                         </div>
