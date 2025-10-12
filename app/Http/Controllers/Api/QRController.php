@@ -90,7 +90,7 @@ class QRController extends Controller
 
         $qr = QrCode::where('qr_token', $qrToken)
             ->where('status', 'pending')
-            ->WhereRaw('TIMESTAMPADD(HOUR, ?, created_at) > NOW()', [$hours])
+            ->WhereRaw('TIMESTAMPADD(HOUR, ?, updated_at) > NOW()', [$hours])
             ->first();
 
 
