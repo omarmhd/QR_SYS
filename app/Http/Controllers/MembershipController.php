@@ -79,8 +79,8 @@ class MembershipController extends Controller
                 'qr'   => 'data:image/png;base64,' . base64_encode($image)
             ];
         }
-
-        return json_encode(['qr_codes' => $qrCodes]);
+        $last_guests_limit=$user->subscription->decrement('last_guests_limit');
+        return json_encode(['qr_codes' => $qrCodes,"last_guests_limit"=>$last_guests_limit]);
     }
 
     public function history($id){

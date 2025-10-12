@@ -326,8 +326,12 @@
 
                                     qrCodeContainer.appendChild(div);
                                 });
-                                spinner.style.display = 'none';
-                                btn.disabled = false;
+
+                                if(data.last_guests_limit==0){
+                                    input.disabled = true;
+                                    button.disabled = true;
+                                    input.value = 0;
+                                }
 
 
                                 qrCodeModal.show();
