@@ -187,8 +187,8 @@ HTML;
               </body>
             </html>
 HTML;
-                SendRestoreScreenJob::dispatch($sInsPwd, $restoreHtml, "https://elunicolounge.com/api/kapri/event"?? 'https://kapri-device.local')
-                    ->delay(now()->addSeconds(5));
+                SendRestoreScreenJob::dispatch($sInsPwd, $restoreHtml, "https://elunicolounge.com/api/kapri/event")
+                    ->delay(now()->addSeconds(10));
             }
         }
 
@@ -202,6 +202,14 @@ HTML;
         ];
 
         return response()->json($response);
+
+        sleep(3);
+        $listBatch[] = [
+            'msgType' => 'ins_screen_html_document_write',
+            'msgArg' => [
+                'sHtml'   => "<img src='boot.jpg'>"
+            ]
+        ];
     }
     private function openGate()
     {
