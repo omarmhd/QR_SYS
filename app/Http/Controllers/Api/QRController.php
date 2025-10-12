@@ -163,8 +163,8 @@ class QRController extends Controller
                 $html = <<<HTML
             <html>
               <body style="background-color:#000; text-align:center; font-family:Arial, sans-serif;">
-                <div style="margin-top:40px;">
-                <img src="boot.jpg" width="160" style="margin-top:40px;"/>
+                <div style="margin-top:20px;">
+                <img src="boot.jpg" width="160" style="margin-top:20px;"/>
                   <h2 style="color:#333;">Welcome {$user->name}</h2>
                   <div id="id_dt_hhmm" style="color:white; margin-top:20px; font-size:24px;"></div>
                 </div>
