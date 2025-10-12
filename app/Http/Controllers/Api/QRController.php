@@ -86,8 +86,6 @@ class QRController extends Controller
 
         $hours = getSetting('qr_expiration_hours', 12);
 
-
-
         $qr = QrCode::where('qr_token', $qrToken)
             ->where('status', 'pending')
             ->WhereRaw('TIMESTAMPADD(HOUR, ?, updated_at) > NOW()', [$hours])
@@ -104,8 +102,12 @@ class QRController extends Controller
 //        }
 
         $qr->update(['status' => 'checked_in']);
+
         $user->visitHistories()->create([]);
 
+        if ($qr->type=="visitor") {
+            $user->subscription->increment('used_guests');
+        }
         $listBatch = [];
 
         if (($event['msgType'] ?? '') === 'on_uart_receive') {
@@ -162,6 +164,24 @@ HTML;
                     'msgArg'  => array_filter([
                         'sHtml'   => $html,
                         'sInsPwd' => $sInsPwd,
+                    ], fn($v) => $v !== null),
+                ];
+
+                $restoreHtml = <<<HTML
+            <html>
+              <body style="background-color:#000; text-align:center; font-family:Arial, sans-serif;">
+                <img src="boot.jpg" width="160" style="margin-top:40px;"/>
+                <div id="id_dt_hhmm" style="color:white; margin-top:20px; font-size:24px;"></div>
+              </body>
+            </html>
+HTML;
+
+                $listBatch[] = [
+                    'msgType' => 'ins_screen_html_document_write',
+                    'msgArg'  => array_filter([
+                        'sHtml'      => $restoreHtml,
+                        'sInsPwd'    => $sInsPwd,
+                        'ucDelay_ds' => 30, // تأخير 3 ثواني (كل وحدة = 0.1 ثانية)
                     ], fn($v) => $v !== null),
                 ];
             }

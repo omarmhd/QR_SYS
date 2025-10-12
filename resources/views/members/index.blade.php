@@ -144,6 +144,8 @@
     <script>
 
         document.addEventListener('DOMContentLoaded', () => {
+
+
             let membersData = [];
             const membersGrid = document.getElementById('members-grid');
             const searchInput = document.getElementById('search-input');
@@ -222,25 +224,33 @@
                                 <div class="mb-1 d-flex align-items-center text-muted"><svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z"></path><path d="M3 7l9 6l9 -6"></path></svg><a href="mailto:${member.email}" class="text-reset">${member.email}</a></div>
                                 <div class="d-flex align-items-center text-muted"><svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M5 4h4l2 5l-2.5 1.5a11 11 0 0 0 5 5l1.5 -2.5l5 2v4a2 2 0 0 1 -2 2a16 16 0 0 1 -15 -15a2 2 0 0 1 2 -2"></path></svg><a href="tel:${member.phone}" class="text-reset">${member.phone}</a></div>
                             </div>
+
+                                           <div class="mt-2">
+                                <h4 class="subheader mb-2">guests information</h4>
+
+                                <div class="mb-2"><span class="text-muted">Number : ${member.plan.guest_passes_per_year}</span></div>
+                                <div class="mb-2"><span class="text-muted">Coming:  ${member.subscription?.last_guests_limit ?? 0}</span></div>
+                                <div class="mb-2"><span class="text-muted">Remaining: ${member.plan.guest_passes_per_year-(member.subscription?.used_guests ?? 0)}</span></div>
+
+                            </div>
                         </div>
                         <div class="card-footer">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <div class="d-flex gap-3">
-<p class="text-muted mb-0">Limit: <span class="text-dark fw-bold">${member.plan.guest_passes_per_year}</span>
+<p class="text-muted mb-0"> <span class="text-dark fw-bold"></span>
 
 </p>
-    <p class="text-muted mb-0">Used: <span class="text-dark fw-bold">    ${member.subscription?.used_guests ?? 0}</span>
+    <p class="text-muted mb-0"><span class="text-dark fw-bold">    </span>
 
 </p>                            </div>
                                 <button class="btn btn-ghost-secondary btn-sm view-history-btn" data-member-id="${member.id}" >
                                   <svg xmlns="http://www.w3.org/2000/svg" class="icon me-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"></path><path d="M12 7v5l3 3"></path></svg>
-                                    History
                                 </button>
                             </div>
                             <form class="generate-form" data-member-id="${member.id}">
                                 <label class="form-label">Generate QR</label>
                                 <div class="input-group">
-                                    <input type="number" value="1" min="1" max="${member.plan.guest_passes_per_year}" class="form-control visitor-count"       onkeydown="return false;"
+                                    <input type="number"  min="1" max="${member.subscription?.last_guests_limit ?? 0}" class="form-control visitor-count"       onkeydown="return false;"
   style="max-width: 70px;" required>
                                     <button type="submit" class="btn btn-primary generate-btn">
                                       <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -258,6 +268,16 @@
                 });
 
                 document.querySelectorAll('.generate-form').forEach(form => {
+
+                    const input = form.querySelector('.visitor-count');
+                    const button = form.querySelector('.generate-btn');
+                    const max = parseInt(input.getAttribute("max")) || 0;
+
+                    if (max === 0) {
+                        input.disabled = true;
+                        button.disabled = true;
+                        input.value = 0;
+                    }
                     form.addEventListener('submit', (e) => {
                         e.preventDefault();
 
