@@ -84,27 +84,6 @@ class QRController extends Controller
         }
 
 
-        $hours = getSetting('qr_expiration_hours', 12);
-
-
-
-        $qr = QrCode::where('qr_token', $qrToken)
-            ->where('status', 'pending')
-            ->WhereRaw('TIMESTAMPADD(HOUR, ?, created_at) > NOW()', [$hours])
-            ->first();
-
-
-        if (!$qr) {
-            return response()->json(['error' => 'QR not valid or expired'], 401);
-        }
-        $user=$qr->user;
-//        if(is_null($user->current_subscription)){
-//            return response()->json(['error' => 'Subscription Expired'], 401);
-//
-//        }
-
-        $qr->update(['status' => 'checked_in']);
-        $user->visitHistories()->create([]);
 
         $listBatch = [];
 
@@ -152,6 +131,27 @@ class QRController extends Controller
 
         if (($event['msgType'] ?? '') === 'on_uart_receive') {
 
+            $hours = getSetting('qr_expiration_hours', 12);
+
+
+
+            $qr = QrCode::where('qr_token', $qrToken)
+                ->where('status', 'pending')
+                ->WhereRaw('TIMESTAMPADD(HOUR, ?, created_at) > NOW()', [$hours])
+                ->first();
+
+
+            if (!$qr) {
+                return response()->json(['error' => 'QR not valid or expired'], 401);
+            }
+            $user=$qr->user;
+//        if(is_null($user->current_subscription)){
+//            return response()->json(['error' => 'Subscription Expired'], 401);
+//
+//        }
+
+            $qr->update(['status' => 'checked_in']);
+            $user->visitHistories()->create([]);
             // If you configured an instruction password on the device (interface_ins_pwd),
         //  you MUST include it in each instruction's msgArg as "sInsPwd": "<your_password>".
 //  Remove the line if you didn’t set that parameter.
