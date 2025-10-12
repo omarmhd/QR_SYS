@@ -164,7 +164,9 @@ class QRController extends Controller
             <html>
               <body style="background-color:#000; text-align:center; font-family:Arial, sans-serif;">
                 <div style="margin-top:40px;">
+                <img src="boot.jpg" width="160" style="margin-top:40px;"/>
                   <h2 style="color:#333;">Welcome {$user->name}</h2>
+                  <div id="id_dt_hhmm" style="color:white; margin-top:20px; font-size:24px;"></div>
                 </div>
               </body>
             </html>
@@ -203,13 +205,7 @@ HTML;
 
         return response()->json($response);
 
-        sleep(3);
-        $listBatch[] = [
-            'msgType' => 'ins_screen_html_document_write',
-            'msgArg' => [
-                'sHtml'   => "<img src='boot.jpg'>"
-            ]
-        ];
+
     }
     private function openGate()
     {
