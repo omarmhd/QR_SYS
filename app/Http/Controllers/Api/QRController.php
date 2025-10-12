@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\SendRestoreScreenJob;
 use App\Models\QRCode;
 use App\Models\Subscription;
 use App\Models\User;
@@ -142,7 +143,6 @@ class QRController extends Controller
                 ]
             ];
 
-// تشغيل البازر (الصافرة)
             $buzzer = [
                 'msgType' => 'ins_inout_buzzer_operate',
                 'msgArg'  => array_filter([
@@ -177,7 +177,7 @@ HTML;
                         'sInsPwd' => $sInsPwd,
                     ], fn($v) => $v !== null),
                 ];
-                sleep(20);
+
 
                 $restoreHtml = <<<HTML
             <html>
@@ -187,15 +187,8 @@ HTML;
               </body>
             </html>
 HTML;
-
-                $listBatch[] = [
-                    'msgType' => 'ins_screen_html_document_write',
-                    'msgArg'  => array_filter([
-                        'sHtml'      => $restoreHtml,
-                        'sInsPwd'    => $sInsPwd,
-                        'ucDelay_ds' => 100,
-                    ], fn($v) => $v !== null),
-                ];
+                SendRestoreScreenJob::dispatch($sInsPwd, $restoreHtml, "https://elunicolounge.com/api/kapri/event"?? 'https://kapri-device.local')
+                    ->delay(now()->addSeconds(5));
             }
         }
 
