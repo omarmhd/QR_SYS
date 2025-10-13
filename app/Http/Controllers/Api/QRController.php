@@ -110,15 +110,13 @@ class QRController extends Controller
 
         $updated=$qr->update(['status' => 'checked_in']);
 
-        if($updated){
-            $user->subscription->increment('used_guests');
-            $user->subscription->decrement('last_guests_limit');
-        }
 
         $user->visitHistories()->create([]);
 
         if ($qr->type=="visitor") {
             $user->subscription->increment('used_guests');
+            $user->subscription->decrement('last_guests_limit');
+
         }
         $listBatch = [];
 
