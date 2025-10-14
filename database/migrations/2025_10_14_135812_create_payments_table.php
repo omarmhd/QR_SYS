@@ -12,13 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('payments', function (Blueprint $table) {
-            $table->foreignId('subscription_id')->constrained()->onDelete('cascade');
-            $table->decimal('amount', 10, 2);
-            $table->string('currency', 10)->default('USD');
-            $table->string('payment_method')->nullable(); // PayPal, Stripe, Card..
-            $table->string('status')->default('pending'); // pending, success, failed
-            $table->string('transaction_id')->nullable();
-            $table->timestamp('paid_at')->nullable();
+            $table->id();
             $table->timestamps();
         });
     }
