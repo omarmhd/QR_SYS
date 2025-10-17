@@ -13,9 +13,13 @@ class ProfileController extends Controller
     public function show(){
         $user = auth()->user()->load(['subscription']);
 
-        $user->subscription = $user->subscription
-            ? new SubscriptionResource($user->subscription)
-            : null;
+        $user->getCollection()->transform(function ($user) {
+            $user->subscription = $user->subscription
+                ? new SubscriptionResource($user->subscription)
+                : null;
+
+            return $user;
+        });
 
         return response()->json($user);
     }
