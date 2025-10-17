@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Storage;
 class ProfileController extends Controller
 {
     public function show(){
-        $user = auth()->user()->load(['plan', 'subscription']);
+        $user = auth()->user()->load(['subscription']);
 
         $user->subscription = $user->subscription
             ? new SubscriptionResource($user->subscription)
