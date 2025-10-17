@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Http\Resources\SubscriptionResource;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -12,6 +13,7 @@ class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasApiTokens, Notifiable, HasFactory;
+    protected $appends = ['subscription_data'];
 
     /**
      * The attributes that are mass assignable.
@@ -71,6 +73,17 @@ class User extends Authenticatable
 
     public function subscription(){
         return $this->belongsTo(Subscription::class,"current_subscription","id");
+    }
+
+    public function getSubscriptionDataAttribute()
+    {
+        if (!$this->relationLoaded('subscription')) {
+            $this->load('subscription');
+        }
+
+        return $this->subscription
+            ? (new SubscriptionResource($this->subscription))->toArray(request())
+            : null;
     }
 
 
