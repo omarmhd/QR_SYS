@@ -64,11 +64,6 @@ class QRController extends Controller
             'message' => 'No subscription found for this user.'
         ], 404);
     }
-
-
-
-
-
     public function handle(Request $request)
     {
         $event = $request->all();
@@ -134,10 +129,10 @@ class QRController extends Controller
             $listBatch[] = [
                 'msgType' => 'ins_inout_relay_operate',
                 'msgArg'  => [
-                    'sPosition' => 'main',   // ريليه الجهاز الرئيسي
-                    'sMode'     => 'on',     // تشغيل (يمكن استخدام 'off' لإيقافه)
+                    'sPosition' => 'main',
+                    'sMode'     => 'on',
                     "ucRelayNum"=> 0,
-                    'ucTime_ds' => 50,       // المدة (3 ثوانٍ)
+                    'ucTime_ds' => 50,
                 ]
             ];
 
@@ -155,7 +150,6 @@ class QRController extends Controller
 
 
 
-            // (Optional) show QR data
             if (!empty($event['msgArg']['sData'])) {
                 $safe = e($event['msgArg']['sData']);
                 $html = <<<HTML
@@ -196,8 +190,8 @@ HTML;
         $response = [
             'msgType' => 'ins_cloud_batch',
             'msgArg'  => [
-                'bReply'    => true,       // ask Kapri to POST back ans_cloud_batch
-                'listBatch' => $listBatch, // a list (can be empty)
+                'bReply'    => true,
+                'listBatch' => $listBatch,
             ],
         ];
 
@@ -213,8 +207,8 @@ HTML;
         $instruction = [
             "msgType" => "ins_inout_relay_switch_on",
             "msgArg" => [
-                "relay" => 0,      // رقم الريليه (0,1,2)
-                "time"  => 5000    // وقت التشغيل بالمللي ثانية (5 ثواني)
+                "relay" => 0,
+                "time"  => 5000
             ]
         ];
 

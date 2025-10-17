@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\SubscriptionResource;
 use App\Models\User;
 use App\Models\QRCode;
 
@@ -32,6 +33,15 @@ class MembershipController extends Controller
         $users->where("approval_status","accepted");
 
         $users = $users->paginate(10);
+
+        $users->getCollection()->transform(function ($user) {
+            $user->subscription = $user->subscription
+                ? new SubscriptionResource($user->subscription)
+                : null;
+
+            return $user;
+        });
+
 
         return json_encode($users);
 
