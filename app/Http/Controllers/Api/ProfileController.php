@@ -10,8 +10,13 @@ use Illuminate\Support\Facades\Storage;
 class ProfileController extends Controller
 {
     public function show(){
-        $user=auth()->user();
-         return response()->json($user);
+        $user = auth()->user()->load(['plan', 'subscription']);
+
+        $user->subscription = $user->subscription
+            ? new SubscriptionResource($user->subscription)
+            : null;
+
+        return response()->json($user);
     }
 
     public function update(Request $request){
