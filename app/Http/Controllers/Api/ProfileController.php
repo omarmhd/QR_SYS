@@ -12,7 +12,7 @@ class ProfileController extends Controller
 {
     public function show()
     {
-        $user = auth()->user()->load(['subscription']);
+        $user = auth()->user();
 
         $user->subscription = $user->subscription
             ? new SubscriptionResource($user->subscription)
