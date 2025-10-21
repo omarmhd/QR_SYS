@@ -4,13 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Models\Payment;
 use App\Models\Plan;
+use App\Services\FcmNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use League\Uri\Http;
 
 class PaymentController extends Controller
 {
+    protected $firebaseService;
 
+    public function __construct(FcmNotificationService $firebaseService)
+    {
+        $this->firebaseService = $firebaseService;
+    }
     /*
     public function startPayment(Request $request)
     {
@@ -137,6 +143,7 @@ class PaymentController extends Controller
     public function startPayment(Request $request)
     {
         $user = auth()->user();
+
         $request->validate([
             'plan_id' => 'required|exists:plans,id',
             'billing_type' => 'required|in:personal,company',
@@ -176,7 +183,7 @@ class PaymentController extends Controller
                 "config" => [
                     "emailTemplate" => "confirm",
                     "notifyUrl" => url('/api/payment/notify'),
-                    "redirectUrl" => url('/api/payment/callback'),
+                    "redirectUrl" => "",
                     "language" => "en"
                 ],
                 "payment" => [
@@ -208,22 +215,18 @@ class PaymentController extends Controller
             ];
 
 
-
-
-
-
             $curl = curl_init();
             curl_setopt_array($curl, [
-                CURLOPT_URL => 'https://secure.sandbox.netopia-payments.com/payment/card/start',
+                CURLOPT_URL => 'https://secure.mobilpay.ro/pay/payment/card/start',
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_POST => true,
                 CURLOPT_POSTFIELDS => json_encode($payload),
                 CURLOPT_HTTPHEADER => [
                     'Content-Type: application/json',
-                    'Authorization: VdhqYXORwtdDySx4q_69IKcm2H5IZaD1yKdhsTaQTKPoRedvKYaM6mHFXQA='
+                    'Authorization: iqZQ-pUTtIu5SI5R-dPgfjTErmM-36urZ0o7AoajZ8a6Vq8zZATdr70xNSjm'
                 ],
             ]);
-
+//                    'Authorization: VdhqYXORwtdDySx4q_69IKcm2H5IZaD1yKdhsTaQTKPoRedvKYaM6mHFXQA='
             $response = curl_exec($curl);
             $error = curl_error($curl);
             curl_close($curl);
@@ -245,6 +248,8 @@ class PaymentController extends Controller
 
             DB::commit();
 
+
+
             return response()->json([
                 'status' => 'success',
                 'payment_url' => $data['payment']["paymentURL"],
@@ -261,4 +266,73 @@ class PaymentController extends Controller
             ], 500);
         }
     }
+
+
+    public function notify(Request $request)
+    {
+        $data = $request->all();
+
+        $payment = Payment::where('order_id', $data['orderID'] ?? null)->first();
+
+        if (!$payment) {
+            return response()->json(['error' => 'Payment not found'], 404);
+        }
+        $status = $data['status'] ?? 'failed';
+        $paymentMethod = $data['paymentMethod'] ?? 'card';
+        $transactionId = $data['transactionId'] ?? null;
+
+
+        $payment->update([
+            'status' => $status === 'paid' ? 'success' : 'failed',
+            'payment_method' => $paymentMethod,
+            'transaction_id' => $transactionId,
+            'paid_at' => $status === 'paid' ? now() : null,
+            'raw_callback' => json_encode($data)
+        ]);
+
+        $expiresAt = match ($payment->user->plan->billing_type) {
+            'day' => now()->addDay(),
+            'month' => now()->addMonth(),
+            'year' => now()->addYear(),
+            default => now()->addMonth(),
+        };
+
+        if ($status === 'paid') {
+            $subscription=$payment->user->subscription()->updateOrCreate(
+                ['plan_id' => $payment->plan_id,"user_id"=>$payment->user_id],
+                ['status' => 'active','start_date'=>now(), 'end_date' =>$expiresAt]
+            );
+
+
+
+            $user = $payment->user;
+            $user->update([
+                'current_subscription' => $subscription->id,
+                'status_subscription' => 1,
+            ]);
+
+
+            $tokens = $user->deviceTokens->pluck('fcm_token')->filter()->toArray();
+
+            if ($tokens) {
+                $title = 'Payment Successful!';
+                $body = "Congratulations! Your subscription is now active. "
+                    . "It will expire on " . $expiresAt->format('F j, Y') . ".";
+
+                $this->firebaseService->sendNotification(
+                    $tokens,
+                    $title,
+                    $body,
+                    ['type' => 'subscription_update'],
+                    null,
+                    'tokens',
+                    $user->id
+                );
+            }
+        }
+
+        return response()->json(['message' => 'Notification processed']);
+    }
+
+
 }

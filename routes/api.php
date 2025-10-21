@@ -35,11 +35,14 @@ Route::get('/user', function (Request $request) {
     Route::post("generate-qr",[\App\Http\Controllers\Api\QRController::class, "storeQR"]);
     Route::post("store-num-guests",[\App\Http\Controllers\Api\QRController::class, "storeNumGuests"]);
 
-        Route::get("visit-histories",[PublicController::class, "visitHistories"]);
-        Route::post("start-payment", [\App\Http\Controllers\PaymentController::class, 'startPayment']);
+    Route::get("visit-histories",[PublicController::class, "visitHistories"]);
+
+    Route::post("start-payment", [\App\Http\Controllers\Api\SubscriptionController::class, 'startPayment']);
+    Route::post("change-plan", [\App\Http\Controllers\Api\SubscriptionController::class, 'changePlan']);
 
 });
 Route::get("plans",[PublicController::class, "plans"]);
 Route::get("static-contents",[PublicController::class, "staticContent"]);
 Route::get("onboarding-screens",[PublicController::class, "onBoardingScreen"]);
 Route::match(['get', 'post'], '/kapri/event', [\App\Http\Controllers\Api\QRController::class, 'handle']);
+Route::post("payment/notify", [\App\Http\Controllers\Api\SubscriptionController::class, 'notify']);

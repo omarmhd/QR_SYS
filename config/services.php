@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    'netopia' => [
+        'url' => env('NETOPIA_URL'),
+        'api_key' => env('NETOPIA_API_KEY'),
+        'pos_signature' => env('NETOPIA_POS_SIGNATURE'),
+        'notify_url' => env('NETOPIA_NOTIFY_URL'),
+        'redirect_url' => env('NETOPIA_REDIRECT_URL'),
+    ]
 ];
