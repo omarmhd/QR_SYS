@@ -46,3 +46,4 @@ Route::get("static-contents",[PublicController::class, "staticContent"]);
 Route::get("onboarding-screens",[PublicController::class, "onBoardingScreen"]);
 Route::match(['get', 'post'], '/kapri/event', [\App\Http\Controllers\Api\QRController::class, 'handle']);
 Route::post("payment/notify", [\App\Http\Controllers\Api\SubscriptionController::class, 'notify']);
+Route::post("check-vat-status",[\App\Http\Controllers\Api\SubscriptionController::class, 'checkVatStatus']);

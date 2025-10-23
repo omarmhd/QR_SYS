@@ -58,7 +58,7 @@ class NetopiaPaymentService
                 "config" => [
                     "emailTemplate" => "confirm",
                     "notifyUrl" => url('/api/payment/notify'),
-                    "redirectUrl" => "",
+                    "redirectUrl" => "myapp://payment-result",
                     "language" => "en"
                 ],
                 "payment" => [

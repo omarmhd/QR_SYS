@@ -8,6 +8,7 @@ use App\Models\Plan;
 use App\Services\{FcmNotificationService,NetopiaPaymentService};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 
 class SubscriptionController extends Controller
 {
@@ -142,6 +143,35 @@ class SubscriptionController extends Controller
 
     */
 
+    public function checkVatStatus(Request $request)
+    {
+        $data = [
+            [
+                'cui' => $request->cui,
+                'data' => now()
+            ]
+        ];
+
+        $response = Http::withHeaders([
+            'Content-Type' => 'application/json',
+            "User-Agent"=>"curl/7.68.0",
+            "Accept"=>"application/json"
+        ])->post('https://webservicesp.anaf.ro/api/PlatitorTvaRest/v9/tva', $data);
+
+        if ($response->successful()) {
+            $result = $response->json();
+
+            return response()->json([
+                'success' => true,
+                'data' => $result
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'error' => $response->body()
+        ], $response->status());
+    }
     public function startPayment(Request $request)
     {
         $request->validate([

@@ -9,6 +9,7 @@ use App\Http\Controllers\StaticContentController;
 use App\Http\Controllers\UserController;
 use App\Models\OnboardingScreen;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PaymentController;
 
 
 
@@ -50,7 +51,7 @@ Route::middleware('auth')->group(function () {
     Route::resource("/services",\App\Http\Controllers\ServiceController::class);
     Route::resource("service-requests",\App\Http\Controllers\ServiceRequestController::class);
 
-    Route::resource("contact-messages",\App\Http\Controllers\ContactMessageController::class)->only(["index","destroy"]);
+    Route::resource("contact-messages", \App\Http\Controllers\ContactMessageController::class)->only(["index","destroy"]);
 
     Route::view("members","members.index");
     Route::get('/memberships', [\App\Http\Controllers\MembershipController::class, 'index'])->name('memberships.index');
@@ -58,6 +59,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/memberships/{id}/generate-qr', [\App\Http\Controllers\MembershipController::class, 'generateQr']);
     Route::get('/memberships/{id}/history', [\App\Http\Controllers\MembershipController::class, 'history']);
 
+    Route::resource("payments",PaymentController::class);
 
 });
 
