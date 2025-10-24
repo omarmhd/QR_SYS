@@ -151,7 +151,7 @@ class NetopiaPaymentService
             return ['error' => 'Payment not found'];
         }
 
-        $status = $data['status'] ?? 'failed';
+        $status = $data['payment']['status'] ?? 'failed';
         $paymentMethod = $data['paymentMethod'] ?? 'card';
         $transactionId = $data['transactionId'] ?? null;
 
