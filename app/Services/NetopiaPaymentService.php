@@ -196,7 +196,7 @@ class NetopiaPaymentService
             $user = $payment->user;
             $user->update([
                 'current_subscription' => $subscription->id,
-                'status_subscription' => 1,
+                'subscription_status' => 1,
                 'plan_id' => $payment->plan_id
             ]);
 
