@@ -24,10 +24,8 @@ Route::get('/', function () {
     return view('dashboard',["stats"=>$stats]);
 })->middleware(['auth', 'verified'])->name('dashboard');
 Route::get('/payment-redirect', function (Illuminate\Http\Request $request) {
-    $status = $request->get('status', 'failed');
-    $amount = $request->get('amount', '0');
 
-    $redirectUrl = "ElUnicoQR://payment-result?status={$status}&amount={$amount}";
+    $redirectUrl = "ElUnicoQR://payment-result";
 
     return redirect()->away($redirectUrl);
 });
