@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\SubscriptionResource;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
@@ -13,6 +14,10 @@ class ProfileController extends Controller
     public function show()
     {
         $user = auth()->user();
+        $tax = DB::table('settings')->where('key', 'tax')->value('value');
+
+        $user->tax = $tax;
+
         return response()->json($user);
     }
     public function update(Request $request){
