@@ -141,11 +141,9 @@ class NetopiaPaymentService
 
     public function handleNotification(array $data)
     {
-        // 🔹 أولاً: سجل كل البيانات القادمة كما هي
         Log::info('📩 Netopia Notification Received:', $data);
 
-        // 🔹 ابحث عن الدفع بناءً على orderID
-        $payment = Payment::where('order_id', $data['orderID'] ?? null)->first();
+        $payment = Payment::where('order_id', $data['order']['orderID'] ?? $data['orderID'] ?? null)->first();
 
         if (!$payment) {
             Log::warning('⚠️ Payment not found for orderID:', ['orderID' => $data['orderID'] ?? null]);
@@ -163,7 +161,6 @@ class NetopiaPaymentService
             'transactionId' => $transactionId,
         ]);
 
-        // 🔹 تحديث بيانات الدفع
         $payment->update([
             'status' => $status === 'paid' ? 'success' : 'failed',
             'payment_method' => $paymentMethod,
@@ -236,7 +233,6 @@ class NetopiaPaymentService
         }
 
         Log::info('🔚 Netopia notification processing finished', ['order_id' => $payment->order_id]);
-
         return ['message' => 'Notification processed'];
     }
 }
