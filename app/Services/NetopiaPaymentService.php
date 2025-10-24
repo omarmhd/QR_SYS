@@ -166,7 +166,7 @@ class NetopiaPaymentService
             'status' => (int)$status === 3 ? 'success' : 'failed',
             'payment_method' => $paymentMethod,
             'transaction_id' => $transactionId,
-            'paid_at' => $status === '3' ? now() : null,
+            'paid_at' => (int)$status === 3 ? now() : null,
             'raw_callback' => json_encode($data)
         ]);
 
