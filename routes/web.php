@@ -25,9 +25,8 @@ Route::get('/', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 Route::get('/payment-redirect', function (Illuminate\Http\Request $request) {
 
-    $redirectUrl = "ElUnicoQR://payment-result";
 
-    return redirect()->away($redirectUrl);
+    return view("redirect-to-app");
 });
 Route::middleware('auth')->group(function () {
 
