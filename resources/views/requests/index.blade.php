@@ -82,21 +82,21 @@
                       <div class="table-responsive">
 
                               <div id="bulk-actions" class="mb-3" style="">
-                                  <div class="input-group input-group-xl" style="max-width: 300px;">
-                                      <select id="bulk-action-select" class="form-select">
-                                          <option value="">-- Select Action --</option>
-                                          <option value="accept">Accept</option>
-                                          <option value="reject">Reject</option>
-                                          <option value="delete">Delete</option>
-                                      </select>
-                                      <button class="btn btn-primary" id="apply-bulk">Apply</button>
-                                  </div>
+{{--                                  <div class="input-group input-group-xl" style="max-width: 300px;">--}}
+{{--                                      <select id="bulk-action-select" class="form-select">--}}
+{{--                                          <option value="">-- Select Action --</option>--}}
+{{--                                          <option value="accept">Accept</option>--}}
+{{--                                          <option value="reject">Reject</option>--}}
+{{--                                          <option value="delete">Delete</option>--}}
+{{--                                      </select>--}}
+{{--                                      <button class="btn btn-primary" id="apply-bulk">Apply</button>--}}
+{{--                                  </div>--}}
                               </div>
 
                           <table id="users-table" class="table table-selectable card-table table-vcenter text-nowrap datatable">
                                <thead>
                             <tr>
-                             <th class="w-1"><input id="check-all" class="form-check-input m-0 align-middle" type="checkbox" aria-label="Select all invoices"></th>
+{{--                             <th class="w-1"><input id="check-all" class="form-check-input m-0 align-middle" type="checkbox" aria-label="Select all invoices"></th>--}}
                               <th class="w-1">
                                #
                                 <!-- Download SVG icon from http://tabler.io/icons/icon/chevron-up -->

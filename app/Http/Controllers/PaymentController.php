@@ -67,9 +67,7 @@ class PaymentController extends Controller
         ]);
     }
 
-    /**
-     * حذف عملية دفع.
-     */
+
     public function destroy($id)
     {
         $payment = Payment::findOrFail($id);

@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\User; /
+use App\Models\User;
 use Google\Client;
 use Illuminate\Support\Facades\Http;
 use Exception;
@@ -56,6 +56,7 @@ class FirestoreService
             $documentPath = "projects/{$this->projectId}/databases/(default)/documents/requests/requests";
 
             $newCount = User::where("approval_status","pending")->count();
+
 
             $payload = [
                 'fields' => [

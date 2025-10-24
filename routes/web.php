@@ -10,7 +10,7 @@ use App\Http\Controllers\UserController;
 use App\Models\OnboardingScreen;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PaymentController;
-
+use App\Http\Controllers\SettingsController;
 
 
 Route::get('/', function () {
@@ -39,10 +39,6 @@ Route::middleware('auth')->group(function () {
     Route::resource("notifications",NotificationController::class);
     Route::resource('/plans', PlanController::class);
 
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
     Route::get("/static-contents",[StaticContentController::class,'edit'])->name("static_contents.edit");
     Route::patch("/static-contents",[StaticContentController::class,'update'])->name("static_contents.update");
 
@@ -61,6 +57,12 @@ Route::middleware('auth')->group(function () {
 
     Route::resource("payments",PaymentController::class);
 
-});
+    Route::get("settings",[SettingsController::class,"index"])->name("settings");
+    Route::post("settings",[SettingsController::class,"update"])->name("settings.update");
+
+    Route::get("profile",[\App\Http\Controllers\AdminController::class,"index"])->name("profile");
+    Route::post("profile",[\App\Http\Controllers\AdminController::class,"update"])->name("profile.update");
+
+});;
 
 require __DIR__.'/auth.php';

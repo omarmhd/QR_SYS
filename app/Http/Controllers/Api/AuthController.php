@@ -5,12 +5,20 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\DeviceToken;
 use App\Models\User;
+use App\Services\FcmNotificationService;
+use App\Services\FirestoreService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
+    protected $firestoreService;
+
+    public function __construct(FirestoreService $firestoreService)
+    {
+        $this->firestoreService = $firestoreService;
+    }
     public function register(Request $request)
     {
         $fields = $request->validate([
@@ -61,6 +69,11 @@ class AuthController extends Controller
 
         $token = $user->createToken('api_token')->plainTextToken;
         $user['token'] = $token;
+
+        $this->firestoreService->updateRequestsCountInFirestore();
+
+
+
 
         DB::commit();
         return response()->json([

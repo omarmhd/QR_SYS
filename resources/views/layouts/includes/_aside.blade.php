@@ -41,8 +41,10 @@
                       <path d="M9 11l3 3l8 -8"></path>
                       <path d="M20 12v6a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h9"></path></svg>
                   </span>
-                  <span class="nav-link-title"> Requests </span>
+                  <span class="nav-link-title"> Requests (<span id="orders-count-realtime" class="text-yellow fs-2*"></span>)    </span>
+
                 </a>
+
               </li>
               <li class="nav-item">
 
@@ -171,9 +173,9 @@
                 <div class="dropdown-menu" data-bs-popper="static">
                   <div class="dropdown-menu-columns">
                     <div class="dropdown-menu-column">
-                      <a class="dropdown-item" href="{{route('static_contents.edit')}}"> Static Contents  </a>
-                       <a class="dropdown-item" href="{{route('onboarding-screens.index')}}">Onboarding Screens </a>
-
+                        <a class="dropdown-item" href="{{route('static_contents.edit')}}"> Static Contents  </a>
+                        <a class="dropdown-item" href="{{route('onboarding-screens.index')}}">Onboarding Screens </a>
+                        <a class="dropdown-item" href="{{route("settings")}}">General settings</a>
                     </div>
 
                   </div>
