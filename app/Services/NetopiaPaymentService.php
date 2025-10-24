@@ -145,6 +145,7 @@ class NetopiaPaymentService
 
         $payment = Payment::where('order_id', $data['order']['orderID'] ?? $data['orderID'] ?? null)->first();
 
+        ;
         if (!$payment) {
             Log::warning('⚠️ Payment not found for orderID:', ['orderID' => $data['orderID'] ?? null]);
             return ['error' => 'Payment not found'];
@@ -162,10 +163,10 @@ class NetopiaPaymentService
         ]);
 
         $payment->update([
-            'status' => $status === 'paid' ? 'success' : 'failed',
+            'status' => (int)$status === 3 ? 'success' : 'failed',
             'payment_method' => $paymentMethod,
             'transaction_id' => $transactionId,
-            'paid_at' => $status === 'paid' ? now() : null,
+            'paid_at' => $status === '3' ? now() : null,
             'raw_callback' => json_encode($data)
         ]);
 
@@ -174,7 +175,7 @@ class NetopiaPaymentService
             'new_status' => $payment->status
         ]);
 
-        if ($status === 'paid') {
+        if ($status === '3') {
             Log::info('🎉 Payment confirmed as PAID. Activating subscription...', [
                 'user_id' => $payment->user_id,
                 'plan_id' => $payment->plan_id
