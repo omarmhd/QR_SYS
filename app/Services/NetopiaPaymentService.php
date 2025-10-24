@@ -141,9 +141,14 @@ class NetopiaPaymentService
 
     public function handleNotification(array $data)
     {
+        // 🔹 أولاً: سجل كل البيانات القادمة كما هي
+        Log::info('📩 Netopia Notification Received:', $data);
+
+        // 🔹 ابحث عن الدفع بناءً على orderID
         $payment = Payment::where('order_id', $data['orderID'] ?? null)->first();
 
         if (!$payment) {
+            Log::warning('⚠️ Payment not found for orderID:', ['orderID' => $data['orderID'] ?? null]);
             return ['error' => 'Payment not found'];
         }
 
@@ -151,6 +156,14 @@ class NetopiaPaymentService
         $paymentMethod = $data['paymentMethod'] ?? 'card';
         $transactionId = $data['transactionId'] ?? null;
 
+        Log::info('💳 Payment status update attempt:', [
+            'order_id' => $payment->order_id,
+            'status' => $status,
+            'paymentMethod' => $paymentMethod,
+            'transactionId' => $transactionId,
+        ]);
+
+        // 🔹 تحديث بيانات الدفع
         $payment->update([
             'status' => $status === 'paid' ? 'success' : 'failed',
             'payment_method' => $paymentMethod,
@@ -159,7 +172,17 @@ class NetopiaPaymentService
             'raw_callback' => json_encode($data)
         ]);
 
+        Log::info('✅ Payment record updated successfully', [
+            'order_id' => $payment->order_id,
+            'new_status' => $payment->status
+        ]);
+
         if ($status === 'paid') {
+            Log::info('🎉 Payment confirmed as PAID. Activating subscription...', [
+                'user_id' => $payment->user_id,
+                'plan_id' => $payment->plan_id
+            ]);
+
             $expiresAt = match ($payment->user->plan->billing_type) {
                 'day' => now()->addDay(),
                 'month' => now()->addMonth(),
@@ -176,7 +199,12 @@ class NetopiaPaymentService
             $user->update([
                 'current_subscription' => $subscription->id,
                 'status_subscription' => 1,
-                'plan_id'=>$payment->plan_id
+                'plan_id' => $payment->plan_id
+            ]);
+
+            Log::info('🆕 Subscription activated', [
+                'subscription_id' => $subscription->id,
+                'expires_at' => $expiresAt
             ]);
 
             $tokens = $user->deviceTokens->pluck('fcm_token')->filter()->toArray();
@@ -192,8 +220,22 @@ class NetopiaPaymentService
                     'tokens',
                     $user->id
                 );
+
+                Log::info('📱 FCM notification sent to user', [
+                    'user_id' => $user->id,
+                    'tokens_count' => count($tokens)
+                ]);
+            } else {
+                Log::info('ℹ️ No device tokens found for user', ['user_id' => $user->id]);
             }
+        } else {
+            Log::warning('❌ Payment status not paid', [
+                'order_id' => $payment->order_id,
+                'status' => $status
+            ]);
         }
+
+        Log::info('🔚 Netopia notification processing finished', ['order_id' => $payment->order_id]);
 
         return ['message' => 'Notification processed'];
     }
