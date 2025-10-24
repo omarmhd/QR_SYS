@@ -23,6 +23,14 @@ Route::get('/', function () {
 
     return view('dashboard',["stats"=>$stats]);
 })->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/payment-redirect', function (Illuminate\Http\Request $request) {
+    $status = $request->get('status', 'failed');
+    $amount = $request->get('amount', '0');
+
+    $redirectUrl = "ElUnicoQR://payment-result?status={$status}&amount={$amount}";
+
+    return redirect()->away($redirectUrl);
+});
 
 Route::middleware('auth')->group(function () {
 
@@ -62,14 +70,6 @@ Route::middleware('auth')->group(function () {
 
     Route::get("profile",[\App\Http\Controllers\AdminController::class,"index"])->name("profile");
     Route::post("profile",[\App\Http\Controllers\AdminController::class,"update"])->name("profile.update");
-    Route::get('/payment-redirect', function (Illuminate\Http\Request $request) {
-        $status = $request->get('status', 'failed');
-        $amount = $request->get('amount', '0');
-
-        $redirectUrl = "myapp://payment-result?status={$status}&amount={$amount}";
-
-        return redirect()->away($redirectUrl);
-    });
 });;
 
 require __DIR__.'/auth.php';
