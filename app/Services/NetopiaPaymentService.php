@@ -175,7 +175,7 @@ class NetopiaPaymentService
             'new_status' => $payment->status
         ]);
 
-        if ($status === '3') {
+        if ((int)$status === 3 ) {
             Log::info('🎉 Payment confirmed as PAID. Activating subscription...', [
                 'user_id' => $payment->user_id,
                 'plan_id' => $payment->plan_id
