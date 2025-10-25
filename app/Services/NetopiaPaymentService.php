@@ -30,14 +30,16 @@ class NetopiaPaymentService
 
     public function startPayment(Request $request, $user)
     {
-        $plan = Plan::findOrFail($request->plan_id);
-        $amount = $request->total;
-        $orderId = 'ORD-' . time();
+
 
 
 
         try {
             DB::beginTransaction();
+
+            $plan = Plan::findOrFail($request->plan_id);
+            $amount = $request->total;
+            $orderId = 'ORD-' . time();
 
             $payment = Payment::create([
                 'user_id' => $user->id,
