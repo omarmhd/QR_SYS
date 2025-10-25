@@ -176,6 +176,7 @@ class SubscriptionController extends Controller
     {
         $request->validate([
             'plan_id' => 'required|exists:plans,id',
+            'cui' => 'required_if:billing_type,company',
             'billing_type' => 'required|in:personal,company',
             'payment_method' => 'required|in:card,apple_pay,bank_transfer',
             'billing_name' => 'required|string',
