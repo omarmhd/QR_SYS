@@ -17,7 +17,7 @@ class ContactMessageController extends Controller
             $contactMessage = ContactMessage::query();
             return DataTables::of($contactMessage)
                 ->addColumn("user_name",function ($data){
-                    return $data->user->name;
+                    return $data?->user?->name ?? '-';
 
                 })->addColumn("user_email",function ($data){
                     return $data->user->email;

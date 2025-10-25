@@ -3,7 +3,7 @@
 
         $('#data-table').DataTable({
             processing: true,
-            serverSide: false,
+            serverSide: true,
             ajax: {
                 url: "{{ route('contact-messages.index') }}"
             },
