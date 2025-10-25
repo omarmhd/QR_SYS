@@ -245,7 +245,7 @@ class SubscriptionController extends Controller
 
     public function cancelSubscription(){
         $user=auth()->user();
-        $status=auth()->user()->update(["is_sub_canceled"=>1]);
+        $status=auth()->user()->update(["is_sub_cancelled"=>1]);
         if ($status) {
             return response()->json([
                 "status" => true,
