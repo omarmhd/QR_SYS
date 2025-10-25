@@ -24,7 +24,6 @@ class ContactMessageController extends Controller
 
                 })->addColumn("phone",function ($data){
                     return $data?->user?->phone ?? $data->phone;
-
                 })
 
                 ->editColumn("title",function ($data){
@@ -38,7 +37,7 @@ class ContactMessageController extends Controller
 
                     return Str::words($data->message,8,'...').' <a href="#" class="btn btn-link p-0 show-message"
                     data-bs-toggle="modal" data-bs-target="#modal-message" id="show-message"
-                        data-message="'.e($data->message).'" data-name="'.e($data->user->name).'">More</a>';
+                        data-message="'.e($data->message).'" data-name="'.e($data?->user?->name ).'">More</a>';
 
                 }) ->addColumn('action', function ($row) {
                     $route_delete = route("contact-messages.destroy", $row);

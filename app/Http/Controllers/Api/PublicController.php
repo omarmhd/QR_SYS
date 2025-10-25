@@ -129,6 +129,7 @@ class PublicController extends Controller
             "phone"=>"required",
             'title' => 'required',
             'message' => 'required',
+            "user_name"=>"required"
 
 
         ]);
@@ -137,7 +138,7 @@ class PublicController extends Controller
 
         $contactMessage=new ContactMessage();
         $contactMessage->user_id=$user?->id;
-        $contactMessage->user_name=$user?->name;
+        $contactMessage->user_name=$user?->name??$validated["user_name"];
         $contactMessage->email=$validated["email"];
         $contactMessage->phone=$validated["phone"];
         $contactMessage->title=$validated["title"];
