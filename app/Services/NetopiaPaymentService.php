@@ -199,7 +199,8 @@ class NetopiaPaymentService
             $user->update([
                 'current_subscription' => $subscription->id,
                 'subscription_status' => 1,
-                'plan_id' => $payment->plan_id
+                'plan_id' => $payment->plan_id,
+                "is_sub_cancelled"=>0
             ]);
 
             Log::info('🆕 Subscription activated', [
