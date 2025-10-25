@@ -47,12 +47,7 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-    protected static function booted()
-    {
-        static::addGlobalScope('latest', function (Builder $builder) {
-            $builder->orderBy('id', 'desc');
-        });
-    }
+
 
     public function getImageAttribute($value)
     {

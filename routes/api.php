@@ -39,6 +39,8 @@ Route::get('/user', function (Request $request) {
     Route::post("start-payment", [\App\Http\Controllers\Api\SubscriptionController::class, 'startPayment']);
     Route::post("change-plan", [\App\Http\Controllers\Api\SubscriptionController::class, 'changePlan']);
 
+    Route::post("cancel-subscription", [\App\Http\Controllers\Api\SubscriptionController::class, 'cancelSubscription']);
+
 });
 Route::get("plans",[PublicController::class, "plans"]);
 Route::get("static-contents",[PublicController::class, "staticContent"]);

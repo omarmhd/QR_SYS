@@ -71,10 +71,7 @@ class ContactMessageController extends Controller
 
     public function destroy(ContactMessage $contactMessage)
     {
-
-
         $contactMessage->delete();
-
         return redirect()->back()->with('success', 'Message deleted successfully.');
     }
 }

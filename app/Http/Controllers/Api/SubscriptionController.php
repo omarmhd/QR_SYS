@@ -243,6 +243,25 @@ class SubscriptionController extends Controller
 
     }
 
+    public function cancelSubscription(){
+        $user=auth()->user();
+        $status=auth()->user()->update(["is_sub_canceled"=>1]);
+        if ($status) {
+            return response()->json([
+                "status" => true,
+                "data"=>[
+                    "end_date"=>$user?->subscription?->end_date
+                ],
+                "message" => "Subscription canceled successfully"
+            ]);
+        } else {
+            return response()->json([
+                "status" => false,
+                "message" => "Update failed"
+            ]);
+
+    }}
+
 
     public function notify(Request $request)
     {
