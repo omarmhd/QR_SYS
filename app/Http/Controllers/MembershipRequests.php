@@ -22,7 +22,7 @@ protected $firebaseService;
     {
 
         if ($request->ajax()) {
-            $users = User::query();
+            $users = User::where("approval_status", "pending")->orwhere("approval_status","rejected");
 
             return DataTables::of($users)
 
