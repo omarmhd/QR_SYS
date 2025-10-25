@@ -2,7 +2,7 @@
        $(document).ready(function() {
            $('#users-table').DataTable({
                processing: true,
-               serverSide: false,
+               serverSide: true,
                ajax: "{{route('users.index')}}",
                columns: [{
                        data: 'id',
