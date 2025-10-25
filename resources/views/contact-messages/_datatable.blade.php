@@ -16,6 +16,10 @@
                     data: 'user_name',
                     name: "user_name"
                 },
+                {
+                    data: 'phone',
+                    name: "phone"
+                },
 
                 {
                     data: 'user_email',

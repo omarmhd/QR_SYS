@@ -20,9 +20,14 @@ class ContactMessageController extends Controller
                     return $data?->user?->name ?? '-';
 
                 })->addColumn("user_email",function ($data){
-                    return $data->user->email;
+                    return $data?->user?->email ?? $data->email;
 
-                })->editColumn("title",function ($data){
+                })->addColumn("phone",function ($data){
+                    return $data?->user?->phone ?? $data->phone;
+
+                })
+
+                ->editColumn("title",function ($data){
                     return $data->title;
 
                 })->editColumn("created_at",function ($data){
@@ -56,7 +61,7 @@ class ContactMessageController extends Controller
                             </form>
                     btns;
                 })
-                ->rawColumns(['user_name',"user_email",'message','title',"created_at",'action'])
+                ->rawColumns(['user_name',"phone","user_email",'message','title',"created_at",'action'])
 
                 ->make(true);
         }

@@ -125,16 +125,21 @@ class PublicController extends Controller
     }
     public function storeContactMessages(Request $request){
         $validated = $request->validate([
+            "email"=>"required|email",
+            "phone"=>"required",
             'title' => 'required',
             'message' => 'required',
 
+
         ]);
-        $user=auth()->user();
+        $user=auth()->user() ?? null;
 
 
         $contactMessage=new ContactMessage();
-        $contactMessage->user_id=$user->id;
-        $contactMessage->user_name=$user->name;
+        $contactMessage->user_id=$user?->id;
+        $contactMessage->user_name=$user?->name;
+        $contactMessage->email=$validated["email"];
+        $contactMessage->phone=$validated["phone"];
         $contactMessage->title=$validated["title"];
         $contactMessage->message=$validated["message"];
         $contactMessage->save();
@@ -143,10 +148,6 @@ class PublicController extends Controller
 
 
         return response()->json(["status"=>true,"message"=>"Your request has been sent successfully"]);
-
-
-
-
     }
     public function visitHistories(){
         $histories=auth()->user()->visitHistories;

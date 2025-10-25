@@ -93,6 +93,7 @@
                                 </svg>
                               </th>
                               <th>User Name</th>
+                              <th>User Phone</th>
                               <th>User Email</th>
                               <th>Title</th>
                               <th>Message</th>
