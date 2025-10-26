@@ -49,4 +49,18 @@ class ProfileController extends Controller
 
     }
 
+
+    public function destroy(){
+        $user = auth()->user();
+
+        if (!$user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $user->delete();
+
+        return response()->json(['message' => 'User deleted successfully'], 200);
+
+    }
+
 }
