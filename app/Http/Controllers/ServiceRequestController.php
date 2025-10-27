@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Plan;
 use App\Models\Service;
 use App\Models\ServiceRequest;
 use App\Models\User;
@@ -52,4 +53,11 @@ class ServiceRequestController extends Controller
 
 
     }
-}
+
+    public function destroy(ServiceRequest $serviceRequest)
+    {
+
+        $serviceRequest->delete();
+
+        return redirect()->route('service_requests.index')->with('success', ' deleted successfully.');
+    }}
