@@ -136,10 +136,14 @@ protected $firestoreService;
 {
     $user=User::findorfail($id);
 
+    if ($user->approval_status=="accepted") {
+        app("firestore")->incrementField('count', -1);
+    }
+
+
     $user->delete();
     $user->deviceTokens()->delete();
 
-    app("firestore")->incrementField('count', -1);
 
     return redirect()->back()->with('success', 'request deleted successfully.');
 }

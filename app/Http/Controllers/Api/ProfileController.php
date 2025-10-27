@@ -51,6 +51,7 @@ class ProfileController extends Controller
 
 
     public function destroy(){
+
         $user = auth()->user();
 
         if (!$user) {
