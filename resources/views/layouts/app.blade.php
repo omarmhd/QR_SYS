@@ -929,7 +929,7 @@ document.addEventListener('DOMContentLoaded', function () {
             ]);
         });
 
-validator.onFail(function () {
+    validator.onFail(function () {
         const firstErrorField = form.querySelector('.is-invalid');
         if (!firstErrorField) return;
 
@@ -954,33 +954,41 @@ validator.onFail(function () {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    const sidebarLinks = document.querySelectorAll('aside .nav-link');
     const currentPath = window.location.pathname;
+    const links = document.querySelectorAll('aside .nav-link, aside .dropdown-item');
 
-    sidebarLinks.forEach(link => {
+    links.forEach(link => {
+        const href = link.getAttribute('href');
+
+        if (!href || href.startsWith('#') || href.startsWith('javascript:')) return;
+
         const linkPath = new URL(link.href).pathname;
-        if (linkPath === currentPath) {
+
+        if (currentPath === linkPath) {
             link.classList.add('active');
 
-            // إضافة الكلاس للعنصر الأب
-            const parentItem = link.closest('.nav-item');
-            if (parentItem) parentItem.classList.add('active');
+            const parentLi = link.closest('li');
+            if (parentLi) parentLi.classList.add('active');
 
-            // التحقق إذا كان داخل dropdown
-            const dropdownMenu = link.closest('.dropdown');
-            if (dropdownMenu) {
-                dropdownMenu.classList.add('show');
+            const dropdown = link.closest('.dropdown');
+            if (dropdown) {
+                dropdown.classList.add('show');
 
-                // إذا تريد فتح الرابط تلقائياً للـ Bootstrap dropdown
-                const dropdownToggle = dropdownMenu.querySelector('.dropdown-toggle');
-                if (dropdownToggle) {
-                    dropdownToggle.classList.add('show');
-                    dropdownToggle.setAttribute('aria-expanded', 'true');
+                const dropdownMenu = dropdown.querySelector('.dropdown-menu');
+                if (dropdownMenu) {
+                    dropdownMenu.classList.add('show');
+                }
+
+                const toggle = dropdown.querySelector('.dropdown-toggle');
+                if (toggle) {
+                    toggle.classList.add('active');
+                    toggle.setAttribute('aria-expanded', 'true');
                 }
             }
         }
     });
 });
+
 
 
 </script>
@@ -997,14 +1005,12 @@ document.addEventListener('DOMContentLoaded', () => {
             appId: "1:53329068541:web:4ca83669cbec592c2e9994",
             measurementId: "G-HY9VRCRH85"
         };
-
         const app = initializeApp(firebaseConfig);
-
         const db = getFirestore(app);
-
-
         const countRef = doc(db, "requests", "requests");
         const countElement = document.getElementById('orders-count-realtime');
+        const countMes = document.getElementById('messages-count-realtime');
+        const countVip = document.getElementById('private-count-realtime');
 
         if (countElement) {
             onSnapshot(countRef, (docSnapshot) => {
@@ -1012,9 +1018,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     const data = docSnapshot.data();
 
                     const newCount = data.count || 0;
-
-                    countElement.textContent = newCount;
+                    const vipCount = data.count_vip || 0;
+                    const messagesCount = data.count_messages || 0;
+                    countElement.textContent=newCount
+                    countMes.textContent=messagesCount
+                    countVip.textContent = vipCount;
                     console.log("Orders count updated:", newCount);
+                    console.log("Messages count updated:", messagesCount);
+
                 } else {
                     console.error("Document 'requests/requests' not found. Check path and security rules.");
                     countElement.textContent = 'error in  data';
@@ -1027,8 +1038,5 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error("HTML element with ID 'orders-count-realtime' not found.");
         }
     </script>
-
-
-    <!-- END PAGE SCRIPTS -->
   </body>
 </html>

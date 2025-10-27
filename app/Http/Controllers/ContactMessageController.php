@@ -72,6 +72,8 @@ class ContactMessageController extends Controller
     public function destroy(ContactMessage $contactMessage)
     {
         $contactMessage->delete();
+        app("firestore")->incrementField('count_messages', -1);
+
         return redirect()->back()->with('success', 'Message deleted successfully.');
     }
 }

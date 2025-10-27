@@ -63,7 +63,7 @@
                                 </p>
                                 <div class="row g-5 mt-auto">
                                     <div class="col-auto">
-                                        <div class="subheader">Approved Requests</div>
+                                        <div class="subheader">Approved</div>
                                         <div class="d-flex align-items-baseline">
                                             <div class="h3 me-2">{{$stats->active_users??0}}</div>
                                             <div class="me-auto">
@@ -79,7 +79,7 @@
                                         </div>
                                     </div>
                                     <div class="col-auto">
-                                        <div class="subheader">Rejected Requests
+                                        <div class="subheader">Pending
                                         </div>
                                         <div class="d-flex align-items-baseline">
                                             <div class="h3 me-2">{{$stats->pending_users??0}}</div>

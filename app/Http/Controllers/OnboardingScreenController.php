@@ -13,7 +13,7 @@ class OnboardingScreenController extends Controller
      */
     public function index()
     {
-       
+
         $screens=OnboardingScreen::all();
        return view("onboarding_screens.index",["screens"=>$screens]);
     }
@@ -21,15 +21,14 @@ class OnboardingScreenController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-  
+
 
       public function create(){
 
-        $screen=new OnboardingScreen(); 
+        $screen=new OnboardingScreen();
         return view('onboarding_screens.action',["screen"=>$screen]);
     }
 
-    // Store new screen
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -47,14 +46,12 @@ class OnboardingScreenController extends Controller
         return redirect()->route('onboarding-screens.index')->with('success', 'Screen created successfully.');
     }
 
-    // Show edit form
     public function edit($id)
     {
         $screen = OnboardingScreen::findOrFail($id);
         return view('onboarding_screens.action', compact('screen'));
     }
 
-    // Update existing screen
     public function update(Request $request, $id)
     {
         $screen = OnboardingScreen::findOrFail($id);

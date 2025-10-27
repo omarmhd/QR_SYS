@@ -120,6 +120,8 @@ class PublicController extends Controller
 
         ]);
         ServiceRequest::create($fields);
+        app("firestore")->incrementField('count_vip', +1);
+
         return response()->json(["status"=>true,"message"=>"Your request has been sent successfully"]);
 
     }
@@ -133,20 +135,19 @@ class PublicController extends Controller
 
 
         ]);
-        $user=auth()->user() ?? null;
+//        $user=auth()->user() ?? null;
 
 
         $contactMessage=new ContactMessage();
-        $contactMessage->user_id=$user?->id;
-        $contactMessage->user_name=$user?->name??$validated["user_name"];
+        $contactMessage->user_id=null;
+        $contactMessage->user_name=$validated["user_name"];
         $contactMessage->email=$validated["email"];
         $contactMessage->phone=$validated["phone"];
         $contactMessage->title=$validated["title"];
         $contactMessage->message=$validated["message"];
         $contactMessage->save();
 
-
-
+        app("firestore")->incrementField('count_messages', +1);
 
         return response()->json(["status"=>true,"message"=>"Your request has been sent successfully"]);
     }

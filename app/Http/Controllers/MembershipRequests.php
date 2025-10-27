@@ -8,21 +8,25 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Yajra\DataTables\DataTables;
 use App\Services\FcmNotificationService;
+use App\Services\FirestoreService;
 
 class MembershipRequests extends Controller
 {
 protected $firebaseService;
+protected $firestoreService;
 
-    public function __construct(FcmNotificationService $firebaseService)
+    public function __construct(FcmNotificationService $firebaseService,FirestoreService $firestoreService)
+
     {
         $this->firebaseService = $firebaseService;
+        $this->firestoreService = $firestoreService;
     }
 
     function index(Request $request)
     {
 
         if ($request->ajax()) {
-            $users = User::where("approval_status", "pending")->orwhere("approval_status","reject");
+            $users = User::where("approval_status", "pending")->orwhere("approval_status","rejected");
 
             return DataTables::of($users)
 
@@ -83,41 +87,50 @@ protected $firebaseService;
 
 
 
-public function changeStatus($id, $status)
-{
-    $allowedStatuses = ['accepted', 'rejected'];
+    public function changeStatus($id, $status)
+    {
+        $allowedStatuses = ['accepted', 'rejected'];
 
-    if (!in_array($status, $allowedStatuses)) {
-        return redirect()->back()->with('error', 'Invalid status value.');
+        if (!in_array($status, $allowedStatuses)) {
+            return redirect()->back()->with('error', 'Invalid status value.');
+        }
+
+        $user = User::findOrFail($id);
+        $user->approval_status = $status;
+        $user->save();
+
+        $notificationTitle = 'Your account status';
+        $notificationBody = $status === 'accepted'
+            ? 'Congratulations, your application has been accepted.'
+            : 'We’re sorry, your application has been rejected.';
+
+        $tokens = $user->deviceTokens->pluck('fcm_token')->toArray();
+
+        try {
+            $this->firebaseService->sendNotification(
+                $tokens,
+                $notificationTitle,
+                $notificationBody,
+                ['type' => 'token'],
+                null,
+                'tokens',
+                $id
+            );
+        } catch (\Throwable $e) {
+            \Log::error('Firebase Notification Error: ' . $e->getMessage());
+        }
+
+        app("firestore")->incrementField('count', -1);
+
+        try {
+            Mail::to($user->email)->send(new ApprovalMail($user, $status));
+        } catch (\Throwable $e) {
+            \Log::error('Mail sending failed: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Status updated, but failed to send email.');
+        }
+
+        return redirect()->back()->with('success', 'Status updated to ' . $status);
     }
-
-    $user = User::findOrFail($id);
-    $user->approval_status = $status;
-
-    $notificationTitle = 'Your account status';
-    $notificationBody = $status === 'accepted'
-        ? 'Congratulations, your application has been accepted.'
-        : 'We’re sorry, your application has been rejected.';
-
-    // Send push notification
-    $tokens = $user->deviceTokens->pluck('fcm_token')->toArray();
-    $this->firebaseService->sendNotification(
-        $tokens,
-        $notificationTitle,
-        $notificationBody,
-        ['type' => 'token'],
-        null,
-        'tokens',
-        $id
-    );
-
-    // Send one mail class with status passed in
-    Mail::to($user->email)->send(new ApprovalMail($user, $status));
-
-    $user->save();
-
-    return redirect()->back()->with('success', 'Status updated to ' . $status);
-}
 
   public function destroy($id)
 {
@@ -126,6 +139,7 @@ public function changeStatus($id, $status)
     $user->delete();
     $user->deviceTokens()->delete();
 
+    app("firestore")->incrementField('count', -1);
 
     return redirect()->back()->with('success', 'request deleted successfully.');
 }

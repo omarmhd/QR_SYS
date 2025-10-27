@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Services\FirestoreService;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 use App\LocaleEnum;
@@ -23,6 +24,10 @@ class AppServiceProvider extends ServiceProvider
     {
             Schema::defaultStringLength(191);
                  view()->share('locales',LocaleEnum::cases());
+
+        $this->app->singleton('firestore', function ($app) {
+            return new FirestoreService();
+        });
 
 
     }

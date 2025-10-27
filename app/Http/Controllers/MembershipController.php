@@ -17,19 +17,18 @@ class MembershipController extends Controller
 
     public function index(Request $request)
     {
-        $users = User::query()->with(["plan","subscription"]);
+        $users = User::query()
+            ->with(['plan', 'subscription'])
+            ->whereHas('subscription');
 
         if (!is_null($request->search)) {
             $search = $request->search;
-
             $users->where(function ($query) use ($search) {
                 $query->where('name', 'like', "%{$search}%")
                     ->orWhere('phone', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%");
             });
         }
-
-        $users->where("approval_status","accepted");
 
         $users = $users->paginate(10);
 

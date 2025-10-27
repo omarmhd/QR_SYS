@@ -17,7 +17,9 @@ Route::get('/', function () {
 
     $stats = \App\Models\User::selectRaw("
             SUM(CASE WHEN approval_status = 'pending' THEN 1 ELSE 0 END) as pending_users,
-            SUM(CASE WHEN approval_status = 'approved' THEN 1 ELSE 0 END) as active_users,
+            SUM(CASE WHEN approval_status = 'accepted' THEN 1 ELSE 0 END) as active_users,
+            SUM(CASE WHEN approval_status = 'rejected' THEN 1 ELSE 0 END) as reject_users,
+
             COUNT(*) as total_users
         ")->first();
 

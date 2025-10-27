@@ -28,7 +28,7 @@ class AuthController extends Controller
             "dob"=>"required|date",
             "plan_id"=>"nullable",
             "plan_name"=>"nullable",
-           'fcm_token' => 'required|string|unique:device_tokens,fcm_token',
+           'fcm_token' => 'required|string',
            'device_id' => 'required|string',
            'device_type' => 'nullable|string'
 
@@ -70,7 +70,7 @@ class AuthController extends Controller
         $token = $user->createToken('api_token')->plainTextToken;
         $user['token'] = $token;
 
-        $this->firestoreService->updateRequestsCountInFirestore();
+        app("firestore")->incrementField('count', +1);
 
 
 
