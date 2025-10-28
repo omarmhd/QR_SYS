@@ -17,7 +17,7 @@ class ServiceRequestController extends Controller
         $service_name=$service->name;
         if ($request->ajax()) {
 
-            $service_requests = ServiceRequest::where("service_id", $request->service_id);
+            $service_requests = ServiceRequest::with("user")->where("service_id", $request->service_id);
 
 
             return DataTables::of($service_requests)
