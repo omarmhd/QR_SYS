@@ -22,10 +22,10 @@ class ServiceRequestController extends Controller
 
             return DataTables::of($service_requests)
             ->addColumn('phone', function ($row) {
-                return $row->user->phone;
+                return $row?->user?->phone;
 
             })->addColumn('email', function ($row) {
-                    return $row->user->email;
+                    return $row?->user?->email;
 
                 })
            ->addColumn('actions', function ($row) {
