@@ -120,6 +120,7 @@ protected $firestoreService;
             \Log::error('Firebase Notification Error: ' . $e->getMessage());
         }
 
+
         app("firestore")->incrementField('count', -1);
 
         try {
@@ -136,7 +137,7 @@ protected $firestoreService;
 {
     $user=User::findorfail($id);
 
-    if ($user->approval_status=="accepted") {
+    if ($user->approval_status=="pending") {
         app("firestore")->incrementField('count', -1);
     }
 
