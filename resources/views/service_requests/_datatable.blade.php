@@ -22,6 +22,15 @@
                        name: "full_name"
                    },
                    {
+                       data: 'email',
+                       name: "email"
+                   },
+
+                   {
+                       data: 'phone',
+                       name: "phone"
+                   },
+                   {
                        data: 'booking_date',
                        name: "booking_date"
                    },

@@ -21,6 +21,13 @@ class ServiceRequestController extends Controller
 
 
             return DataTables::of($service_requests)
+            ->addColumn('phone', function ($row) {
+                return $row->user->phone;
+
+            })->addColumn('email', function ($row) {
+                    return $row->user->email;
+
+                })
            ->addColumn('actions', function ($row) {
                     $route_delete = route("service-requests.destroy", $row);
                     $csrf_token = csrf_token();
@@ -41,7 +48,7 @@ class ServiceRequestController extends Controller
                                 </button>
                             </form>
                     btns;
-                })->rawColumns(['actions'])
+                })->rawColumns(['email','phone','actions'])
                 ->make(true);
         }
 

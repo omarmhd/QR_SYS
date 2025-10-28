@@ -88,7 +88,10 @@
                     </svg>
                   </th>
                   <th>Full Name</th>
-                  <th>Booking Date</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+
+                    <th>Booking Date</th>
                   <th>Booking Time</th>
                   <th>Guest Numbers </th>
                   <th>Cigar Type</th>
