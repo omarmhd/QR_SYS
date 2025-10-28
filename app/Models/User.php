@@ -14,7 +14,7 @@ class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasApiTokens, Notifiable, HasFactory;
-//    protected $appends = ['subscription_data'];
+    protected $appends = ['subscription_data'];
 
     /**
      * The attributes that are mass assignable.
