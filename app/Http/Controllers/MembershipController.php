@@ -21,7 +21,7 @@ class MembershipController extends Controller
         $users = User::query()
             ->with(['plan', 'subscription'])
             ->whereHas('subscription');
-        dd($users);
+
 
         if (!is_null($request->search)) {
             $search = $request->search;
@@ -33,7 +33,7 @@ class MembershipController extends Controller
         }
 
         $users = $users->paginate(10);
-
+        dd($users);
         return json_encode($users);
 
     }
