@@ -33,7 +33,6 @@ class MembershipController extends Controller
         }
 
         $users = $users->paginate(10);
-        dd($users);
         return json_encode($users);
 
     }

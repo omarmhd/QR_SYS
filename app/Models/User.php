@@ -76,7 +76,9 @@ class User extends Authenticatable
     public function subscription(){
         return $this->belongsTo(Subscription::class,"current_subscription","id");
     }
-
+    public function subscriptions(){
+        return $this->hasOne(Subscription::class);
+    }
     public function getSubscriptionDataAttribute()
     {
         if (!$this->relationLoaded('subscription')) {
