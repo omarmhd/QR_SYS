@@ -191,7 +191,7 @@ class NetopiaPaymentService
             };
 
             $subscription = $payment->user->subscription()->updateOrCreate(
-                ['plan_id' => $payment->plan_id, "user_id" => $payment->user_id],
+                ["user_id" => $payment->user_id],
                 ['status' => 'active', 'start_date' => now(), 'end_date' => $expiresAt]
             );
 

@@ -106,7 +106,6 @@ class PublicController extends Controller
         }
         return response()->json(["status"=>true,"data"=>$notifications]);
     }
-
     public function storePrivateService(Request $request){
         $fields = $request->validate([
             'user_id' => 'required|exists:users,id',

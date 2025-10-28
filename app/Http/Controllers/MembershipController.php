@@ -17,9 +17,11 @@ class MembershipController extends Controller
 
     public function index(Request $request)
     {
+
         $users = User::query()
             ->with(['plan', 'subscription'])
             ->whereHas('subscription');
+        dd($users);
 
         if (!is_null($request->search)) {
             $search = $request->search;
