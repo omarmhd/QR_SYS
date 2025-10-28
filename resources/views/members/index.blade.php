@@ -175,6 +175,7 @@
                     .catch(err => console.error());
             };
 
+
             const renderPagination = (res) => {
                 const paginationEl = document.getElementById('pagination');
                 paginationEl.innerHTML = '';
@@ -198,6 +199,7 @@
 
                 membersToRender.forEach(member => {
                     // const subscriptionStatus = "6";
+                    console.log(member)
 
                     const card = document.createElement('div');
                     card.className = 'col-md-3 col-lg-3';
@@ -228,9 +230,9 @@
                                            <div class="mt-2">
                                 <h4 class="subheader mb-2">guests information</h4>
 
-                                <div class="mb-2"><span class="text-muted text-yellow">Total : ${member.plan.guest_passes_per_year}</span></div>
-                                <div class="mb-2"><span class="text-muted  text-yellow">Coming:  ${member.subscription?.last_guests_limit ?? 0}</span></div>
-                                <div class="mb-2"><span class="text-muted  text-yellow">Remaining: ${member.plan.guest_passes_per_year-(member.subscription?.used_guests ?? 0)}</span></div>
+                                <div class="mb-2"><span class="text-muted text-yellow">Total : ${member.plan?.guest_passes_per_year}</span></div>
+                                <div class="mb-2"><span class="text-muted  text-yellow">Coming:  ${member.subscription_data?.coming_guest_passes ?? 0}</span></div>
+                                <div class="mb-2"><span class="text-muted  text-yellow">Remaining: ${member.plan?.guest_passes_per_year-(member.subscription_data?.used_guests ?? 0)}</span></div>
 
                             </div>
                         </div>
@@ -250,7 +252,7 @@
                             <form class="generate-form" data-member-id="${member.id}">
                                 <label class="form-label">Generate QR</label>
                                 <div class="input-group">
-                                    <input type="number"  min="1" max="${member.subscription?.last_guests_limit ?? 0}" class="form-control visitor-count"       onkeydown="return false;"
+                                    <input type="number"  min="1" max="${member.subscription_data?.coming_guest_passes  ?? 0}" class="form-control visitor-count"       onkeydown="return false;"
   style="max-width: 70px;" required>
                                     <button type="submit" class="btn btn-primary generate-btn">
                                       <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
