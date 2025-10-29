@@ -243,14 +243,15 @@ class SubscriptionController extends Controller
 
 
     }
-
-    public function switchPlan(Request $request){
-          $request->validate([
-            "plan_id"=>"required|exists:plans,id",
+    public function switchPlan(Request $request)
+    {
+        $request->validate([
+            "plan_id" => "required|exists:plans,id",
         ]);
-        $plan=Plan::find($request->plan_id);
 
-        $user=auth()->user();
+        $plan = Plan::find($request->plan_id);
+        $user = auth()->user();
+
         $expiresAt = match ($plan->billing_type) {
             'day' => now()->addDay(),
             'month' => now()->addMonth(),
@@ -260,14 +261,19 @@ class SubscriptionController extends Controller
 
         $subscription = $user->subscription()->updateOrCreate(
             ["user_id" => $user->id],
-            ['status' => 'active', 'start_date' => now(), 'end_date' => $expiresAt,"plan_id"=>$plan->id]
+            [
+                'status' => 'active',
+                'start_date' => now(),
+                'end_date' => $expiresAt,
+                "plan_id" => $plan->id
+            ]
         );
 
         $user->update([
             'current_subscription' => $subscription->id,
             'subscription_status' => 1,
-            'plan_id' => $request->paln_id,
-            "is_sub_cancelled"=>0
+            'plan_id' => $plan->id,
+            "is_sub_cancelled" => 0
         ]);
 
         Log::info('🆕 Subscription activated', [
@@ -276,9 +282,10 @@ class SubscriptionController extends Controller
         ]);
 
         $tokens = $user->deviceTokens->pluck('fcm_token')->filter()->toArray();
-        if ($tokens) {
+        if (!empty($tokens)) {
             $title = 'Successful!';
             $body = "Congratulations! Your subscription is now active. It will expire on " . $expiresAt->format('F j, Y') . ".";
+
             $this->firebaseService->sendNotification(
                 $tokens,
                 $title,
@@ -297,8 +304,16 @@ class SubscriptionController extends Controller
             Log::info('ℹ️ No device tokens found for user', ['user_id' => $user->id]);
         }
 
-
+        return response()->json([
+            "status" => true,
+            "message" => "Subscription switched successfully.",
+            "data" => [
+                "plan_name" => $plan?->name,
+                "end_date" => $expiresAt->toDateTimeString()
+            ]
+        ]);
     }
+
 
     public function cancelSubscription(){
         $user=auth()->user();
