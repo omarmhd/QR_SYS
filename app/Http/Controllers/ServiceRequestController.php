@@ -13,11 +13,11 @@ class ServiceRequestController extends Controller
 {
 
     public function index(Request $request){
-        $service=Service::findOrFail($request->service_id)->orderBy('id', 'desc');;
+        $service=Service::findOrFail($request->service_id);;
         $service_name=$service->name;
         if ($request->ajax()) {
 
-            $service_requests = ServiceRequest::with("user")->where("service_id", $request->service_id);
+            $service_requests = ServiceRequest::with("user")->where("service_id", $request->service_id)->orderBy('id', 'desc');
 
 
             return DataTables::of($service_requests)
