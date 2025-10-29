@@ -166,7 +166,7 @@
 
     <style>
         :root {
-            --primary-gradient: linear-gradient(135deg, #066FD1 0%, #054a8f 100%);
+            --primary-gradient: linear-gradient(135deg, #182433 0%, #054a8f 100%);
             --success-gradient: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
             --warning-gradient: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
         }
@@ -271,7 +271,7 @@
 
         .quick-action-item:hover {
             background: #f8f9fa;
-            color: #066FD1;
+            color: #182433;
             transform: translateY(-2px);
         }
 
