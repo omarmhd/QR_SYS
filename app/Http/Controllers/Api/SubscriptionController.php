@@ -249,7 +249,7 @@ class SubscriptionController extends Controller
             "plan_id"=>"required|exists:plans,id",
         ]);
         $plan=Plan::find($request->plan_id);
-        dd($plan->billing_type);
+
         $user=auth()->user();
         $expiresAt = match ($plan->billing_type) {
             'day' => now()->addDay(),
