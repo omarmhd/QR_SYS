@@ -28,6 +28,9 @@
     <!-- BEGIN CUSTOM FONT -->
     <style>
       @import url("https://rsms.me/inter/inter.css");
+      .bg-checked {
+          background-color: #d4edda !important; /* أخضر فاتح */
+      }
     </style>
     <!-- END CUSTOM FONT -->
   </head>

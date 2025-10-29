@@ -62,6 +62,8 @@ Route::middleware('auth')->group(function () {
     Route::resource("/services",\App\Http\Controllers\ServiceController::class);
     Route::resource("service-requests",\App\Http\Controllers\ServiceRequestController::class);
 
+    Route::post('contact-messages/check/{id}', [\App\Http\Controllers\ContactMessageController::class, 'check'])
+        ->name('contact-message.check');
     Route::resource("contact-messages", \App\Http\Controllers\ContactMessageController::class)->only(["index","destroy"]);
 
     Route::view("members","members.index");

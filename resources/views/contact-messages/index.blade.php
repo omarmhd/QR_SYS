@@ -152,5 +152,27 @@
               $("#fullMessage").text($(this).data("message"));
               $("#modal-message .name").text($(this).data("name"));
           });
+          $(document).on('click', '.check-btn', function() {
+              var button = $(this);
+              var id = button.data('id');
+
+              $.ajax({
+                  url: '/contact-messages/check/' + id,
+                  type: 'POST',
+                  data: {
+                      _token: '{{ csrf_token() }}'
+                  },
+                  success: function(response) {
+                      if(response.checked) {
+                          button.closest('tr').css('background-color', '#d4edda'); // أخضر فاتح
+                          button.hide()
+
+                      } else {
+                          button.closest('tr').css('background-color', '');
+                      }
+                  }
+              });
+          });
+
       </script>
       @endpush

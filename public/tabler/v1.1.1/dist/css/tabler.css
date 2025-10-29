@@ -18,6 +18,7 @@
  * @param {Number} $alpha - The level of transparency, ranging from 0 (fully transparent) to 1 (fully opaque). Default is 1.
  * @return {Color} - The resulting color with the specified transparency.
  */
+
 :root,
 [data-bs-theme=light] {
   --tblr-blue: #066fd1;

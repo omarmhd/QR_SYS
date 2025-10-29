@@ -92,7 +92,7 @@
                                 </div>
                                 <span class="text-uppercase small fw-bold text-muted">Total Users</span>
                             </div>
-                            <h1 class="display-4 text-primary mb-2">{{optional($stats)->total_users??0}}</h1>
+                            <h1 class="display-4  mb-2">{{optional($stats)->total_users??0}}</h1>
                             <div class="mt-auto">
                                 <div class="d-flex align-items-center text-success">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -159,7 +159,6 @@
                 @endforeach
             </div>
 
-            <!-- Quick Actions -->
 
         </div>
     </div>
