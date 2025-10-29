@@ -249,7 +249,7 @@ class SubscriptionController extends Controller
             "plan_id"=>"required|exists:plans,id",
         ]);
         $plan=Plan::find($request->paln_id);
-        $user=auth()->user;
+        $user=auth()->user();
         $expiresAt = match ($plan->billing_type) {
             'day' => now()->addDay(),
             'month' => now()->addMonth(),
@@ -258,7 +258,7 @@ class SubscriptionController extends Controller
         };
 
         $subscription = $user->subscription()->updateOrCreate(
-            ["user_id" => $user->user_id],
+            ["user_id" => $user->id],
             ['status' => 'active', 'start_date' => now(), 'end_date' => $expiresAt]
         );
 
