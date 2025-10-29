@@ -82,7 +82,7 @@
                     <div class="card user-stats-card h-100">
                         <div class="card-body d-flex flex-column">
                             <div class="d-flex align-items-center mb-3">
-                                <div class="icon-wrapper bg-primary bg-opacity-10 me-3">
+                                <div class="icon-wrapper  bg-opacity-10 me-3">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                                         <circle cx="9" cy="7" r="4"></circle>
