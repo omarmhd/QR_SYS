@@ -23,7 +23,16 @@ Route::get('/', function () {
             COUNT(*) as total_users
         ")->first();
 
-    return view('dashboard',["stats"=>$stats]);
+    $services = \App\Models\Service::selectRaw('
+        services.id,
+        services.name,
+        COUNT(service_requests.id) as total_requests
+    ')
+        ->leftJoin('service_requests', 'services.id', '=', 'service_requests.service_id')
+        ->groupBy('services.id', 'services.name')
+        ->get();
+
+    return view('dashboard',["stats"=>$stats,"services"=>$services]);
 })->middleware(['auth', 'verified'])->name('dashboard');
 Route::get('/payment-redirect', function (Illuminate\Http\Request $request) {
 
