@@ -20,7 +20,7 @@ class NotificationController extends Controller
     public function index(Request $request){
 
         if($request->ajax()){
-            $notification = Notification::query();
+            $notification = Notification::query()->orderBy('id', 'desc');;
             return DataTables::of($notification)
                 ->make(true);
         }

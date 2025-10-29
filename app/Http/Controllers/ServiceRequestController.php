@@ -13,7 +13,7 @@ class ServiceRequestController extends Controller
 {
 
     public function index(Request $request){
-        $service=Service::findOrFail($request->service_id);
+        $service=Service::findOrFail($request->service_id)->orderBy('id', 'desc');;
         $service_name=$service->name;
         if ($request->ajax()) {
 

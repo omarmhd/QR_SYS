@@ -26,7 +26,8 @@ protected $firestoreService;
     {
 
         if ($request->ajax()) {
-            $users = User::where("approval_status", "pending")->orwhere("approval_status","rejected");
+            $users = User::where("approval_status", "pending")
+                ->orderBy('id', 'desc');;
 
             return DataTables::of($users)
 

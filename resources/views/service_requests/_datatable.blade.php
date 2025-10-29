@@ -7,6 +7,7 @@
            $('#data-table').DataTable({
                processing: true,
                serverSide: false,
+               order: [],
                ajax: {
                    url: "{{ route('service-requests.index') }}",
                    data: {

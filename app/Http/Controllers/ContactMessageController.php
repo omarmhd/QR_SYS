@@ -14,7 +14,7 @@ class ContactMessageController extends Controller
     public function index(Request $request){
 
         if($request->ajax()){
-            $contactMessage = ContactMessage::query();
+            $contactMessage = ContactMessage::query()->orderBy('id', 'desc');;
             return DataTables::of($contactMessage)
                 ->addColumn("user_name",function ($data){
                     return $data?->user?->name ?? '-';

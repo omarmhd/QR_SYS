@@ -3,7 +3,7 @@
            $('#users-table').DataTable({
                processing: true,
                serverSide: true,
-               order: [[0, 'desc']],
+               order: [],
                ajax: "{{route('users.index')}}",
                columns: [{
                        data: 'id',

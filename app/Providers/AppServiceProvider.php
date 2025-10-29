@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Services\FcmNotificationService;
 use App\Services\FirestoreService;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
@@ -29,6 +30,8 @@ class AppServiceProvider extends ServiceProvider
             return new FirestoreService();
         });
 
-
+        $this->app->singleton('notification', function ($app) {
+            return new FcmNotificationService();
+        });
     }
 }

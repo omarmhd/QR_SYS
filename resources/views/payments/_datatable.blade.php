@@ -3,6 +3,7 @@
            $('#data-table').DataTable({
                processing: true,
                serverSide: false,
+               order: [],
                ajax: "{{route('payments.index')}}",
                columns: [
                    { data: 'id', name: 'id' },

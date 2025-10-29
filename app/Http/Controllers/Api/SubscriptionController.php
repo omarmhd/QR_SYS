@@ -9,6 +9,7 @@ use App\Services\{FcmNotificationService,NetopiaPaymentService};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class SubscriptionController extends Controller
 {
@@ -243,10 +244,76 @@ class SubscriptionController extends Controller
 
     }
 
+    public function switchPlan(Request $request){
+          $request->validate([
+            "plan_id"=>"required|exists:plans,id",
+        ]);
+        $plan=Plan::find($request->paln_id);
+        $user=auth()->user;
+        $expiresAt = match ($plan->billing_type) {
+            'day' => now()->addDay(),
+            'month' => now()->addMonth(),
+            'year' => now()->addYear(),
+            default => now()->addMonth(),
+        };
+
+        $subscription = $user->subscription()->updateOrCreate(
+            ["user_id" => $user->user_id],
+            ['status' => 'active', 'start_date' => now(), 'end_date' => $expiresAt]
+        );
+
+        $user->update([
+            'current_subscription' => $subscription->id,
+            'subscription_status' => 1,
+            'plan_id' => $request->paln_id,
+            "is_sub_cancelled"=>0
+        ]);
+
+        Log::info('🆕 Subscription activated', [
+            'subscription_id' => $subscription->id,
+            'expires_at' => $expiresAt
+        ]);
+
+        $tokens = $user->deviceTokens->pluck('fcm_token')->filter()->toArray();
+        if ($tokens) {
+            $title = 'Successful!';
+            $body = "Congratulations! Your subscription is now active. It will expire on " . $expiresAt->format('F j, Y') . ".";
+            $this->firebaseService->sendNotification(
+                $tokens,
+                $title,
+                $body,
+                ['type' => 'subscription_update'],
+                null,
+                'tokens',
+                $user->id
+            );
+
+            Log::info('📱 FCM notification sent to user', [
+                'user_id' => $user->id,
+                'tokens_count' => count($tokens)
+            ]);
+        } else {
+            Log::info('ℹ️ No device tokens found for user', ['user_id' => $user->id]);
+        }
+
+
+    }
+
     public function cancelSubscription(){
         $user=auth()->user();
         $status=auth()->user()->update(["is_sub_cancelled"=>1]);
+        $tokens = $user->deviceTokens->pluck('fcm_token')->toArray();
+
         if ($status) {
+            app("notification")->sendNotification(
+                $tokens,
+                'Subscription Update',
+                'Your subscription has been canceled.',
+                ['type' => 'token'],
+                null,
+                'tokens',
+                $user->id
+            );
             return response()->json([
                 "status" => true,
                 "data"=>[
@@ -260,7 +327,9 @@ class SubscriptionController extends Controller
                 "message" => "Update failed"
             ]);
 
-    }}
+    }
+
+    }
 
 
     public function notify(Request $request)

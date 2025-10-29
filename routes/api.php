@@ -41,6 +41,7 @@ Route::get('/user', function (Request $request) {
 
     Route::post("start-payment", [SubscriptionController::class, 'startPayment']);
     Route::post("change-plan", [SubscriptionController::class, 'changePlan']);
+    Route::post("switch-plan", [SubscriptionController::class, 'switchPlan']);
 
     Route::post("cancel-subscription", [SubscriptionController::class, 'cancelSubscription']);
 

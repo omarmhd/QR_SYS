@@ -12,7 +12,7 @@ class PaymentController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $payments = Payment::with(['user', 'plan'])->select('payments.*');
+            $payments = Payment::with(['user', 'plan'])->select('payments.*')->orderBy('id', 'desc');;
 
             return DataTables::of($payments)
                 ->addIndexColumn()

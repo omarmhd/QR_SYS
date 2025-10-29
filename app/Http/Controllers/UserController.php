@@ -14,7 +14,8 @@ class  UserController extends Controller
     {
 
         if ($request->ajax()) {
-            $users = User::where("approval_status", "accepted");
+            $users = User::where("approval_status","!=", "rejected")
+            ->orderBy('id', 'desc');
 
             return DataTables::of($users)
                 ->editColumn('name', function ($row) {
