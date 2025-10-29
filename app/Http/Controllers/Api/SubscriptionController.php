@@ -260,7 +260,7 @@ class SubscriptionController extends Controller
 
         $subscription = $user->subscription()->updateOrCreate(
             ["user_id" => $user->id],
-            ['status' => 'active', 'start_date' => now(), 'end_date' => $expiresAt]
+            ['status' => 'active', 'start_date' => now(), 'end_date' => $expiresAt,"plan_id"=>$plan->id]
         );
 
         $user->update([
