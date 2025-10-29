@@ -166,7 +166,7 @@
 
     <style>
         :root {
-            --primary-gradient: linear-gradient(135deg, #182433 0%, #054a8f 100%);
+            --primary-gradient: linear-gradient(135deg, #25384f 0%, #054a8f 100%);
             --success-gradient: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
             --warning-gradient: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
         }
@@ -243,7 +243,7 @@
 
         .service-name {
             font-weight: 600;
-            color: #2c3e50;
+            color: #25384f;
         }
 
         .service-stats h2 {
@@ -271,7 +271,7 @@
 
         .quick-action-item:hover {
             background: #f8f9fa;
-            color: #182433;
+            color: #25384f;
             transform: translateY(-2px);
         }
 
@@ -349,7 +349,7 @@
 
         .section-title {
             font-weight: 700;
-            color: #2c3e50;
+            color: #25384f;
             margin-bottom: 0.5rem;
         }
 
