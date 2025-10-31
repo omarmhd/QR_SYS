@@ -81,7 +81,7 @@
                                   <th>Amount</th>
                                   <th>Payment Method</th>
                                   <th>Status</th>
-                                  <th>UserID</th>
+                                  <th>User ID</th>
                                   <th>CUI</th>
                                   <th>Paid At</th>
                                   <th>Action</th>
