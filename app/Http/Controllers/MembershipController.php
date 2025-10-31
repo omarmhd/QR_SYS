@@ -74,7 +74,7 @@ class MembershipController extends Controller
             ]);
 
             $qrCodes[] = [
-                'name' => $user->name." guest " . ($i + 1),
+                'name' =>"Guest ". ($i + 1)."-". $user->name ,
                 'qr'   => 'data:image/png;base64,' . base64_encode($image)
             ];
         }

@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class SubscriptionController extends Controller
 {
@@ -352,5 +353,31 @@ class SubscriptionController extends Controller
     {
         return response()->json($this->paymentService->handleNotification($request->all()));
 
+    }
+
+    public function manualPaymentConfirm(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'payment_date' => 'required|date',
+            'payment_type' => 'required|string|max:255',
+            'transfer_method' => 'required|string|max:255',
+            'confirmation_note' => 'nullable|string|max:500',
+        ]);
+
+        $messageBody = "Manual Payment Confirmation\n\n"
+            . "Name: {$validated['name']}\n"
+            . "Payment Date: {$validated['payment_date']}\n"
+            . "Payment Type: {$validated['payment_type']}\n"
+            . "Transfer Method: {$validated['transfer_method']}\n"
+            . "Confirmation Note: " . ($validated['confirmation_note'] ?? 'N/A') . "\n\n"
+            . "Sent automatically from the system.";
+
+        Mail::raw($messageBody, function ($message) {
+            $message->to('eleyansaed@gmail.com')
+            ->subject('Manual Payment Confirmation');
+        });
+
+        return response()->json(['status'=>true,'message' => 'Manual payment confirmation sent successfully.'], 200);
     }
 }
