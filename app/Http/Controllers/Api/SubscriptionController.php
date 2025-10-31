@@ -359,7 +359,9 @@ class SubscriptionController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'payment_date' => 'required|date',
+            'email' => 'required|string|max:255',
+            'phone' => 'required|string|max:255',
+            'payment_date' => 'required',
             'payment_type' => 'required|string|max:255',
             'transfer_method' => 'required|string|max:255',
             'confirmation_note' => 'nullable|string|max:500',
@@ -367,9 +369,11 @@ class SubscriptionController extends Controller
 
         $messageBody = "Manual Payment Confirmation\n\n"
             . "Name: {$validated['name']}\n"
+            . "Phone: {$validated['phone']}\n"
+            . "Email: {$validated['email']}\n"
             . "Payment Date: {$validated['payment_date']}\n"
             . "Payment Type: {$validated['payment_type']}\n"
-            . "Transfer Method: {$validated['transfer_method']}\n"
+            . "Transfer Method: ".($validated['transfer_method'] ?? 'Bank')."\n"
             . "Confirmation Note: " . ($validated['confirmation_note'] ?? 'N/A') . "\n\n"
             . "Sent automatically from the system.";
 
