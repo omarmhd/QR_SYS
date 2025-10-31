@@ -134,7 +134,7 @@ class PublicController extends Controller
             . "This request was submitted from the App .";
 
         Mail::raw($messageBody, function ($message) {
-            $message->to('omarmhd19988@gmail.com')
+            $message->to('Elyansaad1994@gmail.com')
             ->subject('New Private Service Request');
         });
 
