@@ -156,12 +156,12 @@
                   <label class="form-label required">Subscription Status</label>
                                       <select name="subscription_status" class="form-control">
 
-                            <option value="0"
+                            <option value="1"
                                 {{ old('subscription_status', $user->subscription_status ?? '') == 1 ? 'selected' : '' }}>
                               Yes
                             </option>
 
-                                                        <option value="1"
+                                                        <option value="0"
                                 {{ old('subscription_status', $user->subscription_status ?? '') == 0 ? 'selected' : '' }}>
                                 No
                               </option>

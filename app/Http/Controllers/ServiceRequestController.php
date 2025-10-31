@@ -24,7 +24,9 @@ class ServiceRequestController extends Controller
             ->addColumn('phone', function ($row) {
                 return $row?->user?->phone;
 
-            })->addColumn('email', function ($row) {
+            })->editColumn('created_at', function ($row) {
+                    return $row->created_at ? $row->created_at->format('Y-m-d H:i:s') : '';
+                })->addColumn('email', function ($row) {
                     return $row?->user?->email;
 
                 })
@@ -48,7 +50,7 @@ class ServiceRequestController extends Controller
                                 </button>
                             </form>
                     btns;
-                })->rawColumns(['email','phone','actions'])
+                })->rawColumns(['email','phone','actions','created_at'])
                 ->make(true);
         }
 

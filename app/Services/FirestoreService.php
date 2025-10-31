@@ -150,9 +150,7 @@ class FirestoreService
         }
     }
 
-    /**
-     * 🟢 استدعِ هذه مرة واحدة فقط لتعيين القيم من قاعدة البيانات لأول مرة
-     */
+
     public function initializeCountsFromDatabase(): array
     {
         $accessToken = $this->getAccessToken();
@@ -179,16 +177,12 @@ class FirestoreService
         }
     }
 
-    /**
-     * 🟠 استدعِ هذه كل مرة بدك تحدث فيها رقم واحد فقط (زيادة أو نقصان)
-     */
     public function incrementField(string $field, int $amount = 1): array
     {
         $accessToken = $this->getAccessToken();
         if (!$accessToken) return ['status' => 'error', 'message' => 'No access token'];
 
         try {
-            // 1. احضر القيم الحالية من Firestore
             $current = Http::withToken($accessToken)->get("https://firestore.googleapis.com/v1/{$this->documentPath}");
             if (!$current->successful()) {
                 return ['status' => 'error', 'message' => 'Failed to fetch current values'];
@@ -199,10 +193,8 @@ class FirestoreService
                 ? (int)$data['fields'][$field]['integerValue']
                 : 0;
 
-            // 2. احسب القيمة الجديدة
             $newValue = $currentValue + $amount;
 
-            // 3. حدث الحقل فقط
             $payload = [
                 'fields' => [
                     $field => ['integerValue' => $newValue],

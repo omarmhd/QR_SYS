@@ -7,6 +7,8 @@
            $('#data-table').DataTable({
                processing: true,
                serverSide: false,
+               pageLength: 10,
+
                order: [],
                ajax: {
                    url: "{{ route('service-requests.index') }}",
@@ -50,6 +52,10 @@
                    {
                        data: 'notes',
                        name: "notes"
+                   },
+                   {
+                       data: 'created_at',
+                       name: "crated_at"
                    },
 
                    {

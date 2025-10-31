@@ -1,7 +1,7 @@
-@extends("layouts.app")   
+@extends("layouts.app")
 
 @section("content")
-      
+
       <div class="page-header d-print-none">
           <div class="container-xl">
             <div class="row g-2 align-items-center">
@@ -79,53 +79,42 @@
                     <h3 class="card-title">Users</h3>
                   </div>
                   <div class="card-body border-bottom py-3">
-                    <div class="d-flex">
-                      <!-- <div class="text-secondary">
-                        Show
-                        <div class="mx-2 d-inline-block">
-                          <input type="text" class="form-control form-control-sm" value="8" size="3" aria-label="Invoices count">
-                        </div>
-                        entries
+                      <div class="table-responsive">
+                          <table id="users-table" class="table table-selectable card-table table-vcenter text-nowrap datatable">
+                              <thead>
+                              <tr>
+                                  <!-- <th class="w-1"><input class="form-check-input m-0 align-middle" type="checkbox" aria-label="Select all invoices"></th> -->
+                                  <th class="w-1">
+                                      #
+                                      <!-- Download SVG icon from http://tabler.io/icons/icon/chevron-up -->
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-sm icon-thick icon-2">
+                                          <path d="M6 15l6 -6l6 6"></path>
+                                      </svg>
+                                  </th>
+                                  <th>Name</th>
+                                  <th>Email</th>
+                                  <th>Phone</th>
+                                  <th>DOB</th>
+                                  <th>Plan Name</th>
+                                  <th>Approval Status</th>
+                                  <th>Created at </th>
+
+                                  <th>Action </th>
+
+                              </tr>
+                              </thead>
+
+                              <tbody>
+
+
+
+
+                              </tbody>
+                          </table>
                       </div>
-                      <div class="ms-auto text-secondary">
-                        Search:
-                        <div class="ms-2 d-inline-block">
-                          <input type="text" class="form-control form-control-sm" aria-label="Search invoice">
-                        </div>
-                      </div> -->
-                    </div>
-                  </div>
-                  <div class="table-responsive">
-                    <table id="users-table" class="table table-selectable card-table table-vcenter text-nowrap datatable">
-                           <thead>
-                        <tr>
-                          <!-- <th class="w-1"><input class="form-check-input m-0 align-middle" type="checkbox" aria-label="Select all invoices"></th> -->
-                          <th class="w-1">
-                           #
-                            <!-- Download SVG icon from http://tabler.io/icons/icon/chevron-up -->
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-sm icon-thick icon-2">
-                              <path d="M6 15l6 -6l6 6"></path>
-                            </svg>
-                          </th>
-                          <th>Name</th>
-                          <th>Email</th>
-                          <th>Phone</th>
-                          <th>DOB</th>
-                          <th>Plan Name</th>
-                          <th>Approval Status</th>
-                          <th>Action </th>
-                        </tr>
-                      </thead>
-                      
-                      <tbody>
 
-
-                       
-       
-                      </tbody>
-                    </table>
                   </div>
-        
+
                 </div>
               </div>
           </div>
@@ -136,5 +125,5 @@
 
         @push("js")
         @include("users._datatable")
-          
+
         @endpush

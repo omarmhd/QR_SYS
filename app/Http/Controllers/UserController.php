@@ -2,9 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Payment;
 use App\Models\Plan;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
 
 class  UserController extends Controller
@@ -20,7 +25,22 @@ class  UserController extends Controller
             return DataTables::of($users)
                 ->editColumn('name', function ($row) {
                     return '<strong>' . e($row->name) . '</strong>';
-                })->addColumn('actions', function ($row) {
+                })
+                ->editColumn('created_at', function ($row) {
+                    return $row->created_at ? $row->created_at->format('Y-m-d H:i:s') : '';
+                })->editColumn("approval_status",function ($row){
+                    if ($row->approval_status=="pending"){
+                        return '<span class="badge bg-warning me-1"></span> <strong>' . strtoupper($row->approval_status) . '</strong>';
+                    }else if ($row->approval_status=="rejected"){
+                        return '<span class="badge bg-danger me-1"></span> <strong>' . strtoupper($row->approval_status) . '</strong>';
+                    }else{
+                        return '<span class="badge bg-success me-1"></span> <strong>' . strtoupper($row->approval_status) . '</strong>';
+
+                    }
+
+                })
+
+                ->addColumn('actions', function ($row) {
                     $route_edit = route("users.edit", $row);
                     $route_delete = route("users.destroy", $row);
                     $csrf_token = csrf_token();
@@ -49,7 +69,7 @@ class  UserController extends Controller
                                 </button>
                             </form>
                     btns;
-                })->rawColumns(['name', 'actions'])
+                })->rawColumns(['name', 'actions','created_at','approval_status'])
                 ->make(true);
         }
 
@@ -128,11 +148,107 @@ class  UserController extends Controller
             'subscription_status' => 'boolean',
         ]);
 
-        $user->update($validated);
+        $currentSubscriptionStatus = (int) $user->subscription_status;
+        $requestedSubscriptionStatus = (int) ($request->input('subscription_status', 0));
 
-        return redirect()->back()->with('success', 'User updated successfully.');
+        $planId = $request->input('plan_id') ?? $user->plan_id;
+        $plan = $planId ? Plan::find($planId) : null;
+
+        DB::beginTransaction();
+
+        try {
+            $user->update(Arr::except($validated, ['subscription_status']));
+
+            if ($currentSubscriptionStatus === 0 && $requestedSubscriptionStatus === 1) {
+                if (! $plan) {
+                    DB::rollBack();
+                    return redirect()->back()->with('error', 'Cannot activate subscription: plan not found.');
+                }
+
+                $payment = Payment::create([
+                    'user_id' => $user->id,
+                    'plan_id' => $plan->id,
+                    'amount' => $plan->price ?? 0,
+                    'currency' => $plan->currency ?? 'EUR',
+                    'payment_method' => 'dashboard_manual',
+                    'status' => 'paid',
+                    'transaction_id' => 'ADMIN-' . uniqid(),
+                    'order_id'=>uniqid()
+                ]);
+
+                $expiresAt = match ($plan->billing_type) {
+                    'day' => now()->addDay(),
+                    'month' => now()->addMonth(),
+                    'year' => now()->addYear(),
+                    default => now()->addMonth(),
+                };
+
+                $subscription = $user->subscription()->updateOrCreate(
+                    ['user_id' => $user->id],
+                    [
+                        'plan_id' => $plan->id,
+                        'status' => 'active',
+                        'start_date' => now(),
+                        'end_date' => $expiresAt,
+                    ]
+                );
+
+                $user->update([
+                    'current_subscription' => $subscription->id,
+                    'is_sub_cancelled' => 0,
+                    'plan_id' => $plan->id,
+                    'subscription_status' => 1,
+                ]);
+
+                Log::info('🆕 Subscription manually activated by admin', [
+                    'admin_id' => Auth::id() ?? null,
+                    'user_id' => $user->id,
+                    'plan_id' => $plan->id,
+                    'payment_id' => $payment->id,
+                    'expires_at' => $expiresAt,
+                ]);
+
+                $tokens = $user->deviceTokens->pluck('fcm_token')->filter()->toArray();
+                if ($tokens) {
+
+                    $title = 'Subscription Activated';
+                    $body = "Your subscription has been activated. It will expire on " . $expiresAt->format('F j, Y');
+                    app("notification")->sendNotification(
+                        $tokens,
+                        $title,
+                        $body,
+                        ['type' => 'subscription_update'],
+                        null,
+                        'tokens',
+                        $user->id
+                    );
+
+                }
+            } else {
+                if ($currentSubscriptionStatus === 1 && $requestedSubscriptionStatus === 0) {
+                    $user->subscription()->update(['status' => 'cancelled']);
+                    $user->update(['subscription_status' => 0]);
+                    Log::info('🔕 Subscription cancelled by admin', ['user_id' => $user->id, 'admin_id' => Auth::id() ?? null]);
+                } else {
+                    if ($request->has('plan_id') && $plan) {
+                        $user->update(['plan_id' => $plan->id]);
+                    }
+                }
+            }
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'User updated successfully.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            Log::error('Error updating user/admin activate subscription: ' . $e->getMessage(), [
+                'user_id' => $user->id,
+                'error' => $e,
+            ]);
+
+            return redirect()->back()->with('error', $e->getMessage())->withInput();
+        }
     }
-
     /**
      * Remove the specified resource from storage.
      */

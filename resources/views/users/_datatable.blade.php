@@ -3,6 +3,7 @@
            $('#users-table').DataTable({
                processing: true,
                serverSide: true,
+               pageLength: 100,
                order: [],
                ajax: "{{route('users.index')}}",
                columns: [{
@@ -33,7 +34,10 @@
                        data: 'approval_status',
                        name: "approval_status"
                    },
-
+                   {
+                       data: 'created_at',
+                       name: "created_at"
+                   },
                    {
                        data: 'actions',
                        name: "actions"

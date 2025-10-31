@@ -33,7 +33,11 @@ protected $firestoreService;
 
                 ->editColumn('name', function ($row) {
                     return '<strong>' . e($row->name) . '</strong>';
-                })->editColumn("approval_status",function ($row){
+                })
+                ->editColumn('created_at', function ($row) {
+                    return $row->created_at ? $row->created_at->format('Y-m-d H:i:s') : '';
+                })->
+                editColumn("approval_status",function ($row){
                     if ($row->approval_status=="pending"){
                         return '<span class="badge bg-warning me-1"></span> <strong>' . strtoupper($row->approval_status) . '</strong>';
                     }else if ($row->approval_status=="rejected"){
@@ -79,7 +83,7 @@ protected $firestoreService;
 
 
 
-                ->rawColumns(['name',"approval_status", 'actions','checkbox'])
+                ->rawColumns(['name',"approval_status", 'actions','checkbox',"created_at"])
                 ->make(true);
         }
 
