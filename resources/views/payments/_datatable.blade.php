@@ -8,6 +8,9 @@
                columns: [
                    { data: 'id', name: 'id' },
                    { data: 'order_id', name: 'order_id' },
+                   { data: 'id_number', name: 'id_number' },
+                   { data: 'cui', name: 'cui' },
+
                    { data: 'user', name: 'user' },
                    { data: 'phone', name: 'phone' },
 

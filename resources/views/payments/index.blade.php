@@ -75,6 +75,8 @@
                                       </svg>
                                   </th>
                                   <th>Order ID</th>
+                                  <th>ID</th>
+                                  <th>CUI</th>
                                   <th>User</th>
                                   <th>Phone</th>
                                   <th>Plan</th>
