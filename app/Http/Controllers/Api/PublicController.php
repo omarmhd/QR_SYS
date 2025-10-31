@@ -119,12 +119,13 @@ class PublicController extends Controller
             'notes' => 'nullable'
 
         ]);
-        $service=ServiceRequest::create($fields);
+        $serviceR=ServiceRequest::create($fields);
+
         app("firestore")->incrementField('count_vip', +1);
 
         $messageBody = "New Private Service Request\n\n"
             . "Full Name: {$fields['full_name']}\n"
-            . "Service : {$service->name}\n"
+            . "Service: {$serviceR->service->name["en"]}\n"
             . "Booking Date: {$fields['booking_date']}\n"
             . "Booking Time: {$fields['booking_time']}\n"
             . "Number of Guests: {$fields['guest_number']}\n"
