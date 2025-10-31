@@ -75,14 +75,14 @@
                                       </svg>
                                   </th>
                                   <th>Order ID</th>
-                                  <th>ID</th>
-                                  <th>CUI</th>
                                   <th>User</th>
                                   <th>Phone</th>
                                   <th>Plan</th>
                                   <th>Amount</th>
                                   <th>Payment Method</th>
                                   <th>Status</th>
+                                  <th>UserID</th>
+                                  <th>CUI</th>
                                   <th>Paid At</th>
                                   <th>Action</th>
                               </tr>
