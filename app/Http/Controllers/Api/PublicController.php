@@ -16,6 +16,7 @@ use App\Models\StaticContent;
 use App\Models\ContactMessage;
 use App\Models\VisitHistory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use function Pest\ArchPresets\name;
 
 class PublicController extends Controller
@@ -118,8 +119,23 @@ class PublicController extends Controller
             'notes' => 'nullable'
 
         ]);
-        ServiceRequest::create($fields);
+        $service=ServiceRequest::create($fields);
         app("firestore")->incrementField('count_vip', +1);
+
+        $messageBody = "New Private Service Request\n\n"
+            . "Full Name: {$fields['full_name']}\n"
+            . "Service ID: {$service->name["en"]}\n"
+            . "Booking Date: {$fields['booking_date']}\n"
+            . "Booking Time: {$fields['booking_time']}\n"
+            . "Number of Guests: {$fields['guest_number']}\n"
+            . "Cigar Type: " . ($fields['cigar_type'] ?? 'N/A') . "\n"
+            . "Notes: " . ($fields['notes'] ?? 'None') . "\n\n"
+            . "This request was submitted from the App .";
+
+        Mail::raw($messageBody, function ($message) {
+            $message->to('omarmhd19988@gmail.com')
+            ->subject('New Private Service Request');
+        });
 
         return response()->json(["status"=>true,"message"=>"Your request has been sent successfully"]);
 
