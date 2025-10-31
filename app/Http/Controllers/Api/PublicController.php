@@ -124,7 +124,7 @@ class PublicController extends Controller
 
         $messageBody = "New Private Service Request\n\n"
             . "Full Name: {$fields['full_name']}\n"
-            . "Service ID: {$service->name["en"]}\n"
+            . "Service : {$service->name}\n"
             . "Booking Date: {$fields['booking_date']}\n"
             . "Booking Time: {$fields['booking_time']}\n"
             . "Number of Guests: {$fields['guest_number']}\n"
