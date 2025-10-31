@@ -2,7 +2,9 @@
        $(document).ready(function() {
            $('#data-table').DataTable({
                processing: true,
-               serverSide: false,
+               serverSide: true,
+               pageLength: 100,
+
                order: [],
                ajax: "{{route('payments.index')}}",
                columns: [

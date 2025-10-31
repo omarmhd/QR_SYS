@@ -7,7 +7,7 @@
            $('#data-table').DataTable({
                processing: true,
                serverSide: false,
-               pageLength: 10,
+               pageLength: 100,
 
                order: [],
                ajax: {
