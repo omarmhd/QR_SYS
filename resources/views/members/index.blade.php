@@ -233,6 +233,7 @@
                                 <div class="mb-2"><span class="text-muted text-yellow">Total : ${member.plan?.guest_passes_per_year}</span></div>
                                 <div class="mb-2"><span class="text-muted  text-yellow">Coming:  ${member.subscription_data?.coming_guest_passes ?? 0}</span></div>
                                 <div class="mb-2"><span class="text-muted  text-yellow">Remaining: ${member.plan?.guest_passes_per_year-(member.subscription_data?.used_guests ?? 0)}</span></div>
+                                <div class="mb-2"><span class="text-muted  text-yellow">No of Guests: ${(member.subscription_data?.used_guests ?? 0)}</span></div>
 
                             </div>
                         </div>

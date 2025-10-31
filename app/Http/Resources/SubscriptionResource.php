@@ -18,15 +18,17 @@ class SubscriptionResource extends JsonResource
         $coming = $this->last_guests_limit ?? 0;
         $remaining = $total - ($this->used_guests ?? 0);
 
+
         return [
             "id" => $this->id,
             "status" => $this->status,
             "start_date" => $this->start_date,
             "end_date" => $this->end_date,
-            "used_guests" => $this->used_guests,
+            "no_of_guests" => $this->used_guests,
             "total_guest_passes" => $total,
             "coming_guest_passes" => $coming,
-            "remaining_guest_passes" => $remaining,
+            "remaining_guest_passes" => $remaining
+
         ];
     }
 }
