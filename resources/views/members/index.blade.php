@@ -321,7 +321,7 @@
                                             <div class="card">
                                               <div class="card-body text-center p-2">
                                                 <img src="${code.qr}" alt="QR Code for visitor ${code.name}" class="img-fluid mb-2" />
-                                                <div class="text-muted small">${code.name} - ${member.name}</div>
+                                                <div class="text-muted small">${code.name} </div>
                                               </div>
                                             </div>
                                          `;
