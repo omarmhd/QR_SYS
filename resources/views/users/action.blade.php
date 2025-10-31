@@ -113,14 +113,15 @@
                 {{-- phone --}}
                 <div class="mb-3 col-sm-8 col-md-6">
                   <label class="form-label required">Phone</label>
-                  <input type="number" name="phone" class="form-control"
+                  <input type="text" name="phone" class="form-control"
                     value="{{ old('phone', $user->phone ?? '') }}">
                 </div>
                 <div class="mb-3 col-sm-8 col-md-6">
                   <label class="form-label required">DOB</label>
-                  <input type="date" name="dob" class="form-control"
+                  <input type="text" name="dob" class="form-control"
                     value="{{ old('dob', $user->dob ?? '') }}">
                 </div>
+
 
                 {{-- Currency --}}
                 <div class="mb-3 col-sm-8 col-md-6">
