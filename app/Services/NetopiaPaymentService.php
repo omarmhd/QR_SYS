@@ -78,7 +78,7 @@ class NetopiaPaymentService
                     "description" => "Payment for plan ",
                     "orderID" => "$orderId",
                     "amount" => (float) $amount,
-                    "currency" => "EUR",
+                    "currency" => $plan->currency ?? 'EUR',
                     "billing" => [
                         "email" => "$request->billing_email",
                         "phone" => "$request->billing_phone",
