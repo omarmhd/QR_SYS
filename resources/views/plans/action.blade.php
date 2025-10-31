@@ -143,7 +143,7 @@
         <label class="form-label required">Currency</label>
         <select name="currency" class="form-control">
             <option value="EUR" {{ old('currency', $plan->currency ?? '') == 'EUR' ? 'selected' : '' }}>EUR</option>
-            <option value="USD" {{ old('currency', $plan->currency ?? '') == 'USD' ? 'selected' : '' }}>USD</option>
+            <option value="USD" {{ old('currency', $plan->currency ?? '') == 'RO' ? 'selected' : '' }}>RO</option>
         </select>
     </div>
 
