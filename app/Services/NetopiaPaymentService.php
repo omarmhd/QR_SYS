@@ -45,6 +45,8 @@ class NetopiaPaymentService
                 'user_id' => $user->id,
                 'plan_id' => $plan->id,
                 'order_id' => $orderId,
+                "id_number"=>$request->id_number??0,
+                "cui"=>$request->cui??0,
                 'payment_method' => "$request->payment_method",
                 'billing_type' => "$request->billing_type",
                 'billing_name' => "$request->billing_name",
@@ -82,6 +84,7 @@ class NetopiaPaymentService
                     "billing" => [
                         "email" => "$request->billing_email",
                         "phone" => "$request->billing_phone",
+
                         "firstName" => "$request->billing_name",
                         "lastName" => "$request->billing_name",
                         "city" => "",
