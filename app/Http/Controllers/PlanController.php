@@ -57,7 +57,6 @@ class PlanController extends Controller
         'name.*' => 'required',
         'price' => 'required_if:is_price_hidden,0|numeric|nullable',
         'guest_passes_per_year' => 'required|integer',
-
         'currency' => 'required|in:EUR,RON',
         'billing_type' => 'required|in:day,month,year',
         'features' => 'required|array|min:1',

@@ -163,8 +163,18 @@ class PublicController extends Controller
         $contactMessage->message=$validated["message"];
         $contactMessage->save();
 
-        app("firestore")->incrementField('count_messages', +1);
+        $messageBody = "New Contact Message\n\n"
+            . "Name: {$contactMessage->user_name}\n"
+            . "Email: {$contactMessage->email}\n"
+            . "Phone: {$contactMessage->phone}\n"
+            . "Title: {$contactMessage->title}\n"
+            . "Message:\n{$contactMessage->message}\n\n"
+            . "This message was sent from the website contact form.";
 
+        Mail::raw($messageBody, function ($message) {
+            $message->to('Elyansaad1994@gmail.com')
+            ->subject('New Contact Message');
+        });
         return response()->json(["status"=>true,"message"=>"Your request has been sent successfully"]);
     }
     public function visitHistories(){
