@@ -124,7 +124,7 @@
                   },
                   success: function(response) {
                       if(response.checked) {
-                          button.closest('tr').css('background-color', '#d4edda'); // أخضر فاتح
+                          button.closest('tr').css('background-color', '#d4edda');
                           button.hide()
 
                       } else {

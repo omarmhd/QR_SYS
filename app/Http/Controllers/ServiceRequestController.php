@@ -85,6 +85,9 @@ class ServiceRequestController extends Controller
         {$notesBtn}
     btns;
                 })->rawColumns(['email','phone','actions','created_at'])
+                ->setRowClass(function ($row) {
+                    return $row->checked ? 'bg-checked' : '';
+                })
                 ->make(true);
         }
 
