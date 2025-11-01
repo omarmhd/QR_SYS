@@ -1,7 +1,8 @@
 <!-- Notes Modal -->
 <div class="modal fade" id="notesModal" tabindex="-1" aria-labelledby="notesModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <form id="notesForm">
+        <form id="notesForm" action="javascript:void(0)">
+            @csrf
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="notesModalLabel">Add Notes</h5>

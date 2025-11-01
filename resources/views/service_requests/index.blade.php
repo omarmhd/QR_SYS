@@ -143,29 +143,31 @@
 
             $('#notesModal').modal('show');
         });
+        $(document).ready(function() {
+            $('#notesForm').on('submit', function (e) {
+                e.preventDefault();
 
-        $('#notesForm').on('submit', function(e) {
-            e.preventDefault();
+                const id = $('#requestId').val();
+                const note = $('#noteText').val();
 
-            const id = $('#requestId').val();
-            const note = $('#noteText').val();
+                $.ajax({
+                    url: `/service-requests/${id}/notes`,
+                    type: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        note: note
+                    },
+                    success: function (response) {
+                        $('#notesModal').modal('hide');
+                        alert('Notes saved successfully!');
 
-            $.ajax({
-                url: `/service-requests/${id}/notes`,
-                type: 'POST',
-                data: {
-                    _token: '{{ csrf_token() }}',
-                    note: note
-                },
-                success: function(response) {
-                    $('#notesModal').modal('hide');
-                    alert('Notes saved successfully!');
-
-                },
-                error: function() {
-                    alert('An error occurred while saving notes.');
-                }
+                    },
+                    error: function () {
+                        alert('An error occurred while saving notes.');
+                    }
+                });
             });
+
         });
     </script>
 @endpush
