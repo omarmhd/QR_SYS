@@ -111,7 +111,7 @@ class ServiceRequestController extends Controller
     {
         $serviceRequest = ServiceRequest::findOrFail($id);
         return response()->json([
-            'note' => $serviceRequest->note ?? ''
+            'note' => $serviceRequest->notes_emp ?? ''
         ]);
     }
 

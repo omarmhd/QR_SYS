@@ -147,7 +147,7 @@
                     url: `/service-requests/${id}/notes`,
                     type: 'GET',
                     success: function(response) {
-                        $('#noteText').val(response.note || '');
+                        $('#noteText').val(response.notes_emp || '');
                         $('#notesModal').modal('show');
                     },
                     error: function() {
