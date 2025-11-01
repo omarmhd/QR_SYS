@@ -135,16 +135,14 @@
     <script>
         $(document).ready(function() {
 
-            // عند الضغط على زر الملاحظات
             $(document).on('click', '.notes-btn', function() {
                 const id = $(this).data('id');
                 const name = $(this).data('name');
 
                 $('#requestId').val(id);
                 $('#notesModalLabel').text(`Add Notes for Request / ${name}`);
-                $('#noteText').val(''); // افتراضيًا فارغ
+                $('#noteText').val('');
 
-                // 🔹 جلب الملاحظات القديمة من السيرفر
                 $.ajax({
                     url: `/service-requests/${id}/notes`,
                     type: 'GET',
@@ -158,7 +156,6 @@
                 });
             });
 
-            // عند حفظ الملاحظات
             $('#notesForm').on('submit', function(e) {
                 e.preventDefault();
 
