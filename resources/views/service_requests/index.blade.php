@@ -129,4 +129,41 @@
 
 @push("js")
     @include("service_requests._datatable")
+
+    <script>
+        $(document).on('click', '.notes-btn', function() {
+            const id = $(this).data('id');
+            const name = $(this).data('name');
+
+            $('#requestId').val(id);
+            $('#noteText').val('');
+            $('#notesModalLabel').text(`Add Notes for Request / ${name}`);
+
+            $('#notesModal').modal('show');
+        });
+
+        $('#notesForm').on('submit', function(e) {
+            e.preventDefault();
+
+            const id = $('#requestId').val();
+            const note = $('#noteText').val();
+
+            $.ajax({
+                url: `/service-requests/${id}/notes`, // عدّل حسب المسار الفعلي لديك
+                type: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    note: note
+                },
+                success: function(response) {
+                    $('#notesModal').modal('hide');
+                    alert('Notes saved successfully!');
+
+                },
+                error: function() {
+                    alert('An error occurred while saving notes.');
+                }
+            });
+        });
+    </script>
 @endpush

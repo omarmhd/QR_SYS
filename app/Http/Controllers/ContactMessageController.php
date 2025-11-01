@@ -43,7 +43,6 @@ class ContactMessageController extends Controller
                     $route_delete = route("contact-messages.destroy", $row);
                     $csrf_token = csrf_token();
 
-                    // الزر يظهر فقط إذا لم يتم التحقق
                     $checkBtn = '';
                     if (!$row->checked) {
                         $checkBtn = <<<btn
