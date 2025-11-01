@@ -80,7 +80,7 @@ Route::middleware('auth')->group(function () {
     Route::get("profile",[\App\Http\Controllers\AdminController::class,"index"])->name("profile");
     Route::post("profile",[\App\Http\Controllers\AdminController::class,"update"])->name("profile.update");
 
-    Route::post('/service-requests/{id}/notes', [ServiceRequestController::class, 'storeNote'])->name('service-requests.notes');
+    Route::post('/service-requests/{id}/notes', [\App\Http\Controllers\ServiceRequestController::class, 'storeNote'])->name('service-requests.notes');
 
 });;
 

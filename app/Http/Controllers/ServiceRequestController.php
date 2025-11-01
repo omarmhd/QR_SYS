@@ -101,7 +101,7 @@ class ServiceRequestController extends Controller
         $request->validate(['note' => 'required|string|max:1000']);
 
         $serviceRequest = ServiceRequest::findOrFail($id);
-        $serviceRequest->note = $request->note;
+        $serviceRequest->notes_emp = $request->note;
         $serviceRequest->save();
 
         return response()->json(['message' => 'Note saved successfully']);
