@@ -185,7 +185,7 @@
                 var id = button.data('id');
 
                 $.ajax({
-                    url: '/contact-messages/check/' + id,
+                    url: '/service-requests/check/' + id,
                     type: 'POST',
                     data: {
                         _token: '{{ csrf_token() }}'

@@ -99,6 +99,18 @@ class ServiceRequestController extends Controller
 
 
     }
+
+    public function check($id)
+    {
+
+        $message = ServiceRequest::findOrFail($id);
+        $message->checked = !$message->checked;
+        $message->save();
+        app("firestore")->incrementField('count_vip', -1);
+
+        return response()->json(['checked' => $message->checked]);
+    }
+
     public function storeNote(Request $request, $id)
     {
         $request->validate(['note' => 'required|string|max:1000']);
