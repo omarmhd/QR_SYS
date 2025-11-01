@@ -160,8 +160,8 @@ class FirestoreService
             $payload = [
                 'fields' => [
                     'count' => ['integerValue' => User::where("approval_status", "pending")->count()],
-                    'count_messages' => ['integerValue' => ContactMessage::where("checked","1")->count()],
-                    'count_vip' => ['integerValue' => ServiceRequest::where("checked","1")->count()],
+                    'count_messages' => ['integerValue' => ContactMessage::where("checked","0")->count()],
+                    'count_vip' => ['integerValue' => ServiceRequest::where("checked","0")->count()],
                     'last_updated' => ['timestampValue' => now()->toIso8601String()],
                 ]
             ];
