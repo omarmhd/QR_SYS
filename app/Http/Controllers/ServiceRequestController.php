@@ -107,6 +107,14 @@ class ServiceRequestController extends Controller
         return response()->json(['message' => 'Note saved successfully']);
     }
 
+    public function getNote($id)
+    {
+        $serviceRequest = ServiceRequest::findOrFail($id);
+        return response()->json([
+            'note' => $serviceRequest->note ?? ''
+        ]);
+    }
+
     public function destroy(ServiceRequest $serviceRequest)
     {
 

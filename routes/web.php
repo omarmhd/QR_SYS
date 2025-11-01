@@ -81,7 +81,7 @@ Route::middleware('auth')->group(function () {
     Route::post("profile",[\App\Http\Controllers\AdminController::class,"update"])->name("profile.update");
 
     Route::post('/service-requests/{id}/notes', [\App\Http\Controllers\ServiceRequestController::class, 'storeNote'])->name('service-requests.notes');
-
+    Route::get('/service-requests/{id}/notes', [\App\Http\Controllers\ServiceRequestController::class, 'getNote'])->name('service-requests.getNote');
 });;
 
 require __DIR__.'/auth.php';

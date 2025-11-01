@@ -133,18 +133,33 @@
     @include("service_requests._datatable")
 
     <script>
-        $(document).on('click', '.notes-btn', function() {
-            const id = $(this).data('id');
-            const name = $(this).data('name');
-
-            $('#requestId').val(id);
-            $('#noteText').val('');
-            $('#notesModalLabel').text(`Add Notes for Request / ${name}`);
-
-            $('#notesModal').modal('show');
-        });
         $(document).ready(function() {
-            $('#notesForm').on('submit', function (e) {
+
+            // عند الضغط على زر الملاحظات
+            $(document).on('click', '.notes-btn', function() {
+                const id = $(this).data('id');
+                const name = $(this).data('name');
+
+                $('#requestId').val(id);
+                $('#notesModalLabel').text(`Add Notes for Request / ${name}`);
+                $('#noteText').val(''); // افتراضيًا فارغ
+
+                // 🔹 جلب الملاحظات القديمة من السيرفر
+                $.ajax({
+                    url: `/service-requests/${id}/notes`,
+                    type: 'GET',
+                    success: function(response) {
+                        $('#noteText').val(response.note || '');
+                        $('#notesModal').modal('show');
+                    },
+                    error: function() {
+                        alert('Error fetching notes.');
+                    }
+                });
+            });
+
+            // عند حفظ الملاحظات
+            $('#notesForm').on('submit', function(e) {
                 e.preventDefault();
 
                 const id = $('#requestId').val();
@@ -157,15 +172,16 @@
                         _token: '{{ csrf_token() }}',
                         note: note
                     },
-                    success: function (response) {
+                    success: function(response) {
                         $('#notesModal').modal('hide');
                         alert('Notes saved successfully!');
-
                     },
-                    error: function () {
+                    error: function() {
                         alert('An error occurred while saving notes.');
                     }
                 });
+
+                return false;
             });
 
         });
