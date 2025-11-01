@@ -125,6 +125,8 @@
   </div>
 </div>
 
+
+    @include("service_requests._modal")
 @endsection
 
 @push("js")
@@ -149,7 +151,7 @@
             const note = $('#noteText').val();
 
             $.ajax({
-                url: `/service-requests/${id}/notes`, // عدّل حسب المسار الفعلي لديك
+                url: `/service-requests/${id}/notes`,
                 type: 'POST',
                 data: {
                     _token: '{{ csrf_token() }}',
