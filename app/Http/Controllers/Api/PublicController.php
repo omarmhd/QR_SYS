@@ -162,6 +162,7 @@ class PublicController extends Controller
         $contactMessage->title=$validated["title"];
         $contactMessage->message=$validated["message"];
         $contactMessage->save();
+        app("firestore")->incrementField('count_messages', +1);
 
         $messageBody = "New Contact Message\n\n"
             . "Name: {$contactMessage->user_name}\n"
