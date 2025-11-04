@@ -134,7 +134,7 @@ class PublicController extends Controller
             . "This request was submitted from the App .";
 
         Mail::raw($messageBody, function ($message) {
-            $message->to('Elyansaad1994@gmail.com')
+            $message->to('jad.rahal@el-unico.ro')
             ->subject('New Private Service Request');
         });
 
@@ -173,7 +173,7 @@ class PublicController extends Controller
             . "This message was sent from the website contact form.";
 
         Mail::raw($messageBody, function ($message) {
-            $message->to('Elyansaad1994@gmail.com')
+            $message->to('jad.rahal@el-unico.ro')
             ->subject('New Contact Message');
         });
         return response()->json(["status"=>true,"message"=>"Your request has been sent successfully"]);
