@@ -193,7 +193,7 @@ class FirestoreService
                 ? (int)$data['fields'][$field]['integerValue']
                 : 0;
 
-            $newValue = $currentValue + $amount;
+            $newValue = max($currentValue + $amount, 0);
 
             $payload = [
                 'fields' => [

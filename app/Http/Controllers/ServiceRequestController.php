@@ -133,8 +133,10 @@ class ServiceRequestController extends Controller
     public function destroy(ServiceRequest $serviceRequest)
     {
 
+
         $serviceRequest->delete();
         app("firestore")->incrementField('count_vip',-1);
+
 
         return redirect()->back()->with('success', ' deleted successfully.');
     }}
