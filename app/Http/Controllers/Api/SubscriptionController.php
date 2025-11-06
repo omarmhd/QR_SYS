@@ -275,6 +275,7 @@ class SubscriptionController extends Controller
             'current_subscription' => $subscription->id,
             'subscription_status' => 1,
             'plan_id' => $plan->id,
+            'plan_name'=>$plan->name,
             "is_sub_cancelled" => 0
         ]);
 
