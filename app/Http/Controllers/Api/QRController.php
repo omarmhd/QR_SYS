@@ -230,11 +230,8 @@ class QRController extends Controller
         }
         $user=$qr->user;
 
-        dd($user->subscription->last_guests_limit);
-        if ($user->subscription->last_guests_limit==0){
-            return response()->json(['error' => 'QR not valid or expired'], 401);
 
-        }
+
 
         if(is_null($user->current_subscription)){
             return response()->json(['error' => 'Subscription Expired'], 401);
@@ -249,7 +246,10 @@ class QRController extends Controller
         if ($qr->type=="visitor") {
             $user->subscription->increment('used_guests');
             $user->subscription->decrement('last_guests_limit');
+            if ($user->subscription->last_guests_limit==0){
+                return response()->json(['error' => 'QR not valid or expired'], 401);
 
+            }
         }
         $listBatch = [];
 
