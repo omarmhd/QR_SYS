@@ -223,13 +223,14 @@ class QRController extends Controller
             ->WhereRaw('TIMESTAMPADD(HOUR, ?, updated_at) > NOW()', [$hours])
             ->first();
 
-        dd($qr);
+
 
         if (!$qr) {
             return response()->json(['error' => 'QR not valid or expired'], 401);
         }
         $user=$qr->user;
 
+        dd($user->subscription->last_guests_limit);
         if ($user->subscription->last_guests_limit==0){
             return response()->json(['error' => 'QR not valid or expired'], 401);
 
