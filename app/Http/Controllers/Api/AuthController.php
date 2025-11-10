@@ -10,6 +10,7 @@ use App\Services\FirestoreService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class AuthController extends Controller
 {
@@ -46,6 +47,22 @@ class AuthController extends Controller
             'plan_name' => $fields['plan_name']
 
         ]);
+
+            $adminEmail = 'jad.rahal@el-unico.ro';
+
+            $messageBody = "New User Registration\n\n"
+                . "Full Name: {$fields['name']}\n"
+                . "Email: {$fields['email']}\n"
+                . "Phone: {$fields['phone']}\n"
+                . "Date of Birth: {$fields['dob']}\n"
+                . "Plan ID: " . ($fields['plan_id'] ?? 'N/A') . "\n"
+                . "Plan Name: " . ($fields['plan_name'] ?? 'N/A') . "\n\n"
+                . "Please review this user in the Admin Dashboard.";
+
+            Mail::raw($messageBody, function ($message) use ($adminEmail) {
+                $message->to($adminEmail)
+                    ->subject('New User Registration Alert');
+            });
 
 //    $existing = DeviceToken::where('device_id', $fields['device_id'])
 //    ->where('user_id', '!=', $user->id)
