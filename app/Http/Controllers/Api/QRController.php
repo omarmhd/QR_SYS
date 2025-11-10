@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Log;
 
 class QRController extends Controller
 {
-
     public function storeQR(Request $request){
         $validated = $request->validate([
             "qr_token" => "required"]);
@@ -33,6 +32,7 @@ class QRController extends Controller
         );
 
         return response()->json([
+            "status"=>true,
             'message' => 'QR code saved successfully',
             'data'    => $qr
         ]);
@@ -223,6 +223,7 @@ class QRController extends Controller
             ->WhereRaw('TIMESTAMPADD(HOUR, ?, updated_at) > NOW()', [$hours])
             ->first();
 
+        dd($qr);
 
         if (!$qr) {
             return response()->json(['error' => 'QR not valid or expired'], 401);
