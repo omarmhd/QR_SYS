@@ -221,7 +221,6 @@ class QRController extends Controller
         $hours = getSetting('qr_expiration_hours', 12);
 
         $qr = QrCode::where('qr_token', $qrToken)
-            ->where('status', 'pending')
             ->WhereRaw('TIMESTAMPADD(HOUR, ?, updated_at) > NOW()', [$hours])
             ->first();
 
