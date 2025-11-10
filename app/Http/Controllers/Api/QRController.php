@@ -243,7 +243,7 @@ class QRController extends Controller
 
         $user->visitHistories()->create([]);
 
-        if ($qr->type=="visitor") {
+        if ($qr->type=="visitor" and $qr->status=="pending") {
             $user->subscription->increment('used_guests');
             $user->subscription->decrement('last_guests_limit');
             if ($user->subscription->last_guests_limit==0){
