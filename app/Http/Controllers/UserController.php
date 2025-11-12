@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Payment;
 use App\Models\Plan;
+use App\Models\ServiceRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -19,8 +20,7 @@ class  UserController extends Controller
     {
 
         if ($request->ajax()) {
-            $users = User::where("approval_status","!=", "rejected")
-            ->orderBy('id', 'desc');
+            $users = User::orderBy('id', 'desc');
 
             return DataTables::of($users)
                 ->editColumn('name', function ($row) {
@@ -157,7 +157,19 @@ class  UserController extends Controller
         DB::beginTransaction();
 
         try {
-            $user->update(Arr::except($validated, ['subscription_status']));
+
+            if ($user->approval_status !== 'rejected' && $validated['approval_status'] === 'rejected') {
+                $user->update(['subscription_status' => 0]);
+
+                $user->subscription->delete();
+                ServiceRequest::where('user_id', $user->id)->delete();
+            }
+
+
+                $user->update(Arr::except($validated, ['subscription_status']));
+
+
+
 
             if ($currentSubscriptionStatus === 0 && $requestedSubscriptionStatus === 1) {
                 if (! $plan) {
