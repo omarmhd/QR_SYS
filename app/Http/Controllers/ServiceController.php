@@ -43,7 +43,7 @@ class ServiceController extends Controller
     }
 
     public function edit(Service $service){
-        return view("services.edit",["service"=>$service]);
+        return view("services.action",["service"=>$service]);
     }
 
     public function update(Request $request,Service $service){
