@@ -237,12 +237,6 @@ class QRController extends Controller
             return response()->json(['error' => 'Subscription Expired'], 401);
 
         }
-
-        $updated=$qr->update(['status' => 'checked_in']);
-
-
-        $user->visitHistories()->create([]);
-
         if ($qr->type=="visitor" and $qr->status=="pending") {
             $user->subscription->increment('used_guests');
             $user->subscription->decrement('last_guests_limit');
@@ -251,6 +245,14 @@ class QRController extends Controller
 
             }
         }
+
+
+
+        $updated=$qr->update(['status' => 'checked_in']);
+
+
+        $user->visitHistories()->create([]);
+
         $listBatch = [];
 
         if (($event['msgType'] ?? '') === 'on_uart_receive') {
