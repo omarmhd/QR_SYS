@@ -35,7 +35,7 @@ class CheckSubscriptions extends Command
             $endDate = Carbon::parse($sub->end_date);
             $daysLeft = $today->diffInDays($endDate, false);
 
-            if ($daysLeft === 5 && !$sub->reminder_sent) {
+            if ($daysLeft <= 5 && !$sub->reminder_sent) {
                 $this->sendNotification($sub, 'reminder');
                 $sub->update(['reminder_sent' => true]);
             }
@@ -59,7 +59,7 @@ class CheckSubscriptions extends Command
 
         if ($type === 'reminder') {
             $title = '🔔 Reminder: Subscription expiring soon';
-            $body = "Your subscription will expire in 5 days (on "
+            $body = "Your subscription will expire "
                 . Carbon::parse($subscription->end_date)->format('F j, Y') . ").";
             $dataType = 'subscription_reminder';
         } else {
