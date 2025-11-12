@@ -153,7 +153,7 @@ class  UserController extends Controller
 
         $planId = $request->input('plan_id') ?? $user->plan_id;
         $plan = $planId ? Plan::find($planId) : null;
-        $validated["plan_name"]=$plan->name;
+        $validated["plan_name"]=$plan->name["en"];
         DB::beginTransaction();
 
         try {
