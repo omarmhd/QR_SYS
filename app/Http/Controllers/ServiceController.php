@@ -50,7 +50,6 @@ class ServiceController extends Controller
         $validated = $request->validate([
             'name.*' => 'required',
             'description.*' => 'required',
-            'icon' => 'required',
 
         ]);
         if ($request->hasFile('icon')) {
