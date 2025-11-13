@@ -26,8 +26,8 @@ Route::get('/', function () {
     $services = \App\Models\Service::selectRaw('
         services.id,
         services.name,
-        COUNT(service_requests.id) as total_requests
-    ')
+         COUNT(CASE WHEN checked != 1 THEN 1 END) AS total_requests
+     ')
         ->leftJoin('service_requests', 'services.id', '=', 'service_requests.service_id')
         ->groupBy('services.id', 'services.name')
         ->get();
