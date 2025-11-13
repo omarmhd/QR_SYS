@@ -166,7 +166,6 @@ class  UserController extends Controller
             }
 
 
-                $user->update(Arr::except($validated, ['subscription_status']));
 
 
 
@@ -247,6 +246,7 @@ class  UserController extends Controller
                     }
                 }
             }
+            $user->update(Arr::except($validated, ['subscription_status']));
 
             DB::commit();
 
