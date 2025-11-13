@@ -230,7 +230,7 @@ class QRController extends Controller
         }
         $user = $qr->user ?? null;
 
-        if(is_null($user)) {
+        if(!is_null($user)) {
 
 
             if (is_null($user->current_subscription)) {
