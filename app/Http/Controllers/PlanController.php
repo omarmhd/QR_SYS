@@ -32,9 +32,13 @@ class PlanController extends Controller
         'currency' => 'required|in:EUR,RON',
         'billing_type' => 'required|in:day,month,year',
         'features' => 'required|array|min:1',
-            'features.*' => 'required|string|min:1'
     ]);
-
+        foreach ($request->features as $lang => $items) {
+            $request->validate([
+                "features.$lang" => 'required|array|min:1',
+                "features.$lang.*" => 'required|string|min:1',
+            ]);
+        }
 
         $plan = new Plan();
         $plan->name = $request->name;;
@@ -59,10 +63,14 @@ class PlanController extends Controller
         'guest_passes_per_year' => 'required|integer',
         'currency' => 'required|in:EUR,RON',
         'billing_type' => 'required|in:day,month,year',
-        'features' => 'required|array|min:1',
-        'features.*' => 'required|string|min:1'
-    ]);
+        'features' => 'required|array|min:1']);
 
+        foreach ($request->features as $lang => $items) {
+            $request->validate([
+                "features.$lang" => 'required|array|min:1',
+                "features.$lang.*" => 'required|string|min:1',
+            ]);
+        }
     $plan->name = $request->name;
     $plan->price = $request->price;
     $plan->guest_passes_per_year = $request->guest_passes_per_year;
