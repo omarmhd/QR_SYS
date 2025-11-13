@@ -55,6 +55,8 @@
                                                     </div>
                                                 </div>
                                             </div>
+
+
                                         </div>
                                     </div>
                                 </div>
@@ -157,7 +159,37 @@
                         </div>
                     </div>
                 @endforeach
+
+                    <div class="col-sm-6 col-xl-3 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body d-flex flex-column">
+                                <h6 class="card-title mb-3">Generate QR Code</h6>
+                                <p class="text-muted small mb-3">Enter  expiration in Hours</p>
+
+                                <form id="qr-form" class="mb-3">
+
+                                    <div class="mb-3">
+                                        <input type="number" class="form-control form-control" id="qr-expire" placeholder="Expiration (days)" min="1">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-100 generate-btn service-icon-wrapper me-3">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 18px; height: 18px;">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 4.5A.75.75 0 014.5 3.75h4.5a.75.75 0 01.75.75v4.5a.75.75 0 01-.75.75h-4.5a.75.75 0 01-.75-.75v-4.5zM3.75 15A.75.75 0 014.5 14.25h4.5a.75.75 0 01.75.75v4.5a.75.75 0 01-.75.75h-4.5a.75.75 0 01-.75-.75v-4.5zM15 3.75A.75.75 0 0014.25 3h-4.5a.75.75 0 00-.75.75v4.5a.75.75 0 00.75.75h4.5a.75.75 0 00.75-.75v-4.5zM19.5 19.5h.008v.008h-.008v-.008zM16.5 15h.008v.008h-.008V15zM15 16.5h.008v.008H15v-.008zM16.5 18h.008v.008h-.008v-.008zM18 16.5h.008v.008H18v-.008zM19.5 15h.008v.008h-.008V15zM18 19.5h.008v.008H18v-.008zM19.5 18h.008v.008h-.008v-.008zM15 19.5h.008v.008H15v-.008z" />
+                                        </svg>
+                                        Generate
+                                        <span class="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true" style="display:none;"></span>
+                                    </button>
+                                </form>
+
+                                <div id="qr-result" class="mt-auto text-center" style="display:none;">
+                                    <p class="small mb-1">QR Code Generated:</p>
+                                    <img src="" id="qr-image" class="img-fluid" alt="QR Code">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
             </div>
+            <!-- QR Generator Card -->
 
 
         </div>
