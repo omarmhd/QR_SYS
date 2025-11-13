@@ -16,6 +16,7 @@ use App\Models\StaticContent;
 use App\Models\ContactMessage;
 use App\Models\VisitHistory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use function Pest\ArchPresets\name;
 
@@ -189,6 +190,13 @@ class PublicController extends Controller
             ], 200);
         }
         return response()->json(["status"=>true,"data"=>$histories]);
+    }
+
+    public function generalStatics(){
+
+        $settings=DB::table("settings")->get();
+        return response()->json(["status"=>true,"data"=>$settings]);
+
     }
 
 

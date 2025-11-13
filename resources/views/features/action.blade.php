@@ -131,6 +131,9 @@
 
                 <div class="mb-3">
                   <label class="form-label">Upload Icon</label>
+                    <small class="form-text text-muted">
+                        It is recommended to upload an image with dimensions 12×13 px.
+                    </small>
                   <input type="file" name="icon" class="form-control" id="imageInput" accept="image/*">
                   <div class="mt-3">
                     <img id="imagePreview" src="{{ isset($feature->icon) ? asset('storage/' . $feature->icon) : '#' }}"

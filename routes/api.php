@@ -57,3 +57,4 @@ Route::match(['get', 'post'], '/kapri/event', [QRController::class, 'handle']);
 Route::post("payment/notify", [SubscriptionController::class, 'notify']);
 Route::post("check-vat-status",[SubscriptionController::class, 'checkVatStatus']);
 Route::post("contact-message",[PublicController::class, "storeContactMessages"]);
+Route::get("/general-statics",[PublicController::class, 'generalStatics']);
