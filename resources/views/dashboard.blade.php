@@ -1,6 +1,35 @@
 @extends("layouts.app")
 
 @section("content")
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="qrModal" tabindex="-1" aria-labelledby="qrModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="qrModalLabel">QR Code</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <div id="qr-loading" class="py-4">
+                        <div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>
+                        <div class="mt-2 small text-muted">Generating QR...</div>
+                    </div>
+
+                    <div id="qr-result" class="d-none">
+                        <p class="small mb-1">QR Code Generated:</p>
+                        <img src="" id="qr-image" class="img-fluid" alt="QR Code" style="max-width: 320px;">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="btn-print-qr" type="button" class="btn btn-outline-primary d-none">Print</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="page-body">
         <div class="container-xl">
 
@@ -8,8 +37,11 @@
             <div class="row mb-4">
                 <div class="col-12">
                     <div class="welcome-header">
+
                         <h1 class="display-6 text-gradient">Dashboard Overview</h1>
                         <p class="text-muted">Monitor your system performance and user activities</p>
+                        <button id="btn-generate-qr" class="btn btn-primary btn btn-primary w-100 generate-btn service-icon-wrapper me-3" data-id="123">Generate QR</button>
+
                     </div>
                 </div>
             </div>
@@ -160,33 +192,6 @@
                     </div>
                 @endforeach
 
-                    <div class="col-sm-6 col-xl-3 mb-4">
-                        <div class="card h-100 shadow-sm">
-                            <div class="card-body d-flex flex-column">
-                                <h6 class="card-title mb-3">Generate QR Code</h6>
-                                <p class="text-muted small mb-3">Enter  expiration in Hours</p>
-
-                                <form id="qr-form" class="mb-3">
-
-                                    <div class="mb-3">
-                                        <input type="number" class="form-control form-control" id="qr-expire" placeholder="Expiration (days)" min="1">
-                                    </div>
-                                    <button type="submit" class="btn btn-primary w-100 generate-btn service-icon-wrapper me-3">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 18px; height: 18px;">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 4.5A.75.75 0 014.5 3.75h4.5a.75.75 0 01.75.75v4.5a.75.75 0 01-.75.75h-4.5a.75.75 0 01-.75-.75v-4.5zM3.75 15A.75.75 0 014.5 14.25h4.5a.75.75 0 01.75.75v4.5a.75.75 0 01-.75.75h-4.5a.75.75 0 01-.75-.75v-4.5zM15 3.75A.75.75 0 0014.25 3h-4.5a.75.75 0 00-.75.75v4.5a.75.75 0 00.75.75h4.5a.75.75 0 00.75-.75v-4.5zM19.5 19.5h.008v.008h-.008v-.008zM16.5 15h.008v.008h-.008V15zM15 16.5h.008v.008H15v-.008zM16.5 18h.008v.008h-.008v-.008zM18 16.5h.008v.008H18v-.008zM19.5 15h.008v.008h-.008V15zM18 19.5h.008v.008H18v-.008zM19.5 18h.008v.008h-.008v-.008zM15 19.5h.008v.008H15v-.008z" />
-                                        </svg>
-                                        Generate
-                                        <span class="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true" style="display:none;"></span>
-                                    </button>
-                                </form>
-
-                                <div id="qr-result" class="mt-auto text-center" style="display:none;">
-                                    <p class="small mb-1">QR Code Generated:</p>
-                                    <img src="" id="qr-image" class="img-fluid" alt="QR Code">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
             </div>
             <!-- QR Generator Card -->
@@ -429,3 +434,88 @@
         /* Dark mode support */
     </style>
 @endsection
+
+@push("js")
+    <!-- تأكد أنك حضرت jQuery وBootstrap JS -->
+    <script>
+        $(function(){
+            $('#btn-generate-qr').on('click', function(e){
+                e.preventDefault();
+
+                const id = $(this).data('id');
+                $('#qrModal').modal('show');
+
+                $('#qr-loading').removeClass('d-none');
+                $('#qr-result').addClass('d-none');
+                $('#btn-print-qr').addClass('d-none');
+                $.ajax({
+                    url: `/memberships/0/generate-qr`,
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': "{{ csrf_token() }}"|| ''
+                    },
+                    success: function(res){
+                        if (typeof res === 'string') {
+                            res = JSON.parse(res);
+                        }
+                        console.log(res.success)
+                        if (res.success && res.qr_codes && res.qr_codes.length > 0) {
+                            const firstQr = res.qr_codes[0];
+
+                            $('#qr-loading').addClass('d-none');
+
+                            $('#qr-result').removeClass('d-none');
+
+                            $('#qr-image').attr('src', firstQr.qr);
+
+                            $('#btn-print-qr').removeClass('d-none');
+                        } else {
+                            alert('No QR code found.');
+                            $('#qrModal').modal('hide');
+                        }
+                    },
+                    error: function(xhr){
+                        let msg = 'Server error';
+                        if(xhr.responseJSON && xhr.responseJSON.message) msg = xhr.responseJSON.message;
+                        alert(msg);
+                        $('#qrModal').modal('hide');
+                    }
+                });
+            });
+
+            $('#btn-print-qr').on('click', function(){
+                const imgSrc = $('#qr-image').attr('src');
+                if(!imgSrc) return alert('No image to print.');
+
+                const win = window.open('', '_blank');
+                win.document.write(`
+      <html>
+        <head>
+          <title>Print QR</title>
+          <style>
+            @media print {
+              body { margin: 0; display:flex; align-items:center; justify-content:center; height:100vh; }
+              img { max-width:100%; max-height:100vh; }
+            }
+            body { margin: 0; display:flex; align-items:center; justify-content:center; height:100vh; }
+            img { max-width:600px; width:100%; height:auto; }
+          </style>
+        </head>
+        <body>
+          <img src="${imgSrc}" onload="setTimeout(()=>{ window.print(); },200);" />
+        </body>
+      </html>
+    `);
+                win.document.close();
+            });
+
+            $('#qrModal').on('hidden.bs.modal', function(){
+                $('#qr-image').attr('src','');
+                $('#qr-result').addClass('d-none');
+                $('#qr-loading').removeClass('d-none');
+                $('#btn-print-qr').addClass('d-none');
+            });
+        });
+    </script>
+
+@endpush

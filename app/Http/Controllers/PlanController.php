@@ -32,7 +32,7 @@ class PlanController extends Controller
         'currency' => 'required|in:EUR,RON',
         'billing_type' => 'required|in:day,month,year',
         'features' => 'required|array|min:1',
-        'features.*' => 'required',
+            'features.*' => 'required|string|min:1'
     ]);
 
 
@@ -60,7 +60,7 @@ class PlanController extends Controller
         'currency' => 'required|in:EUR,RON',
         'billing_type' => 'required|in:day,month,year',
         'features' => 'required|array|min:1',
-        'features.*' => 'required',
+        'features.*' => 'required|string|min:1'
     ]);
 
     $plan->name = $request->name;

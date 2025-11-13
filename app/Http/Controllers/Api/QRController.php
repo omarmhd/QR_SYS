@@ -228,30 +228,30 @@ class QRController extends Controller
         if (!$qr) {
             return response()->json(['error' => 'QR not valid or expired'], 401);
         }
-        $user=$qr->user;
+        $user = $qr->user ?? null;
+
+        if(is_null($user)) {
 
 
-
-
-        if(is_null($user->current_subscription)){
-            return response()->json(['error' => 'Subscription Expired'], 401);
-
-        }
-        if ($qr->type=="visitor" and $qr->status=="pending") {
-            $user->subscription->increment('used_guests');
-            $user->subscription->decrement('last_guests_limit');
-            if ($user->subscription->last_guests_limit==0){
-                return response()->json(['error' => 'QR not valid or expired'], 401);
+            if (is_null($user->current_subscription)) {
+                return response()->json(['error' => 'Subscription Expired'], 401);
 
             }
+            if ($qr->type == "visitor" and $qr->status == "pending") {
+                $user->subscription->increment('used_guests');
+                $user->subscription->decrement('last_guests_limit');
+                if ($user->subscription->last_guests_limit == 0) {
+                    return response()->json(['error' => 'QR not valid or expired'], 401);
+
+                }
+            }
+
+
+            $updated = $qr->update(['status' => 'checked_in']);
+
+
+            $user->visitHistories()->create([]);
         }
-
-
-
-        $updated=$qr->update(['status' => 'checked_in']);
-
-
-        $user->visitHistories()->create([]);
 
         $listBatch = [];
 
@@ -281,8 +281,8 @@ class QRController extends Controller
                 'msgArg'  => array_filter([
                     'sPosition' => 'main',
                     'sMode'     => 'on',     // أو 'beep_50' لنبضات متقطعة
-                    'ucTime_ds' => 1,       // 3.0 ثوانٍ
-                    'sInsPwd'   => $sInsPwd, // فقط لو عندك كلمة مرور للأوامر
+                    'ucTime_ds' => 1,
+                    'sInsPwd'   => $sInsPwd,
                 ], fn($v) => $v !== null),
             ];
 
@@ -297,7 +297,7 @@ class QRController extends Controller
               <body style="background-color:#000; text-align:center; font-family:Arial, sans-serif;">
                 <div style="margin-top:10px;">
                 <img src="boot.jpg" width="160" style="margin-top:10px;"/>
-                <h2 style="color:#333;">Welcome {($qr->type == "visitor" ? "Guest " : "")}{$user->name}</h2>
+                <h2 style="color:#333;">Welcome {($qr->type == "visitor" ? "Guest " : "")}{{ $user->name ?? "" }}</h2>
                   <div id="id_dt_hhmm" style="color:white; margin-top:5px; font-size:24px;"></div>
                 </div>
               </body>
@@ -321,8 +321,7 @@ HTML;
               </body>
             </html>
 HTML;
-                SendRestoreScreenJob::dispatch($sInsPwd, $restoreHtml, "https://elunicolounge.com/api/kapri/event")
-                    ->delay(now()->addSeconds(10));
+
             }
         }
 

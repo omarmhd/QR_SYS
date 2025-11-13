@@ -38,13 +38,17 @@ class MembershipController extends Controller
 
     }
 
-    public function generateQr(Request $request,$id,UsageCheckerService $usageCheckerService)
+    public function generateQr(Request $request,$id=null,UsageCheckerService $usageCheckerService)
     {
         $count = $request->input('count', 1);
         $qrCodes = [];
 
         $renderer = new GDLibRenderer(200);
         $writer = new Writer($renderer);
+        $id=$id==0?null:$id;
+
+        if(!is_null($id)){
+
         $user = User::with('subscription')->find($id);
 
         $canUseVisitOrInvite=$usageCheckerService->canUseVisitOrInvite($user);
@@ -56,6 +60,7 @@ class MembershipController extends Controller
                 "message" => $canUseVisitOrInvite['message']
             ]);
 
+        }
         }
 
         for ($i = 0; $i < $count; $i++) {
@@ -74,11 +79,11 @@ class MembershipController extends Controller
             ]);
 
             $qrCodes[] = [
-                'name' =>"Guest ". ($i + 1)."-". $user->name ,
+                'name' => "Guest " . ($i + 1) . "-" . ($user?->name ?? ''),
                 'qr'   => 'data:image/png;base64,' . base64_encode($image)
             ];
         }
-        return json_encode(['qr_codes' => $qrCodes]);
+        return json_encode(['success'=>true,'qr_codes' => $qrCodes]);
     }
 
     public function history($id){
