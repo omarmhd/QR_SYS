@@ -288,6 +288,7 @@ class QRController extends Controller
 
             $listBatch[] = $buzzer;
 
+            $welcome = "Welcome " . ($qr->type == "visitor" ? "Guest " : "") . ($user->name ?? "");
 
 
             if (!empty($event['msgArg']['sData'])) {
@@ -297,7 +298,7 @@ class QRController extends Controller
               <body style="background-color:#000; text-align:center; font-family:Arial, sans-serif;">
                 <div style="margin-top:10px;">
                 <img src="boot.jpg" width="160" style="margin-top:10px;"/>
-                <h2 style="color:#333;">Welcome {($qr->type == "visitor" ? "Guest " : "")}{{ $user?->name ?? "" }}</h2>
+                <h2 style="color:#333;">{$welcome}</h2>
                   <div id="id_dt_hhmm" style="color:white; margin-top:5px; font-size:24px;"></div>
                 </div>
               </body>
