@@ -204,7 +204,7 @@ class NetopiaPaymentService
                 'current_subscription' => $subscription->id,
                 'subscription_status' => 1,
                 'plan_id' => $payment->plan_id,
-                'plan_name' => $payment->plan->name,
+                'plan_name' => $payment->plan->name["en"],
                 "is_sub_cancelled"=>0
             ]);
 
