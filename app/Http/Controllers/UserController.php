@@ -26,6 +26,9 @@ class  UserController extends Controller
                 ->editColumn('name', function ($row) {
                     return '<strong>' . e($row->name) . '</strong>';
                 })
+                ->editColumn('plan_name', function ($row) {
+                    return '<strong>' . e($row->plan->name['en']) . '</strong>';
+                })
                 ->editColumn('created_at', function ($row) {
                     return $row->created_at ? $row->created_at->format('Y-m-d H:i:s') : '';
                 })->editColumn("approval_status",function ($row){
@@ -69,7 +72,7 @@ class  UserController extends Controller
                                 </button>
                             </form>
                     btns;
-                })->rawColumns(['name', 'actions','created_at','approval_status'])
+                })->rawColumns(['name', 'actions','created_at','approval_status','plan_name'])
                 ->make(true);
         }
 
