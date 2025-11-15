@@ -443,22 +443,24 @@
                 }
             });
 
+        document.addEventListener("input", function(e) {
+            if (e.target.classList.contains("visitor-count")) {
 
-        document.querySelectorAll('.visitor-count').forEach(input => {
-            input.addEventListener('input', function () {
-                let max = parseInt(this.max);
-                let min = parseInt(this.min);
-                let value = parseInt(this.value);
+                let input = e.target;
+                let max = parseInt(input.getAttribute("max"));
+                let min = parseInt(input.getAttribute("min"));
+                let value = parseInt(input.value);
 
                 if (value > max) {
-                    this.value = max;
+                    input.value = max;
                 }
 
                 if (value < min) {
-                    this.value = min;
+                    input.value = min;
                 }
-            });
+            }
         });
+
 
 
     </script>
