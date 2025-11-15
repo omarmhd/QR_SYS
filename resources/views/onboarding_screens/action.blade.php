@@ -140,6 +140,9 @@
 
                 <div class="mb-3">
                   <label class="form-label">Upload Image</label>
+                    <small class="form-text text-muted">
+                        It is recommended to upload an image with dimensions 1080×1920  px.
+                    </small>
                   <input type="file" name="image" class="form-control" id="imageInput" accept="image/*">
                   <div class="mt-3">
                     <img id="imagePreview" src="{{ isset($screen->image) ? asset('storage/' . $screen->image) : '#' }}"

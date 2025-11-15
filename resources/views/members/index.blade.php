@@ -231,7 +231,7 @@
                             <form class="generate-form" data-member-id="${member.id}">
                                 <label class="form-label">Generate QR</label>
                                 <div class="input-group">
-                                    <input type="number"  min="1" max="${member.subscription?.last_guests_limit  ?? 0}" class="form-control visitor-count"       onkeydown="return false;"
+                                    <input type="number"  min="1" max="${member.subscription?.last_guests_limit  ?? 0}" class="form-control visitor-count"
   style="max-width: 70px;" required>
                                     <button type="submit" class="btn btn-primary generate-btn">
                                       <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
