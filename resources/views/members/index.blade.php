@@ -444,6 +444,21 @@
             });
 
 
+        document.querySelectorAll('.visitor-count').forEach(input => {
+            input.addEventListener('input', function () {
+                let max = parseInt(this.max);
+                let min = parseInt(this.min);
+                let value = parseInt(this.value);
+
+                if (value > max) {
+                    this.value = max;
+                }
+
+                if (value < min) {
+                    this.value = min;
+                }
+            });
+        });
 
 
     </script>
