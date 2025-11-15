@@ -173,7 +173,7 @@ class  UserController extends Controller
 
 
 
-            if ($user->plan_id!==$request->plan_id && $requestedSubscriptionStatus === 1) {
+            if (($user->plan_id!==$request->plan_id && $requestedSubscriptionStatus === 1)or($currentSubscriptionStatus === 0 && $requestedSubscriptionStatus === 1)) {
                 if (! $plan) {
                     DB::rollBack();
                     return redirect()->back()->with('error', 'Cannot activate subscription: plan not found.');
