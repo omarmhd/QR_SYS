@@ -240,7 +240,7 @@ class  UserController extends Controller
                 }
             } else {
                 if ($currentSubscriptionStatus === 1 && $requestedSubscriptionStatus === 0) {
-                    $user->subscription()->update(['status' => 'cancelled']);
+                    $user->subscription()->delete();
                     $user->update(['subscription_status' => 0]);
                     Log::info('🔕 Subscription cancelled by admin', ['user_id' => $user->id, 'admin_id' => Auth::id() ?? null]);
                 } else {
