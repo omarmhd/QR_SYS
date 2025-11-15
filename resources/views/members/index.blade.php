@@ -189,15 +189,15 @@
                                 <div class="flex-grow-1">
                                     <h3 class="card-title mb-1">${member.name}</h3>
                                     <div>
-                                  <span class="badge ${member.subscription_status ? "bg-green-lt" : "bg-red-lt"}">
-                                    ${member.subscription_status ? "Active" : "Inactive"}
+                                  <span class="badge ${member.subscription_status==1 ? "bg-green-lt" : "bg-red-lt"}">
+                                    ${member.subscription_status==1 ? "Active" : "Inactive"}
                                   </span></div>
                                 </div>
                             </div>
                             <div class="mb-3">
                                 <h4 class="subheader mb-2">Subscription details</h4>
                                 <div class="mb-2"><span class="badge bg-yellow text-yellow-fg">${member.plan.name['en']}</span></div>
-                                <div class="d-flex align-items-center text-muted"><svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z"></path><path d="M16 3v4"></path><path d="M8 3v4"></path><path d="M4 11h16"></path><path d="M11 15h1"></path><path d="M12 15v3"></path></svg><span>Expiration: </span> 17-09-26</div>
+                                <div class="d-flex align-items-center text-muted"><svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z"></path><path d="M16 3v4"></path><path d="M8 3v4"></path><path d="M4 11h16"></path><path d="M11 15h1"></path><path d="M12 15v3"></path></svg><span>Expiration: </span>  ${member.subscription?.end_date ?? 0} </div>
                             </div>
                             <div>
                                 <h4 class="subheader mb-2">Contact information</h4>
