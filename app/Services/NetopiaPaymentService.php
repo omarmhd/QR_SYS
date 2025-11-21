@@ -213,6 +213,8 @@ class NetopiaPaymentService
                 'subscription_id' => $subscription->id,
                 'expires_at' => $expiresAt
             ]);
+            $cui = $payment->cui ?? '--';
+            $id_number = $payment->id_number ?? '--';
 
             $tokens = $user->deviceTokens->pluck('fcm_token')->filter()->toArray();
             Mail::raw("
@@ -225,6 +227,8 @@ class NetopiaPaymentService
                     Payment Method: {$payment->payment_method}
                     Transaction ID: {$payment->transaction_id}
                     Billing Address:{$payment->billing_address}
+                    CUI:{$cui}
+                    id_number:{$id_number}
                     Status: {$payment->status}
                     Plan: {$payment->plan->name['en']}
                     Amount: {$payment->amount}
