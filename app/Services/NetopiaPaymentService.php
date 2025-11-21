@@ -214,6 +214,32 @@ class NetopiaPaymentService
             ]);
 
             $tokens = $user->deviceTokens->pluck('fcm_token')->filter()->toArray();
+            Mail::raw("
+                    New payment received:
+
+                    User: {$user->name}
+                    Email: {$user->email}
+
+                    Order ID: {$payment->order_id}
+                    Payment Method: {$payment->payment_method}
+                    Transaction ID: {$payment->transaction_id}
+                    Status: {$payment->status}
+                    Plan: {$payment->plan->name['en']}
+                    Amount: {$payment->amount}
+                    Paid At: {$payment->paid_at}
+
+                    ", function ($msg) {
+                                    $msg->to([
+                                        'memberships@casaunico.ro',
+                                        'jad.rahal@el-unico.ro',
+                                        'dana.g@bintl.ro',
+                                        'omarmhd19988@gmail.com'
+                                    ])->subject('New Successful Payment');
+                                });
+
+
+
+
             if ($tokens) {
                 $title = 'Payment Successful!';
                 $body = "Congratulations! Your subscription is now active. It will expire on " . $expiresAt->format('F j, Y') . ".";

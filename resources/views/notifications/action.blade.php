@@ -85,21 +85,44 @@
                 </div>
               </div>
               @endif
+
+                <ul class="nav nav-tabs mb-3" role="tablist">
+                    @foreach($locales as $locale)
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link @if ($loop->first) active @endif" data-bs-toggle="tab" href="#tab-{{ $locale }}" role="tab">
+                                {{ $locale->label() }}
+                            </a>
+                        </li>
+                    @endforeach
+                </ul>
+
+                <div class="tab-content">
+                    @foreach($locales as $locale)
+                        <div class="tab-pane fade @if ($loop->first) show active @endif" id="tab-{{ $locale }}" role="tabpanel">
+
+                            <!-- Name -->
+
+                            <div class="mb-3">
+                                <label class="form-label required">Title ({{ $locale->value}})</label>
+                                <input type="text" name="title[{{ $locale->value }}]" class="form-control"
+                                       value="" required>
+                            </div>
+
+
+                            <div class="mb-3">
+                                <label class="form-label required"> Body({{ $locale }})</label>
+                                <textarea name="body[{{ $locale }}]" class="form-control" required></textarea>
+                            </div>
+
+                        </div>
+                    @endforeach
+                </div>
               <div class="row row-cards">
-                <div class="mb-3 col-sm-8 col-md-12">
-                  <label class="form-label required">Title</label>
-                  <input name="title" type="text" class="form-control"
-                    value="{{ old('title', $user->name ?? '') }}">
-                </div>
-
-                <div class="mb-3 col-sm-8 col-md-12">
-                  <label class="form-label required">Body</label>
-                  <textarea name="body" id="" col="3" rows="3" class="form-control"></textarea>
-
-                </div>
 
 
-          
+
+
+
                 <div class="card-footer text-end">
                   <button type="submit" class="btn btn-primary">
                     Send Notification
