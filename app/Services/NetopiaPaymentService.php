@@ -224,6 +224,7 @@ class NetopiaPaymentService
                     Order ID: {$payment->order_id}
                     Payment Method: {$payment->payment_method}
                     Transaction ID: {$payment->transaction_id}
+                    Billing Address:{$payment->billing_address}
                     Status: {$payment->status}
                     Plan: {$payment->plan->name['en']}
                     Amount: {$payment->amount}
