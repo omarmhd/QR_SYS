@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
-class LoungeController extends Controller
+class  LoungeController extends Controller
 {
     public  function index(){
 

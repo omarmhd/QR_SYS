@@ -26,11 +26,11 @@ class FcmNotificationService
         $token = $this->client->fetchAccessTokenWithAssertion();
         return $token['access_token'];
     }
-
+/*
 public function sendNotification(array|string $tokensOrTopic, string $title, string $body, array $data = [], ?string $image = null, string $type = 'tokens',$user_id=null)
 {
     $accessToken = $this->getAccessToken();
-    
+
 
 
   if ($type === 'tokens') {
@@ -74,7 +74,7 @@ public function sendNotification(array|string $tokensOrTopic, string $title, str
 
     }
 
-    
+
 
     if (isset($responses[0]['name'])) {
 
@@ -93,6 +93,88 @@ public function sendNotification(array|string $tokensOrTopic, string $title, str
     }
     return $responses;
 }
+  */
+    public function sendNotification(
+        array|string $tokensOrTopic,
+        string $title,
+        string $body,
+        array $data = [],
+        ?string $image = null,
+        string $type = 'tokens',
+        $user_id = null
+    ) {
+        $accessToken = $this->getAccessToken();
+
+        $payloadBase = [
+            'notification' => [
+                'title' => $title,
+                'body'  => $body,
+            ],
+            'data' => $data,
+        ];
+
+        if ($image) {
+            $payloadBase['notification']['image'] = $image;
+        }
+
+        $responses = [];
+
+        // ---------------------------
+        // 🔹 إرسال باستخدام tokens
+        // ---------------------------
+        if ($type === 'tokens' && is_array($tokensOrTopic)) {
+
+            foreach ($tokensOrTopic as $token) {
+                $payload = [
+                    'message' => array_merge($payloadBase, [
+                        'token' => $token
+                    ])
+                ];
+
+                $response = $this->send($payload, $accessToken);
+                $responses[] = json_decode($response, true);
+            }
+
+        }
+        // ---------------------------
+        // 🔹 إرسال باستخدام topic
+        // ---------------------------
+        else {
+
+            $payload = [
+                'message' => array_merge($payloadBase, [
+                    'topic' => $tokensOrTopic
+                ])
+            ];
+
+            $response = $this->send($payload, $accessToken);
+            $responses[] = json_decode($response, true);
+        }
+
+
+        // -----------------------------------
+        // 🔹 حفظ الإشعار في قاعدة البيانات
+        // -----------------------------------
+        // نتحقق أن الإرسال نجح (Firebase يعيد name عند النجاح)
+        $first = $responses[0] ?? [];
+
+        if (isset($first['name'])) {
+
+            ModelsNotification::create([
+                'user_id'  => $user_id,
+                'title'    => $title,
+                'body'     => $body,
+                'type'     => $type,
+                'data'     => !empty($data) ? json_encode($data, JSON_UNESCAPED_UNICODE) : null,
+                'is_read'  => 0,
+                'sent_at'  => now(),
+            ]);
+        }
+
+        return $responses;
+    }
+
+
     protected function send(array $payload, string $accessToken)
     {
         $ch = curl_init('https://fcm.googleapis.com/v1/projects/' . env('FIREBASE_PROJECT_ID') . '/messages:send');
@@ -112,5 +194,4 @@ public function sendNotification(array|string $tokensOrTopic, string $title, str
     }
 
 
-}  
- 
+}

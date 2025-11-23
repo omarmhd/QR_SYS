@@ -228,7 +228,7 @@ class NetopiaPaymentService
                     Transaction ID: {$payment->transaction_id}
                     Billing Address:{$payment->billing_address}
                     CUI:{$cui}
-                    id_number:{$id_number}
+                    ID NO:{$id_number}
                     Status: {$payment->status}
                     Plan: {$payment->plan->name['en']}
                     Amount: {$payment->amount}

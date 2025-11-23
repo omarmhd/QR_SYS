@@ -37,8 +37,8 @@ class NotificationController extends Controller
     public function store(Request $request){
 
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'body' => 'required|string'
+            'title.*' => 'required|string|max:255',
+            'body.*' => 'required|string'
         ]);
         $response=$this->firebaseService->sendNotification('general', $validated["title"], $validated["body"], ["type" => "topic"], null, 'topic');
          if(!isset($response[0]['name'])){
