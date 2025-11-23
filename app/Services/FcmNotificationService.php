@@ -97,8 +97,8 @@ public function sendNotification(array|string $tokensOrTopic, string $title, str
 
     public function sendNotification(
         array|string $tokensOrTopic,
-        array $title,  // جميع اللغات هنا
-        array $body,   // جميع اللغات هنا
+        array $title,
+        array $body,
         array $data = [],
         ?string $image = null,
         string $type = 'tokens',
@@ -107,17 +107,17 @@ public function sendNotification(array|string $tokensOrTopic, string $title, str
         $accessToken = $this->getAccessToken();
         $responses = [];
 
-        // اختر لغة العرض السريع (tray notification)
+        // tray notification – language default EN
         $titleDefault = $title['en'] ?? reset($title);
         $bodyDefault  = $body['en'] ?? reset($body);
 
-        // أضف جميع اللغات في data
-        $data['languages'] = [
+        // convert all languages into string (mandatory for Firebase)
+        $data['languages'] = json_encode([
             'title' => $title,
             'body'  => $body,
-        ];
+        ], JSON_UNESCAPED_UNICODE);
 
-        // إعداد payload الأساسي
+        // payload base
         $payloadBase = [
             'notification' => [
                 'title' => $titleDefault,
@@ -130,10 +130,9 @@ public function sendNotification(array|string $tokensOrTopic, string $title, str
             $payloadBase['notification']['image'] = $image;
         }
 
-        // ---------------------------
-        // إرسال باستخدام tokens
-        // ---------------------------
+        // sending tokens
         if ($type === 'tokens' && is_array($tokensOrTopic)) {
+
             foreach ($tokensOrTopic as $token) {
                 $payload = [
                     'message' => array_merge($payloadBase, [
@@ -145,11 +144,8 @@ public function sendNotification(array|string $tokensOrTopic, string $title, str
                 $responses[] = json_decode($response, true);
             }
 
-        }
-        // ---------------------------
-        // إرسال باستخدام topic
-        // ---------------------------
-        else {
+        } else {
+            // sending topic
             $payload = [
                 'message' => array_merge($payloadBase, [
                     'topic' => $tokensOrTopic
@@ -160,12 +156,8 @@ public function sendNotification(array|string $tokensOrTopic, string $title, str
             $responses[] = json_decode($response, true);
         }
 
-        // ---------------------------
-        // حفظ الإشعار في قاعدة البيانات
-        // ---------------------------
-        $first = $responses[0] ?? [];
-
-        if (isset($first['name'])) {
+        // save to DB
+        if (isset($responses[0]['name'])) {
             ModelsNotification::create([
                 'user_id' => $user_id,
                 'title'   => json_encode($title, JSON_UNESCAPED_UNICODE),
