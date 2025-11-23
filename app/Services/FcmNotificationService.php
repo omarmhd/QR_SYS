@@ -94,21 +94,34 @@ public function sendNotification(array|string $tokensOrTopic, string $title, str
     return $responses;
 }
   */
+
     public function sendNotification(
         array|string $tokensOrTopic,
-        string $title,
-        string $body,
+        array $title,  // جميع اللغات هنا
+        array $body,   // جميع اللغات هنا
         array $data = [],
         ?string $image = null,
         string $type = 'tokens',
         $user_id = null
     ) {
         $accessToken = $this->getAccessToken();
+        $responses = [];
 
+        // اختر لغة العرض السريع (tray notification)
+        $titleDefault = $title['en'] ?? reset($title);
+        $bodyDefault  = $body['en'] ?? reset($body);
+
+        // أضف جميع اللغات في data
+        $data['languages'] = [
+            'title' => $title,
+            'body'  => $body,
+        ];
+
+        // إعداد payload الأساسي
         $payloadBase = [
             'notification' => [
-                'title' => $title,
-                'body'  => $body,
+                'title' => $titleDefault,
+                'body'  => $bodyDefault,
             ],
             'data' => $data,
         ];
@@ -117,13 +130,10 @@ public function sendNotification(array|string $tokensOrTopic, string $title, str
             $payloadBase['notification']['image'] = $image;
         }
 
-        $responses = [];
-
         // ---------------------------
-        // 🔹 إرسال باستخدام tokens
+        // إرسال باستخدام tokens
         // ---------------------------
         if ($type === 'tokens' && is_array($tokensOrTopic)) {
-
             foreach ($tokensOrTopic as $token) {
                 $payload = [
                     'message' => array_merge($payloadBase, [
@@ -137,10 +147,9 @@ public function sendNotification(array|string $tokensOrTopic, string $title, str
 
         }
         // ---------------------------
-        // 🔹 إرسال باستخدام topic
+        // إرسال باستخدام topic
         // ---------------------------
         else {
-
             $payload = [
                 'message' => array_merge($payloadBase, [
                     'topic' => $tokensOrTopic
@@ -151,28 +160,26 @@ public function sendNotification(array|string $tokensOrTopic, string $title, str
             $responses[] = json_decode($response, true);
         }
 
-
-        // -----------------------------------
-        // 🔹 حفظ الإشعار في قاعدة البيانات
-        // -----------------------------------
-        // نتحقق أن الإرسال نجح (Firebase يعيد name عند النجاح)
+        // ---------------------------
+        // حفظ الإشعار في قاعدة البيانات
+        // ---------------------------
         $first = $responses[0] ?? [];
 
         if (isset($first['name'])) {
-
             ModelsNotification::create([
-                'user_id'  => $user_id,
-                'title'    => $title,
-                'body'     => $body,
-                'type'     => $type,
-                'data'     => !empty($data) ? json_encode($data, JSON_UNESCAPED_UNICODE) : null,
-                'is_read'  => 0,
-                'sent_at'  => now(),
+                'user_id' => $user_id,
+                'title'   => json_encode($title, JSON_UNESCAPED_UNICODE),
+                'body'    => json_encode($body, JSON_UNESCAPED_UNICODE),
+                'type'    => $type,
+                'data'    => json_encode($data, JSON_UNESCAPED_UNICODE),
+                'is_read' => 0,
+                'sent_at' => now(),
             ]);
         }
 
         return $responses;
     }
+
 
 
     protected function send(array $payload, string $accessToken)

@@ -38,15 +38,23 @@ class NotificationController extends Controller
 
         $validated = $request->validate([
             'title.*' => 'required|string|max:255',
-            'body.*' => 'required|string'
+            'body.*'  => 'required|string'
         ]);
-        $response=$this->firebaseService->sendNotification('general', $validated["title"], $validated["body"], ["type" => "topic"], null, 'topic');
-         if(!isset($response[0]['name'])){
-            return redirect()->back()->with("error","Error in send notification");
-         }
 
-        return redirect()->route("notifications.index")->with("success","");
+        $response = $this->firebaseService->sendNotification(
+            'general',
+            $validated['title'],
+            $validated['body'],
+            ["type" => "topic"],
+            null,
+            'topic'
+        );
 
+        if (!isset($response[0]['name'])) {
+            return back()->with("error", "Error in sending notification");
+        }
+
+        return redirect()->route("notifications.index")->with("success", "Notification sent successfully");
      }
 
 
