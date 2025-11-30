@@ -104,10 +104,20 @@ protected $firestoreService;
         $user->approval_status = $status;
         $user->save();
 
-        $notificationTitle = 'Your account status';
+        $notificationTitle = [
+            'en' => 'Your account status',
+            'ro' => 'Statusul contului tău' // الترجمة الرومانية
+        ];
+
         $notificationBody = $status === 'accepted'
-            ? 'Congratulations, your application has been accepted.'
-            : 'We’re sorry, your application has been rejected.';
+            ? [
+                'en' => 'Congratulations, your application has been accepted.',
+                'ro' => 'Felicitări, aplicația ta a fost acceptată.'
+            ]
+            : [
+                'en' => 'We’re sorry, your application has been rejected.',
+                'ro' => 'Ne pare rău, aplicația ta a fost respinsă.'
+            ];
 
         $tokens = $user->deviceTokens->pluck('fcm_token')->toArray();
 

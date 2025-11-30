@@ -224,9 +224,16 @@ class  UserController extends Controller
 
                 $tokens = $user->deviceTokens->pluck('fcm_token')->filter()->toArray();
                 if ($tokens) {
-
-                    $title = 'Subscription Activated';
-                    $body = "Your subscription has been activated. It will expire on " . $expiresAt->format('F j, Y');
+                    $title = [
+                        'en' => 'Subscription Activated',
+                        'ro' => 'Abonament activat'
+                    ];
+                    $body = [
+                        'en' => "Your subscription has been activated. It will expire on " . $expiresAt->format('F j, Y'),
+                        'ro' => "Abonamentul tău a fost activat. Va expira pe data de " . $expiresAt->format('F j, Y')
+                    ];
+//                    $title = 'Subscription Activated';
+//                    $body = "Your subscription has been activated. It will expire on " . $expiresAt->format('F j, Y');
                     app("notification")->sendNotification(
                         $tokens,
                         $title,
