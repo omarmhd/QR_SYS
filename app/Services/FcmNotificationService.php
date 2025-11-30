@@ -95,10 +95,86 @@ public function sendNotification(array|string $tokensOrTopic, string $title, str
 }
   */
 
+//    public function sendNotification(
+//        array|string $tokensOrTopic,
+//        array $title,
+//        array $body,
+//        array $data = [],
+//        ?string $image = null,
+//        string $type = 'tokens',
+//        $user_id = null
+//    ) {
+//        $accessToken = $this->getAccessToken();
+//        $responses = [];
+//
+//        // tray notification – language default EN
+//        $titleDefault = $title['en'] ?? reset($title);
+//        $bodyDefault  = $body['en'] ?? reset($body);
+//
+//        // convert all languages into string (mandatory for Firebase)
+//        $data['languages'] = json_encode([
+//            'title' => $title,
+//            'body'  => $body,
+//        ], JSON_UNESCAPED_UNICODE);
+//
+//        // payload base
+//        $payloadBase = [
+//            'notification' => [
+//                'title' => $titleDefault,
+//                'body'  => $bodyDefault,
+//            ],
+//            'data' => $data,
+//        ];
+//
+//        if ($image) {
+//            $payloadBase['notification']['image'] = $image;
+//        }
+//
+//        if ($type === 'tokens' && is_array($tokensOrTopic)) {
+//
+//            foreach ($tokensOrTopic as $token) {
+//                $payload = [
+//                    'message' => array_merge($payloadBase, [
+//                        'token' => $token
+//                    ])
+//                ];
+//
+//                $response = $this->send($payload, $accessToken);
+//                $responses[] = json_decode($response, true);
+//            }
+//
+//        } else {
+//            // sending topic
+//            $payload = [
+//                'message' => array_merge($payloadBase, [
+//                    'topic' => $tokensOrTopic
+//                ])
+//            ];
+//
+//            $response = $this->send($payload, $accessToken);
+//            $responses[] = json_decode($response, true);
+//        }
+//
+//        // save to DB
+//        if (isset($responses[0]['name'])) {
+//            ModelsNotification::create([
+//                'user_id' => $user_id,
+//                'title'   => json_encode($title, JSON_UNESCAPED_UNICODE),
+//                'body'    => json_encode($body, JSON_UNESCAPED_UNICODE),
+//                'type'    => $type,
+//                'data'    => json_encode($data, JSON_UNESCAPED_UNICODE),
+//                'is_read' => 0,
+//                'sent_at' => now(),
+//            ]);
+//        }
+//
+//        return $responses;
+//    }
+
     public function sendNotification(
         array|string $tokensOrTopic,
-        array $title,
-        array $body,
+        array|string $title, // تم السماح باستقبال نص أو مصفوفة
+        array|string $body,  // تم السماح باستقبال نص أو مصفوفة
         array $data = [],
         ?string $image = null,
         string $type = 'tokens',
@@ -107,21 +183,40 @@ public function sendNotification(array|string $tokensOrTopic, string $title, str
         $accessToken = $this->getAccessToken();
         $responses = [];
 
-        // tray notification – language default EN
-        $titleDefault = $title['en'] ?? reset($title);
-        $bodyDefault  = $body['en'] ?? reset($body);
+        // 1. معالجة العنوان (Title Processing)
+        if (is_array($title)) {
+            // إذا كان مصفوفة نأخذ الإنجليزي أو أول عنصر
+            $titleDefault = $title['en'] ?? reset($title);
+            // نجهز المصفوفة للحفظ كـ JSON
+            $titleData = $title;
+        } else {
+            // إذا كان نصاً نستخدمه مباشرة
+            $titleDefault = $title;
+            // نحوله لمصفوفة لتوحيد شكل البيانات في الـ data والـ DB
+            $titleData = ['en' => $title];
+        }
 
-        // convert all languages into string (mandatory for Firebase)
+        // 2. معالجة المحتوى (Body Processing)
+        if (is_array($body)) {
+            $bodyDefault = $body['en'] ?? reset($body);
+            $bodyData = $body;
+        } else {
+            $bodyDefault = $body;
+            $bodyData = ['en' => $body];
+        }
+
+        // 3. تجهيز بيانات اللغات للـ Payload
+        // نقوم بترميز المصفوفات الموحدة التي أنشأناها في الخطوات السابقة
         $data['languages'] = json_encode([
-            'title' => $title,
-            'body'  => $body,
+            'title' => $titleData,
+            'body'  => $bodyData,
         ], JSON_UNESCAPED_UNICODE);
 
         // payload base
         $payloadBase = [
             'notification' => [
-                'title' => $titleDefault,
-                'body'  => $bodyDefault,
+                'title' => $titleDefault, // النص الظاهر في الإشعار
+                'body'  => $bodyDefault,  // المحتوى الظاهر في الإشعار
             ],
             'data' => $data,
         ];
@@ -130,9 +225,8 @@ public function sendNotification(array|string $tokensOrTopic, string $title, str
             $payloadBase['notification']['image'] = $image;
         }
 
-        // sending tokens
+        // إرسال الإشعار (نفس المنطق السابق)
         if ($type === 'tokens' && is_array($tokensOrTopic)) {
-
             foreach ($tokensOrTopic as $token) {
                 $payload = [
                     'message' => array_merge($payloadBase, [
@@ -143,7 +237,6 @@ public function sendNotification(array|string $tokensOrTopic, string $title, str
                 $response = $this->send($payload, $accessToken);
                 $responses[] = json_decode($response, true);
             }
-
         } else {
             // sending topic
             $payload = [
@@ -160,8 +253,9 @@ public function sendNotification(array|string $tokensOrTopic, string $title, str
         if (isset($responses[0]['name'])) {
             ModelsNotification::create([
                 'user_id' => $user_id,
-                'title'   => json_encode($title, JSON_UNESCAPED_UNICODE),
-                'body'    => json_encode($body, JSON_UNESCAPED_UNICODE),
+                // نقوم بحفظ النسخة الـ JSON دائماً لتوحيد البيانات في قاعدة البيانات
+                'title'   => json_encode($titleData, JSON_UNESCAPED_UNICODE),
+                'body'    => json_encode($bodyData, JSON_UNESCAPED_UNICODE),
                 'type'    => $type,
                 'data'    => json_encode($data, JSON_UNESCAPED_UNICODE),
                 'is_read' => 0,
@@ -171,8 +265,6 @@ public function sendNotification(array|string $tokensOrTopic, string $title, str
 
         return $responses;
     }
-
-
 
     protected function send(array $payload, string $accessToken)
     {
