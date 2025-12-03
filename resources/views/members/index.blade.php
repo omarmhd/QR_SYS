@@ -357,7 +357,7 @@
 .row, .container-fluid {
 margin: 0 auto;    padding: 0;
 }
-                .card { margin-bottom: 20px; }
+                .card { margin-bottom: 20px; padding:5px}
                 /*img { max-width: 100%; height: auto; }*/
                 /*img {*/
                 /*    width: 1.9in !important;*/
