@@ -298,9 +298,9 @@
                                     // div.innerHTML = `<img src="${code}" class="img-fluid mb-2"/><p>${code}</p>`;
                                     div.innerHTML = `
                                             <div class="card">
-                                              <div class="card-body text-center p-2">
+                                              <div class="card-body text-center">
                                                 <img src="${code.qr}" alt="QR Code for visitor ${code.name}" class="img-fluid mb-2" />
-                                                <div class="text-muted small">${code.name} </div>
+                                                <div class="text-muted small" style="font-size: 4px">${code.name} </div>
                                               </div>
                                             </div>
                                          `;
@@ -343,8 +343,11 @@
             <style>
                 body { padding: 20px; font-family: Arial, sans-serif; margin: 0; }
                 .card { margin-bottom: 20px; }
-                img { max-width: 100%; height: auto; }
-
+                /*img { max-width: 100%; height: auto; }*/
+                img {
+                    width: 1.9in !important;
+                    height: 1.9in !important;
+                }
                 button, .btn { display: none !important; }
 
                 .row { display: flex; flex-wrap: wrap; }

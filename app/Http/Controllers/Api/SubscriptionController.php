@@ -192,8 +192,6 @@ class SubscriptionController extends Controller
         $user = auth()->user();
         return response()->json($this->paymentService->startPayment($request, $user));
     }
-
-
     public function changePlan(Request $request){
         $request->validate([
             "old_plan"=>"required|exists:plans,id",

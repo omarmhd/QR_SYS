@@ -239,8 +239,9 @@ class QRController extends Controller
             }
             if ($qr->type == "visitor" and $qr->status == "pending") {
                 $user->subscription->increment('used_guests');
-                $user->subscription->decrement('last_guests_limit');
-                if ($user->subscription->last_guests_limit == 0) {
+                if ($user->subscription->last_guests_limit > 0) {
+                    $user->subscription->decrement('last_guests_limit');
+                }                if ($user->subscription->last_guests_limit <= 0) {
                     return response()->json(['error' => 'QR not valid or expired'], 401);
 
                 }
