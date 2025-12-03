@@ -347,8 +347,8 @@
     }
 
     img {
-        width: 1.9in !important;
-        height: 1.9in !important;
+        width: 1.2in !important;
+        height: 1.2in !important;
         display: block;
         margin: 0 auto;
     }
