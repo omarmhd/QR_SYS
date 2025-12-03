@@ -352,7 +352,12 @@
         display: block;
         margin: 0 auto;
     }
-                body { padding: 10px; font-family: Arial, sans-serif; margin: 0; }
+                body {     margin: 0;
+    padding: 0;}
+.row, .container-fluid {
+    margin: 0;
+    padding: 0;
+}
                 .card { margin-bottom: 20px; }
                 /*img { max-width: 100%; height: auto; }*/
                 /*img {*/
