@@ -300,7 +300,7 @@
                                             <div class="card">
                                               <div class="card-body text-center">
                                                 <img src="${code.qr}" alt="QR Code for visitor ${code.name}" class="img-fluid mb-2" />
-                                                <div class="text-muted small" style="font-size: 4px">${code.name} </div>
+                                                <div class="text-muted small" style="font-size: 10px">${code.name} </div>
                                               </div>
                                             </div>
                                          `;
@@ -341,7 +341,7 @@
             <title> QR</title>
             <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
             <style>
-                body { padding: 20px; font-family: Arial, sans-serif; margin: 0; }
+                body { padding: 10px; font-family: Arial, sans-serif; margin: 0; }
                 .card { margin-bottom: 20px; }
                 /*img { max-width: 100%; height: auto; }*/
                 img {
