@@ -340,35 +340,44 @@
         <head>
             <title> QR</title>
             <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
-            <style>
+        <style>
     @page {
-        size: 3in 3in; /* غيّرها حسب حجم الورقة الذي تريده */
+        size: 2in 2in;
         margin: 0;
     }
 
-    img {
-        width: 1.1in !important;
-        height: 1.1in !important;
-        display: block;
-        margin: 0 auto;
+    body {
+        margin: 0;
+        padding: 0;
+        width: 2in;
+        height: 2in;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-family: Arial, sans-serif;
     }
-                body {     margin: 0;
-    padding: 0;}
-.row, .container-fluid {
-margin: 0 auto;    padding: 0;
-}
-                .card { margin-bottom: 20px; padding:5px}
-                /*img { max-width: 100%; height: auto; }*/
-                /*img {*/
-                /*    width: 1.9in !important;*/
-                /*    height: 1.9in !important;*/
-                /*}*/
-                button, .btn { display: none !important; }
 
-                .row { display: flex; flex-wrap: wrap; }
+    img {
+        width: 1.25in;
+        height: 1.25in;
+        display: block;
+        margin-bottom: 2px;
+    }
 
+    .qr-name {
+        font-size: 9px;
+        text-align: center;
+        margin-top: 2px;
+        width: 100%;
+        display: block;
+    }
 
-            </style>
+    /* إخفاء أي شيء غير QR */
+    button, .btn, .card, .row, .container-fluid {
+        display: none !important;
+    }
+</style>
         </head>
         <body>
             <div class="container-fluid">
