@@ -374,7 +374,7 @@
     }
 
     /* إخفاء أي شيء غير QR */
-    button, .btn, .card, .row, .container-fluid {
+    button, .btn{
         display: none !important;
     }
 </style>
