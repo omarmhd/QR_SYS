@@ -341,13 +341,24 @@
             <title> QR</title>
             <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
             <style>
+    @page {
+        size: 3in 3in; /* غيّرها حسب حجم الورقة الذي تريده */
+        margin: 0;
+    }
+
+    img {
+        width: 1.9in !important;
+        height: 1.9in !important;
+        display: block;
+        margin: 0 auto;
+    }
                 body { padding: 10px; font-family: Arial, sans-serif; margin: 0; }
                 .card { margin-bottom: 20px; }
                 /*img { max-width: 100%; height: auto; }*/
-                img {
-                    width: 1.9in !important;
-                    height: 1.9in !important;
-                }
+                /*img {*/
+                /*    width: 1.9in !important;*/
+                /*    height: 1.9in !important;*/
+                /*}*/
                 button, .btn { display: none !important; }
 
                 .row { display: flex; flex-wrap: wrap; }
