@@ -347,13 +347,17 @@
     }
 
     img {
-        width: 1.2in !important;
-        height: 1.2in !important;
-        display: block;
-        margin: 0 auto;
-    }
-                body {     margin: 0;
-    padding: 0;}
+         width: 1.9in !important;
+        height: 1.9in !important;
+        object-fit: contain;
+}
+                body {            margin: 0;
+        padding: 0;
+        width: 3in;
+        height: 3in;
+        display: flex;
+        align-items: center;
+        justify-content: center;}
 .row, .container-fluid {
 margin: 0 auto;
 padding: 0;
