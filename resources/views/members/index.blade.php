@@ -347,20 +347,15 @@
     }
 
     img {
-         width: 1.9in !important;
-        height: 1.9in !important;
-        object-fit: contain;
-}
-                body {            margin: 0;
-        padding: 0;
-        width: 3in;
-        height: 3in;
-        display: flex;
-        align-items: center;
-        justify-content: center;}
+        width: 1.1in !important;
+        height: 1.1in !important;
+        display: block;
+        margin: 0 auto;
+    }
+                body {     margin: 0;
+    padding: 0;}
 .row, .container-fluid {
-margin: 0 auto;
-padding: 0;
+margin: 0 auto;    padding: 0;
 }
                 .card { margin-bottom: 20px; }
                 /*img { max-width: 100%; height: auto; }*/
