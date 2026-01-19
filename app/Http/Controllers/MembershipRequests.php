@@ -106,7 +106,7 @@ protected $firestoreService;
 
         $notificationTitle = [
             'en' => 'Your account status',
-            'ro' => 'Statusul contului tău' // الترجمة الرومانية
+            'ro' => 'Statusul contului tău'
         ];
 
         $notificationBody = $status === 'accepted'

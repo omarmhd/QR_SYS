@@ -58,13 +58,30 @@ class CheckSubscriptions extends Command
         if (!$tokens) return;
 
         if ($type === 'reminder') {
-            $title = '🔔 Reminder: Subscription expiring soon';
-            $body = "Your subscription will expire "
-                . Carbon::parse($subscription->end_date)->format('F j, Y') . ").";
+
+            $title = [
+                'en' => '🔔 Reminder: Subscription Expiring Soon',
+                'ro' => '🔔 Memento: Abonamentul expiră în curând',
+            ];
+
+            $body = [
+                'en' => 'Your subscription will expire on '
+                    . Carbon::parse($subscription->end_date)->format('F j, Y') . '.',
+                'ro' => 'Abonamentul tău va expira pe '
+                    . Carbon::parse($subscription->end_date)->format('F j, Y') . '.',
+            ];
+
             $dataType = 'subscription_reminder';
         } else {
-            $title = '❌ Subscription Expired';
-            $body = "Your subscription has ended. Please renew to continue using the service.";
+            $title = [
+                'en' => '❌ Subscription Expired',
+                'ro' => '❌ Abonamentul a expirat',
+            ];
+
+            $body = [
+                'en' => 'Your subscription has ended. Please renew to continue using the service.',
+                'ro' => 'Abonamentul tău a expirat. Te rugăm să îl reînnoiești pentru a continua să folosești serviciul.',
+            ];
             $dataType = 'subscription_expired';
         }
 

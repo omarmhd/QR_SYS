@@ -214,6 +214,7 @@ class NetopiaPaymentService
                 'expires_at' => $expiresAt
             ]);
             $cui = $payment->cui ?? '--';
+            $company_name = $payment->cui ?? '--';
             $id_number = $payment->id_number ?? '--';
 
             $tokens = $user->deviceTokens->pluck('fcm_token')->filter()->toArray();
@@ -222,11 +223,11 @@ class NetopiaPaymentService
 
                     User: {$user->name}
                     Email: {$user->email}
-
                     Order ID: {$payment->order_id}
                     Payment Method: {$payment->payment_method}
                     Transaction ID: {$payment->transaction_id}
                     Billing Address:{$payment->billing_address}
+                    CUI:{$cui}
                     CUI:{$cui}
                     ID NO:{$id_number}
                     Status: {$payment->status}
@@ -239,7 +240,8 @@ class NetopiaPaymentService
                                         'memberships@casaunico.ro',
                                         'jad.rahal@el-unico.ro',
                                         'dana.g@bintl.ro',
-                                        'omarmhd19988@gmail.com'
+                                        'omarmhd19988@gmail.com',
+                                        'eleyansalam@gmail.com'
                                     ])->subject('New Successful Payment');
                                 });
 
@@ -247,8 +249,16 @@ class NetopiaPaymentService
 
 
             if ($tokens) {
-                $title = 'Payment Successful!';
-                $body = "Congratulations! Your subscription is now active. It will expire on " . $expiresAt->format('F j, Y') . ".";
+
+                $title = [
+                    'en' => 'Payment Successful!',
+                    'ro' => 'Abonament activat'
+                ];
+                $body = [
+                    'en' => "Your subscription has been activated. It will expire on " . $expiresAt->format('F j, Y'),
+                    'ro' => "Abonamentul tău a fost activat. Va expira pe data de " . $expiresAt->format('F j, Y')
+                ];
+
                 $this->firebaseService->sendNotification(
                     $tokens,
                     $title,

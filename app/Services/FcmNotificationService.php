@@ -173,8 +173,8 @@ public function sendNotification(array|string $tokensOrTopic, string $title, str
 
     public function sendNotification(
         array|string $tokensOrTopic,
-        array|string $title, // تم السماح باستقبال نص أو مصفوفة
-        array|string $body,  // تم السماح باستقبال نص أو مصفوفة
+        array|string $title,
+        array|string $body,
         array $data = [],
         ?string $image = null,
         string $type = 'tokens',
@@ -183,20 +183,14 @@ public function sendNotification(array|string $tokensOrTopic, string $title, str
         $accessToken = $this->getAccessToken();
         $responses = [];
 
-        // 1. معالجة العنوان (Title Processing)
         if (is_array($title)) {
-            // إذا كان مصفوفة نأخذ الإنجليزي أو أول عنصر
             $titleDefault = $title['en'] ?? reset($title);
-            // نجهز المصفوفة للحفظ كـ JSON
             $titleData = $title;
         } else {
-            // إذا كان نصاً نستخدمه مباشرة
             $titleDefault = $title;
-            // نحوله لمصفوفة لتوحيد شكل البيانات في الـ data والـ DB
             $titleData = ['en' => $title];
         }
 
-        // 2. معالجة المحتوى (Body Processing)
         if (is_array($body)) {
             $bodyDefault = $body['en'] ?? reset($body);
             $bodyData = $body;
@@ -205,18 +199,15 @@ public function sendNotification(array|string $tokensOrTopic, string $title, str
             $bodyData = ['en' => $body];
         }
 
-        // 3. تجهيز بيانات اللغات للـ Payload
-        // نقوم بترميز المصفوفات الموحدة التي أنشأناها في الخطوات السابقة
         $data['languages'] = json_encode([
             'title' => $titleData,
             'body'  => $bodyData,
         ], JSON_UNESCAPED_UNICODE);
 
-        // payload base
         $payloadBase = [
             'notification' => [
-                'title' => $titleDefault, // النص الظاهر في الإشعار
-                'body'  => $bodyDefault,  // المحتوى الظاهر في الإشعار
+                'title' => $titleDefault,
+                'body'  => $bodyDefault,
             ],
             'data' => $data,
         ];
@@ -225,7 +216,6 @@ public function sendNotification(array|string $tokensOrTopic, string $title, str
             $payloadBase['notification']['image'] = $image;
         }
 
-        // إرسال الإشعار (نفس المنطق السابق)
         if ($type === 'tokens' && is_array($tokensOrTopic)) {
             foreach ($tokensOrTopic as $token) {
                 $payload = [
@@ -238,7 +228,6 @@ public function sendNotification(array|string $tokensOrTopic, string $title, str
                 $responses[] = json_decode($response, true);
             }
         } else {
-            // sending topic
             $payload = [
                 'message' => array_merge($payloadBase, [
                     'topic' => $tokensOrTopic
@@ -249,11 +238,9 @@ public function sendNotification(array|string $tokensOrTopic, string $title, str
             $responses[] = json_decode($response, true);
         }
 
-        // save to DB
         if (isset($responses[0]['name'])) {
             ModelsNotification::create([
                 'user_id' => $user_id,
-                // نقوم بحفظ النسخة الـ JSON دائماً لتوحيد البيانات في قاعدة البيانات
                 'title'   => json_encode($titleData, JSON_UNESCAPED_UNICODE),
                 'body'    => json_encode($bodyData, JSON_UNESCAPED_UNICODE),
                 'type'    => $type,

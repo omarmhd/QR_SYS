@@ -192,6 +192,7 @@ class SubscriptionController extends Controller
         $user = auth()->user();
         return response()->json($this->paymentService->startPayment($request, $user));
     }
+
     public function changePlan(Request $request){
         $request->validate([
             "old_plan"=>"required|exists:plans,id",
@@ -240,9 +241,8 @@ class SubscriptionController extends Controller
             "amount_due" => $amountDue
         ]);
 
-
-
     }
+
     public function switchPlan(Request $request)
     {
         $request->validate([
@@ -315,7 +315,6 @@ class SubscriptionController extends Controller
         ]);
     }
 
-
     public function cancelSubscription(){
         $user=auth()->user();
         $status=auth()->user()->update(["is_sub_cancelled"=>1]);
@@ -348,18 +347,21 @@ class SubscriptionController extends Controller
 
     }
 
-
     public function notify(Request $request)
     {
         return response()->json($this->paymentService->handleNotification($request->all()));
 
     }
 
+
     public function manualPaymentConfirm(Request $request)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|max:255',
+            "ci"=>"nullable",
+            "address"=>"nullable",
+            "company_name"=>"nullable",
             'phone' => 'required|string|max:255',
             'payment_date' => 'required',
             'payment_type' => 'required|string|max:255',
@@ -370,6 +372,9 @@ class SubscriptionController extends Controller
         $messageBody = "Manual Payment Confirmation\n\n"
             . "Name: {$validated['name']}\n"
             . "Phone: {$validated['phone']}\n"
+            . "CI: ".($validated['ci'] ?? 'N/A')."\n"
+            . "Company:" .($validated['company_name'] ?? 'N/A')."\n"
+            . "Address:" .($validated['address'] ?? 'N/A')."\n"
             . "Email: {$validated['email']}\n"
             . "Payment Date: {$validated['payment_date']}\n"
             . "Payment Type: {$validated['payment_type']}\n"
@@ -378,10 +383,11 @@ class SubscriptionController extends Controller
             . "Sent automatically from the system.";
 
         Mail::raw($messageBody, function ($message) {
-            $message->to('jad.rahal@el-unico.ro')
+            $message->to('jad.rahal@el-unico.ro','eleyansalam@gmail.com')
             ->subject('Manual Payment Confirmation');
         });
 
         return response()->json(['status'=>true,'message' => 'Manual payment confirmation sent successfully.'], 200);
     }
+
 }
