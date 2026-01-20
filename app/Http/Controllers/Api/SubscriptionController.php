@@ -371,16 +371,25 @@ class SubscriptionController extends Controller
 
         $messageBody = "Manual Payment Confirmation\n\n"
             . "Name: {$validated['name']}\n"
-            . "Phone: {$validated['phone']}\n"
-            . "CI: ".($validated['ci'] ?? 'Personal')."\n"
-            . "Company:" .($validated['company_name'] ?? 'Personal')."\n"
-            . "Address:" .($validated['address'] ?? 'N/A')."\n"
+            . "Phone: {$validated['phone']}\n";
+
+        if (!empty($validated['ci'])) {
+            $messageBody .= "CI: {$validated['ci']}\n";
+        }
+
+        if (!empty($validated['company_name'])) {
+            $messageBody .= "Company: {$validated['company_name']}\n";
+        }
+
+        $messageBody .=
+            "Address: " . ($validated['address'] ?? 'N/A') . "\n"
             . "Email: {$validated['email']}\n"
             . "Payment Date: {$validated['payment_date']}\n"
             . "Payment Type: {$validated['payment_type']}\n"
-            . "Transfer Method: ".($validated['transfer_method'] ?? 'Bank')."\n"
+            . "Transfer Method: " . ($validated['transfer_method'] ?? 'Bank') . "\n"
             . "Confirmation Note: " . ($validated['confirmation_note'] ?? 'N/A') . "\n\n"
             . "Sent automatically from the system.";
+
 
         Mail::raw($messageBody, function ($message) {
             $message->to('jad.rahal@el-unico.ro','eleyansalam@gmail.com',"elyansaad1994@gmail.com")
