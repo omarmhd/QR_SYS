@@ -241,7 +241,8 @@ class NetopiaPaymentService
                                         'jad.rahal@el-unico.ro',
                                         'dana.g@bintl.ro',
                                         'omarmhd19988@gmail.com',
-                                        'eleyansalam@gmail.com'
+                                        'eleyansalam@gmail.com',
+                                        "elyansaad1994@gmail.com"
                                     ])->subject('New Successful Payment');
                                 });
 

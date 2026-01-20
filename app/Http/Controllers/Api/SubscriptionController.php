@@ -383,7 +383,7 @@ class SubscriptionController extends Controller
             . "Sent automatically from the system.";
 
         Mail::raw($messageBody, function ($message) {
-            $message->to('jad.rahal@el-unico.ro','eleyansalam@gmail.com')
+            $message->to('jad.rahal@el-unico.ro','eleyansalam@gmail.com',"elyansaad1994@gmail.com")
             ->subject('Manual Payment Confirmation');
         });
 
