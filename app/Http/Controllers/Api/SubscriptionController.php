@@ -393,7 +393,12 @@ class SubscriptionController extends Controller
 
 
         Mail::raw($messageBody, function ($message) {
-            $message->to('jad.rahal@el-unico.ro','eleyansalam@gmail.com',"elyansaad1994@gmail.com","omarmhd19988@gmail.com")
+            $message->to([
+                'jad.rahal@el-unico.ro',
+                'eleyansalam@gmail.com',
+                'elyansaad1994@gmail.com',
+                'omarmhd19988@gmail.com'
+            ])
             ->subject('Manual Payment Confirmation');
         });
 
