@@ -356,6 +356,7 @@ class SubscriptionController extends Controller
 
     public function manualPaymentConfirm(Request $request)
     {
+        dd("d");
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|max:255',
