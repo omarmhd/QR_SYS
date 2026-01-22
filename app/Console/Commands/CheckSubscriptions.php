@@ -61,13 +61,13 @@ class CheckSubscriptions extends Command
 
             $title = [
                 'en' => '🔔 Reminder: Subscription Expiring Soon',
-                'ro' => '🔔 Memento: Abonamentul expiră în curând',
+                'ro' => '🔔 Notificare: Abonamentul dvs. expiră în curând',
             ];
 
             $body = [
                 'en' => 'Your subscription will expire on '
                     . Carbon::parse($subscription->end_date)->format('F j, Y') . '.',
-                'ro' => 'Abonamentul tău va expira pe '
+                'ro' => 'Abonamentul dvs. va expira pe '
                     . Carbon::parse($subscription->end_date)->format('F j, Y') . '.',
             ];
 
@@ -80,7 +80,7 @@ class CheckSubscriptions extends Command
 
             $body = [
                 'en' => 'Your subscription has ended. Please renew to continue using the service.',
-                'ro' => 'Abonamentul tău a expirat. Te rugăm să îl reînnoiești pentru a continua să folosești serviciul.',
+                'ro' => 'Abonamentul dvs. a expirat. Reînnoiți abonamentul dvs. pentru a continua.',
             ];
             $dataType = 'subscription_expired';
         }

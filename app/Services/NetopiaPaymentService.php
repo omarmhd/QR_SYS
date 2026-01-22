@@ -252,12 +252,12 @@ class NetopiaPaymentService
             if ($tokens) {
 
                 $title = [
-                    'en' => 'Payment Successful!',
+                    'en' => 'Subscription Activated',
                     'ro' => 'Abonament activat'
                 ];
                 $body = [
                     'en' => "Your subscription has been activated. It will expire on " . $expiresAt->format('F j, Y'),
-                    'ro' => "Abonamentul tău a fost activat. Va expira pe data de " . $expiresAt->format('F j, Y')
+                    'ro' => "Abonamentul dvs. a fost activat. Va expira pe data de " . $expiresAt->format('F j, Y')
                 ];
 
                 $this->firebaseService->sendNotification(

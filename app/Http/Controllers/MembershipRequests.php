@@ -112,11 +112,11 @@ protected $firestoreService;
         $notificationBody = $status === 'accepted'
             ? [
                 'en' => 'Congratulations, your application has been accepted.',
-                'ro' => 'Felicitări, aplicația ta a fost acceptată.'
+                'ro' => 'Felicitări, cererea dvs. a fost acceptată.'
             ]
             : [
                 'en' => 'We’re sorry, your application has been rejected.',
-                'ro' => 'Ne pare rău, aplicația ta a fost respinsă.'
+                'ro' => 'Ne pare rău, cererea dvs. a fost respinsă.'
             ];
 
         $tokens = $user->deviceTokens->pluck('fcm_token')->toArray();

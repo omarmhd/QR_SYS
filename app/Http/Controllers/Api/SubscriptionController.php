@@ -375,7 +375,7 @@ class SubscriptionController extends Controller
             . "Phone: {$validated['phone']}\n";
 
         if (!empty($validated['ci'])) {
-            $messageBody .= "CI: {$validated['ci']}\n";
+            $messageBody .= "CIF: {$validated['ci']}\n";
         }
 
         if (!empty($validated['company_name'])) {

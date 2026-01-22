@@ -230,7 +230,7 @@ class  UserController extends Controller
                     ];
                     $body = [
                         'en' => "Your subscription has been activated. It will expire on " . $expiresAt->format('F j, Y'),
-                        'ro' => "Abonamentul tău a fost activat. Va expira pe data de " . $expiresAt->format('F j, Y')
+                        'ro' => "Abonamentul dvs. a fost activat. Va expira pe data de " . $expiresAt->format('F j, Y')
                     ];
 //                    $title = 'Subscription Activated';
 //                    $body = "Your subscription has been activated. It will expire on " . $expiresAt->format('F j, Y');
