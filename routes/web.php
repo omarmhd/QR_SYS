@@ -36,9 +36,43 @@ Route::get('/', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 Route::get('/payment-redirect', function (Illuminate\Http\Request $request) {
 
+    $orderId = $request->get('orderId') ?? $request->get('orderID');
 
-    return view("redirect-to-app");
+    $payment = $orderId
+        ? \App\Models\Payment::where('order_id', $orderId)->first()
+        : null;
+
+    if (!$payment) {
+        return view('payment-status', [
+            'status'  => 'unknown',
+            'messages' => [
+                'en' => 'We are verifying your payment. Please wait...',
+                'ro' => 'Verificăm plata dumneavoastră. Vă rugăm să așteptați...'
+            ]
+        ]);
+    }
+
+    $messages = match ($payment->status) {
+        'success' => [
+            'en' => 'Payment successful 🎉 Redirecting...',
+            'ro' => 'Plata a fost efectuată cu succes 🎉 Redirecționare...'
+        ],
+        'failed' => [
+            'en' => 'Payment failed ❌ Please try again.',
+            'ro' => 'Plata a eșuat ❌ Vă rugăm să încercați din nou.'
+        ],
+        default => [
+            'en' => 'Payment is being processed ⏳',
+            'ro' => 'Plata este în curs de procesare ⏳'
+        ]
+    };
+
+    return view('redirect-to-app', [
+        'status' => $payment->status,
+        'messages' => $messages
+    ]);
 });
+
 Route::middleware('auth')->group(function () {
 
     Route::resource("users",UserController::class);

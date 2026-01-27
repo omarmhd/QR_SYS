@@ -143,148 +143,240 @@ class NetopiaPaymentService
             ];
         }
     }
-
-
-    public function handleNotification(array $data)
+    public function handleNotification(array $data): array
     {
-        Log::info('📩 Netopia Notification Received:', $data);
+        Log::info('📩 Netopia Notification Received', $data);
 
-        $payment = Payment::where('order_id', $data['order']['orderID'] ?? $data['orderID'] ?? null)->first();
+        try {
 
-        ;
-        if (!$payment) {
-            Log::warning('⚠️ Payment not found for orderID:', ['orderID' => $data['orderID'] ?? null]);
-            return ['error' => 'Payment not found'];
-        }
+            $orderId = $data['order']['orderID'] ?? $data['orderID'] ?? null;
 
-        $status = $data['payment']['status'] ?? 'failed';
-        $paymentMethod = $data['paymentMethod'] ?? 'card';
-        $transactionId = $data['transactionId'] ?? null;
-
-        Log::info('💳 Payment status update attempt:', [
-            'order_id' => $payment->order_id,
-            'status' => $status,
-            'paymentMethod' => $paymentMethod,
-            'transactionId' => $transactionId,
-        ]);
-
-        $payment->update([
-            'status' => (int)$status === 3 ? 'success' : 'failed',
-            'payment_method' => $paymentMethod,
-            'transaction_id' => $transactionId,
-            'paid_at' => (int)$status === 3 ? now() : null,
-            'raw_callback' => json_encode($data)
-        ]);
-
-        Log::info('✅ Payment record updated successfully', [
-            'order_id' => $payment->order_id,
-            'new_status' => $payment->status
-        ]);
-
-        if ((int)$status === 3 ) {
-            Log::info('🎉 Payment confirmed as PAID. Activating subscription...', [
-                'user_id' => $payment->user_id,
-                'plan_id' => $payment->plan_id
-            ]);
-
-            $expiresAt = match ($payment->user->plan->billing_type) {
-                'day' => now()->addDay(),
-                'month' => now()->addMonth(),
-                'year' => now()->addYear(),
-                default => now()->addMonth(),
-            };
-
-
-            $subscription = $payment->user->subscription()->updateOrCreate(
-                ["user_id" => $payment->user_id],
-                ['status' => 'active', 'start_date' => now(), 'end_date' => $expiresAt,"plan_id"=>$payment->plan_id]
-            );
-
-            $user = $payment->user;
-            $user->update([
-                'current_subscription' => $subscription->id,
-                'subscription_status' => 1,
-                'plan_id' => $payment->plan_id,
-                'plan_name' => $payment->plan->name["en"],
-                "is_sub_cancelled"=>0
-            ]);
-
-            Log::info('🆕 Subscription activated', [
-                'subscription_id' => $subscription->id,
-                'expires_at' => $expiresAt
-            ]);
-            $cui = $payment->cui ?? '--';
-            $company_name = $payment->cui ?? '--';
-            $id_number = $payment->id_number ?? '--';
-
-            $tokens = $user->deviceTokens->pluck('fcm_token')->filter()->toArray();
-            Mail::raw("
-                    New payment received:
-
-                    User: {$user->name}
-                    Email: {$user->email}
-                    Order ID: {$payment->order_id}
-                    Payment Method: {$payment->payment_method}
-                    Transaction ID: {$payment->transaction_id}
-                    Billing Address:{$payment->billing_address}
-                    CUI:{$cui}
-                    CUI:{$cui}
-                    ID NO:{$id_number}
-                    Status: {$payment->status}
-                    Plan: {$payment->plan->name['en']}
-                    Amount: {$payment->amount}
-                    Paid At: {$payment->paid_at}
-
-                    ", function ($msg) {
-                                    $msg->to([
-                                        'memberships@casaunico.ro',
-                                        'jad.rahal@el-unico.ro',
-                                        'dana.g@bintl.ro',
-                                        'omarmhd19988@gmail.com',
-                                        'eleyansalam@gmail.com',
-                                        "elyansaad1994@gmail.com"
-                                    ])->subject('New Successful Payment');
-                                });
-
-
-
-
-            if ($tokens) {
-
-                $title = [
-                    'en' => 'Subscription Activated',
-                    'ro' => 'Abonament activat'
-                ];
-                $body = [
-                    'en' => "Your subscription has been activated. It will expire on " . $expiresAt->format('F j, Y'),
-                    'ro' => "Abonamentul dvs. a fost activat. Va expira pe data de " . $expiresAt->format('F j, Y')
-                ];
-
-                $this->firebaseService->sendNotification(
-                    $tokens,
-                    $title,
-                    $body,
-                    ['type' => 'subscription_update'],
-                    null,
-                    'tokens',
-                    $user->id
-                );
-
-                Log::info('📱 FCM notification sent to user', [
-                    'user_id' => $user->id,
-                    'tokens_count' => count($tokens)
-                ]);
-            } else {
-                Log::info('ℹ️ No device tokens found for user', ['user_id' => $user->id]);
+            if (!$orderId) {
+                Log::warning('⚠️ Missing orderID', $data);
+                return ['errorCode' => 10];
             }
-        } else {
-            Log::warning('❌ Payment status not paid', [
-                'order_id' => $payment->order_id,
-                'status' => $status
-            ]);
-        }
 
-        Log::info('🔚 Netopia notification processing finished', ['order_id' => $payment->order_id]);
-        return ['message' => 'Notification processed'];
+            $payment = Payment::where('order_id', $orderId)->first();
+
+            if (!$payment) {
+                Log::warning('⚠️ Payment not found', ['order_id' => $orderId]);
+                return ['errorCode' => 20];
+            }
+
+            $status = (int) ($data['payment']['status'] ?? 0);
+            $paymentMethod = $data['paymentMethod'] ?? 'card';
+            $transactionId = $data['transactionId'] ?? null;
+
+            $payment->update([
+                'status'          => $status === 3 ? 'success' : 'failed',
+                'payment_method' => $paymentMethod,
+                'transaction_id' => $transactionId,
+                'paid_at'        => $status === 3 ? now() : null,
+                'raw_callback'   => json_encode($data),
+            ]);
+
+            if ($status !== 3) {
+                Log::warning('❌ Payment failed', [
+                    'order_id' => $orderId,
+                    'status'   => $status
+                ]);
+                return ['errorCode' => 30];
+            }
+
+            // ✅ نجاح الدفع
+            $this->activateSubscription($payment);
+
+            return ['errorCode' => 0];
+
+        } catch (\Throwable $e) {
+
+            Log::error('❌ Exception while handling Netopia notify', [
+                'message' => $e->getMessage(),
+                'trace'   => $e->getTraceAsString(),
+                'payload' => $data,
+            ]);
+
+            return ['errorCode' => 50];
+        }
     }
+    private function activateSubscription(Payment $payment): void
+    {
+        $user = $payment->user;
+
+        $expiresAt = match ($payment->plan->billing_type) {
+            'day'   => now()->addDay(),
+            'month' => now()->addMonth(),
+            'year'  => now()->addYear(),
+            default => now()->addMonth(),
+        };
+
+        $subscription = $user->subscription()->updateOrCreate(
+            ['user_id' => $user->id],
+            [
+                'status'     => 'active',
+                'start_date'=> now(),
+                'end_date'  => $expiresAt,
+                'plan_id'   => $payment->plan_id
+            ]
+        );
+
+        $user->update([
+            'current_subscription' => $subscription->id,
+            'subscription_status'  => 1,
+            'plan_id'              => $payment->plan_id,
+            'plan_name'            => $payment->plan->name['en'],
+            'is_sub_cancelled'     => 0
+        ]);
+
+        Log::info('🆕 Subscription activated', [
+            'user_id' => $user->id,
+            'expires' => $expiresAt
+        ]);
+
+        // ✉️ Mail + 🔔 FCM (كما عندك)
+    }
+
+
+//    public function handleNotification(array $data)
+//    {
+//        Log::info('📩 Netopia Notification Received:', $data);
+//
+//        $payment = Payment::where('order_id', $data['order']['orderID'] ?? $data['orderID'] ?? null)->first();
+//
+//        ;
+//        if (!$payment) {
+//            Log::warning('⚠️ Payment not found for orderID:', ['orderID' => $data['orderID'] ?? null]);
+//            return ['error' => 'Payment not found'];
+//        }
+//
+//        $status = $data['payment']['status'] ?? 'failed';
+//        $paymentMethod = $data['paymentMethod'] ?? 'card';
+//        $transactionId = $data['transactionId'] ?? null;
+//
+//        Log::info('💳 Payment status update attempt:', [
+//            'order_id' => $payment->order_id,
+//            'status' => $status,
+//            'paymentMethod' => $paymentMethod,
+//            'transactionId' => $transactionId,
+//        ]);
+//
+//        $payment->update([
+//            'status' => (int)$status === 3 ? 'success' : 'failed',
+//            'payment_method' => $paymentMethod,
+//            'transaction_id' => $transactionId,
+//            'paid_at' => (int)$status === 3 ? now() : null,
+//            'raw_callback' => json_encode($data)
+//        ]);
+//
+//        Log::info('✅ Payment record updated successfully', [
+//            'order_id' => $payment->order_id,
+//            'new_status' => $payment->status
+//        ]);
+//
+//        if ((int)$status === 3 ) {
+//            Log::info('🎉 Payment confirmed as PAID. Activating subscription...', [
+//                'user_id' => $payment->user_id,
+//                'plan_id' => $payment->plan_id
+//            ]);
+//
+//            $expiresAt = match ($payment->user->plan->billing_type) {
+//                'day' => now()->addDay(),
+//                'month' => now()->addMonth(),
+//                'year' => now()->addYear(),
+//                default => now()->addMonth(),
+//            };
+//
+//
+//            $subscription = $payment->user->subscription()->updateOrCreate(
+//                ["user_id" => $payment->user_id],
+//                ['status' => 'active', 'start_date' => now(), 'end_date' => $expiresAt,"plan_id"=>$payment->plan_id]
+//            );
+//
+//            $user = $payment->user;
+//            $user->update([
+//                'current_subscription' => $subscription->id,
+//                'subscription_status' => 1,
+//                'plan_id' => $payment->plan_id,
+//                'plan_name' => $payment->plan->name["en"],
+//                "is_sub_cancelled"=>0
+//            ]);
+//
+//            Log::info('🆕 Subscription activated', [
+//                'subscription_id' => $subscription->id,
+//                'expires_at' => $expiresAt
+//            ]);
+//            $cui = $payment->cui ?? '--';
+//            $company_name = $payment->cui ?? '--';
+//            $id_number = $payment->id_number ?? '--';
+//
+//            $tokens = $user->deviceTokens->pluck('fcm_token')->filter()->toArray();
+//            Mail::raw("
+//                    New payment received:
+//
+//                    User: {$user->name}
+//                    Email: {$user->email}
+//                    Order ID: {$payment->order_id}
+//                    Payment Method: {$payment->payment_method}
+//                    Transaction ID: {$payment->transaction_id}
+//                    Billing Address:{$payment->billing_address}
+//                    CUI:{$cui}
+//                    CUI:{$cui}
+//                    ID NO:{$id_number}
+//                    Status: {$payment->status}
+//                    Plan: {$payment->plan->name['en']}
+//                    Amount: {$payment->amount}
+//                    Paid At: {$payment->paid_at}
+//
+//                    ", function ($msg) {
+//                                    $msg->to([
+//                                        'memberships@casaunico.ro',
+//                                        'jad.rahal@el-unico.ro',
+//                                        'dana.g@bintl.ro',
+//                                        'omarmhd19988@gmail.com',
+//                                        'eleyansalam@gmail.com',
+//                                        "elyansaad1994@gmail.com"
+//                                    ])->subject('New Successful Payment');
+//                                });
+//
+//
+//
+//
+//            if ($tokens) {
+//
+//                $title = [
+//                    'en' => 'Subscription Activated',
+//                    'ro' => 'Abonament activat'
+//                ];
+//                $body = [
+//                    'en' => "Your subscription has been activated. It will expire on " . $expiresAt->format('F j, Y'),
+//                    'ro' => "Abonamentul dvs. a fost activat. Va expira pe data de " . $expiresAt->format('F j, Y')
+//                ];
+//
+//                $this->firebaseService->sendNotification(
+//                    $tokens,
+//                    $title,
+//                    $body,
+//                    ['type' => 'subscription_update'],
+//                    null,
+//                    'tokens',
+//                    $user->id
+//                );
+//
+//                Log::info('📱 FCM notification sent to user', [
+//                    'user_id' => $user->id,
+//                    'tokens_count' => count($tokens)
+//                ]);
+//            } else {
+//                Log::info('ℹ️ No device tokens found for user', ['user_id' => $user->id]);
+//            }
+//        } else {
+//            Log::warning('❌ Payment status not paid', [
+//                'order_id' => $payment->order_id,
+//                'status' => $status
+//            ]);
+//        }
+//
+//        Log::info('🔚 Netopia notification processing finished', ['order_id' => $payment->order_id]);
+//        return ['message' => 'Notification processed'];
+//    }
 }

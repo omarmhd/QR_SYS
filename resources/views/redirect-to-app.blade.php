@@ -1,20 +1,27 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html>
 <head>
-    <meta charset="utf-8">
-    <title>فتح التطبيق</title>
+    <meta charset="UTF-8">
+    <title>Payment Status</title>
 </head>
-<body style="text-align:center; font-family: sans-serif; margin-top: 50px;">
-<h2>اضغط لفتح التطبيق</h2>
-<button onclick="openApp()" style="padding:10px 20px; font-size:16px;">فتح التطبيق الآن</button>
+<body>
+<h2>EN: {{ $messages['en'] }}</h2>
+<h2>RO: {{ $messages['ro'] }}</h2>
 
 <script>
-    function openApp() {
-        window.location.href = "ElUnicoQR://payment-result?status={{ request('status', 'failed') }}";
-        setTimeout(() => {
-            window.location.href = "https://elunicolounge.com/download";
-        }, 2000);
-    }
+    @if($status === 'success')
+    setTimeout(() => {
+        window.location.href = "myapp://payment-success";
+    }, 1500);
+    @elseif($status === 'failed')
+    setTimeout(() => {
+        window.location.href = "myapp://payment-failed";
+    }, 2000);
+    @else
+    setTimeout(() => {
+        window.location.href = "/dashboard";
+    }, 3000);
+    @endif
 </script>
 </body>
 </html>

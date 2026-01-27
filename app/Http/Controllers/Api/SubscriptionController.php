@@ -349,8 +349,10 @@ class SubscriptionController extends Controller
 
     public function notify(Request $request)
     {
-        return response()->json($this->paymentService->handleNotification($request->all()));
-
+        return response()->json(
+            $this->paymentService->handleNotification($request->all()),
+            200
+        );
     }
 
 
