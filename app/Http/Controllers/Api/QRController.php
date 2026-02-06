@@ -468,33 +468,49 @@ HTML;
     public function handle(Request $request)
     {
         $event = $request->all();
-        \Log::info('Kapri Event Received:', $event);
+        // مفيد جداً لمراقبة نوع الرسائل القادمة في ملف laravel.log
+        \Log::info('Kapri Event:', ['type' => $event['msgType'] ?? 'unknown', 'data' => $event]);
 
-        // تجهيز متغيرات الرد الافتراضية
-        $sInsPwd = env('KAPRI_INS_PWD'); // كلمة مرور الجهاز إن وجدت
-        $listBatch = []; // قائمة الأوامر
-        $errorMessage = null; // لتخزين رسالة الخطأ إن وجدت
+        // كلمة المرور الخاصة بالجهاز
+        $sInsPwd = env('KAPRI_INS_PWD');
 
-        // 1. التحقق من التوكن (Auth)
+        // ============================================================
+        // 1. تصفية الرسائل (تجاهل الرسائل التي ليست قراءة كود)
+        // ============================================================
+
+        // تأكد من وجود مفتاح sData. إذا لم يكن موجوداً، فهذه رسالة نظام (Heartbeat)
+        // نرد عليها برد إيجابي صامت حتى لا يعلق الجهاز، ونوقف التنفيذ.
+        if (empty($event['msgArg']['sData'])) {
+            return response()->json([
+                'msgType' => 'ins_cloud_batch',
+                'msgArg'  => [
+                    'bReply'    => true,
+                    'listBatch' => [], // لا تفعل شيئاً
+                ],
+            ]);
+        }
+
+        // ============================================================
+        // هنا نبدأ المعالجة الفعلية لأننا تأكدنا أن هناك كود QR
+        // ============================================================
+
+        $errorMessage = null;
+        $listBatch = [];
+
+        // 2. التحقق من التوكن (Auth)
         if (($event['msgArg']['sToken'] ?? '') !== 'test-123456789') {
             $errorMessage = 'Unauthorized Device';
         }
 
-        // 2. التحقق من وجود بيانات الكود
-        $qrToken = $event['msgArg']['sData'] ?? null;
-        if (!$errorMessage && !$qrToken) {
-            $errorMessage = 'QR Missing';
-        }
+        $qrToken = $event['msgArg']['sData']; // نحن متأكدون الآن أنه موجود
 
-        // 3. جلب الإعدادات والبحث عن الكود وصلاحية الوقت
+        // 3. جلب الإعدادات والبحث
         $qr = null;
         $user = null;
 
         if (!$errorMessage) {
             $hours = getSetting('qr_expiration_hours', 12);
 
-            // الشرط هنا يتحقق أن الوقت الحالي أقل من (وقت التحديث + الساعات المسموحة)
-            // هذا يسمح بالدخول المتكرر طالما المعادلة صحيحة
             $qr = QrCode::where('qr_token', $qrToken)
                 ->whereRaw('TIMESTAMPADD(HOUR, ?, updated_at) > NOW()', [$hours])
                 ->first();
@@ -506,32 +522,25 @@ HTML;
             }
         }
 
-        // 4. التحقق من اليوزر والاشتراك ومنطق الزوار
+        // 4. التحقق من اليوزر والاشتراك
         if (!$errorMessage && $user) {
 
             if (is_null($user->current_subscription)) {
                 $errorMessage = 'Subscription Expired';
             }
             else {
-                // منطق الزائر (يتم الخصم فقط إذا كانت الحالة Pending)
-                // إذا كانت الحالة Checked_in يمرر الكود ولا يخصم مرة أخرى (وهذا يسمح بالدخول والخروج)
+                // منطق الزائر
                 if ($qr->type == "visitor" && $qr->status == "pending") {
-
-                    // تحقق من الرصيد قبل الخصم
                     if ($user->subscription->last_guests_limit <= 0) {
                         $errorMessage = 'Guest Limit Reached';
                     } else {
-                        // الخصم وتحديث الحالة
                         $user->subscription->increment('used_guests');
                         $user->subscription->decrement('last_guests_limit');
-
-                        // تحديث الحالة إلى checked_in
-                        // ملاحظة مهمة: هذا التحديث سيغير updated_at وبالتالي سيبدأ عد الـ 12 ساعة من هذه اللحظة
+                        // تحديث الحالة لمرة واحدة فقط
                         $qr->update(['status' => 'checked_in']);
                     }
                 }
 
-                // تسجيل تاريخ الزيارة (Log)
                 if (!$errorMessage) {
                     $user->visitHistories()->create([]);
                 }
@@ -541,13 +550,11 @@ HTML;
         }
 
         // ============================================================
-        // مرحلة بناء الرد (لن نستخدم 401 أبداً لتجنب التعليق)
+        // بناء الرد (خطأ أو نجاح)
         // ============================================================
 
         if ($errorMessage) {
-            // --- حالة الخطأ/الرفض ---
-            // نرسل أوامر للجهاز: شغل صوت خطأ + اعرض رسالة الرفض
-
+            // --- رد الرفض (بدون 401) ---
             $safeError = e($errorMessage);
             $htmlError = <<<HTML
         <html>
@@ -559,17 +566,15 @@ HTML;
           </body>
         </html>
 HTML;
-
             $listBatch[] = [
                 'msgType' => 'ins_inout_buzzer_operate',
                 'msgArg'  => [
                     'sPosition' => 'main',
-                    'sMode'     => 'beep_error', // نغمة خطأ
+                    'sMode'     => 'beep_error',
                     'ucTime_ds' => 5,
                     'sInsPwd'   => $sInsPwd,
                 ]
             ];
-
             $listBatch[] = [
                 'msgType' => 'ins_screen_html_document_write',
                 'msgArg'  => [
@@ -577,24 +582,18 @@ HTML;
                     'sInsPwd' => $sInsPwd,
                 ]
             ];
-
         } else {
-            // --- حالة النجاح ---
-            // نرسل أوامر: فتح الباب + صوت نجاح + ترحيب
-
-            // 1. فتح الريلاي
+            // --- رد النجاح ---
             $listBatch[] = [
                 'msgType' => 'ins_inout_relay_operate',
                 'msgArg'  => [
                     'sPosition' => 'main',
                     'sMode'     => 'on',
                     "ucRelayNum"=> 0,
-                    'ucTime_ds' => 50, // 5 ثواني
+                    'ucTime_ds' => 50,
                     'sInsPwd'   => $sInsPwd,
                 ]
             ];
-
-            // 2. صوت صفارة
             $listBatch[] = [
                 'msgType' => 'ins_inout_buzzer_operate',
                 'msgArg'  => [
@@ -605,7 +604,6 @@ HTML;
                 ]
             ];
 
-            // 3. الشاشة
             $welcome = "Welcome " . ($qr->type == "visitor" ? "Guest " : "") . ($user->name ?? "");
             $safeWelcome = e($welcome);
 
@@ -620,7 +618,6 @@ HTML;
           </body>
         </html>
 HTML;
-
             $listBatch[] = [
                 'msgType' => 'ins_screen_html_document_write',
                 'msgArg'  => [
@@ -630,7 +627,6 @@ HTML;
             ];
         }
 
-        // إرجاع الرد النهائي بصيغة JSON 200 OK دائماً
         return response()->json([
             'msgType' => 'ins_cloud_batch',
             'msgArg'  => [
