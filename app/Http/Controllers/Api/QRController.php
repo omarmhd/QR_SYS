@@ -76,7 +76,9 @@ class QRController extends Controller
                 }
 
                 // تحديث الحالة وتسجيل الزيارة
-                $qr->update(['status' => 'checked_in']);
+                if ($qr->status !== 'checked_in') {
+                    $qr->update(['status' => 'checked_in']);
+                }
                 $user->visitHistories()->create([]);
             });
         } catch (\Exception $e) {
@@ -481,7 +483,7 @@ HTML;
         Http::post($url, $instruction);
     }
 
-    public function handle(Request $request)
+    public function handle4(Request $request)
     {
         // 1. التقاط البيانات وبدء مصفوفة الأوامر فارغة
         $event = $request->all();
@@ -653,5 +655,124 @@ HTML;
         return array_filter($args, fn($v) => $v !== null);
     }
 
+
+    public function handle(Request $request)
+    {
+        $event = $request->all();
+        \Log::info('Kapri Event Received:', $event);
+
+        // التحقق من الـ token
+        if (($event['msgArg']['sToken'] ?? '') !== 'test-123456789') {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        $qrToken = $event['msgArg']['sData'] ?? null;
+
+        if (!$qrToken) {
+            return response()->json(['error' => 'QR token missing'], 400);
+        }
+
+        // جلب الـ QR وتحقق الصلاحية
+        $hours = getSetting('qr_expiration_hours', 12);
+        $qr = QrCode::where('qr_token', $qrToken)
+            ->WhereRaw('TIMESTAMPADD(HOUR, ?, updated_at) > NOW()', [$hours])
+            ->first();
+
+        if (!$qr) {
+            return response()->json(['error' => 'QR not valid or expired'], 401);
+        }
+
+        $user = $qr->user ?? null;
+
+        // التحقق من الاشتراك والضيوف
+        if (!is_null($user)) {
+            if (is_null($user->current_subscription)) {
+                return response()->json(['error' => 'Subscription Expired'], 401);
+            }
+
+            if ($qr->type == "visitor" && $qr->status == "pending") {
+                $user->subscription->increment('used_guests');
+                if ($user->subscription->last_guests_limit > 0) {
+                    $user->subscription->decrement('last_guests_limit');
+                }
+                if ($user->subscription->last_guests_limit <= 0) {
+                    return response()->json(['error' => 'QR not valid or expired'], 401);
+                }
+            }
+
+            // سجّل الزيارة دائمًا
+            $user->visitHistories()->create([]);
+
+            // غيّر status بس لو لسّا pending
+            if ($qr->status !== 'checked_in') {
+                $qr->update(['status' => 'checked_in']);
+            }
+        }
+
+        // إعداد الـ batch دائمًا (حل مشكلة التعليق)
+        $listBatch = [];
+        $sInsPwd = env('KAPRI_INS_PWD');
+
+        if (($event['msgType'] ?? '') === 'on_uart_receive') {
+            // 1. فتح الـ relay (باب) لـ 5 ثواني - دائمًا
+            $listBatch[] = [
+                'msgType' => 'ins_inout_relay_operate',
+                'msgArg' => [
+                    'sPosition' => 'main',
+                    'sMode' => 'on',
+                    'ucRelayNum' => 0,
+                    'ucTime_ds' => 50, // 5 ثواني
+                ]
+            ];
+
+            // 2. صوت البازر - دائمًا
+            $listBatch[] = [
+                'msgType' => 'ins_inout_buzzer_operate',
+                'msgArg' => array_filter([
+                    'sPosition' => 'main',
+                    'sMode' => 'on',
+                    'ucTime_ds' => 1,
+                    'sInsPwd' => $sInsPwd,
+                ], fn($v) => $v !== null),
+            ];
+
+            // 3. شاشة HTML حسب الحالة - دائمًا
+            $statusText = ($qr->status == 'checked_in') ? "Welcome back" : "Welcome";
+            $nameText = ($qr->type == "visitor" ? "Guest " : "") . ($user->name ?? "User");
+            $welcome = $statusText . " " . $nameText;
+
+            $html = <<<HTML
+<html>
+  <body style="background-color:#000; text-align:center; font-family:Arial, sans-serif;">
+    <div style="margin-top:10px;">
+      <img src="boot.jpg" width="160" style="margin-top:10px;"/>
+      <h2 style="color:#333;">{$welcome}</h2>
+      <div id="id_dt_hhmm" style="color:white; margin-top:5px; font-size:24px;"></div>
+    </div>
+  </body>
+</html>
+HTML;
+
+            $listBatch[] = [
+                'msgType' => 'ins_screen_html_document_write',
+                'msgArg' => array_filter([
+                    'sHtml' => $html,
+                    'sInsPwd' => $sInsPwd,
+                ], fn($v) => $v !== null),
+            ];
+        }
+
+        // الـ response النهائي - دائمًا ins_cloud_batch مع listBatch مليان
+        $response = [
+            'msgType' => 'ins_cloud_batch',
+            'msgArg' => [
+                'bReply' => true,
+                'listBatch' => $listBatch, // **ما يصير فارغ أبدًا**
+            ],
+        ];
+
+        \Log::info('Kapri Response Sent:', $response);
+        return response()->json($response);
+    }
 
 }
