@@ -639,7 +639,7 @@ HTML;
         $event = $request->all();
 
         // تسجيل الحدث للمراقبة
-        // \Log::info('Kapri Event:', ['data' => $event]);
+       Log::info('Kapri Event:', ['data' => $event]);
 
         // 1. تجاهل رسائل النظام (Heartbeat) التي لا تحتوي كود
         if (empty($event['msgArg']['sData'])) {
@@ -674,7 +674,7 @@ HTML;
             if (!$qr) {
                 $errorMessage = 'QR Expired or Invalid';
             } else {
-                $user = $qr->user ?? null; // قد يكون null وهذا مقبول الآن
+                $user = $qr->user ?? null;
             }
         }
 
