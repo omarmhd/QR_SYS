@@ -384,142 +384,150 @@ HTML;
     public function handle(Request $request)
     {
         $event = $request->all();
-        \Log::info('Kapri Event Received:', $event);
+        \Log::debug('Kapri Event Received', $event);
 
-
+        /* =========================
+         |  Basic validation
+         ========================= */
         if (($event['msgArg']['sToken'] ?? '') !== 'test-123456789') {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
-        $qrToken = $event['msgArg']['sData'] ?? null;
 
-        if (!$qrToken) {
-            return response()->json(['error' => 'QR token missing'], 400);
+        if (($event['msgType'] ?? '') !== 'on_uart_receive') {
+            return $this->emptyBatch();
         }
 
+        $qrToken  = $event['msgArg']['sData'] ?? null;
+        $deviceId = $event['msgArg']['sEUI64'] ?? 'unknown';
 
+        if (!$qrToken) {
+            return $this->emptyBatch();
+        }
+
+        /* =========================
+         |  Device LOCK (VERY IMPORTANT)
+         ========================= */
+        $deviceLockKey = 'kapri_device_lock_' . $deviceId;
+
+        if (\Cache::has($deviceLockKey)) {
+            return $this->emptyBatch(); // device busy
+        }
+
+        \Cache::put($deviceLockKey, true, now()->addSeconds(3));
+
+        /* =========================
+         |  QR validation
+         ========================= */
         $hours = getSetting('qr_expiration_hours', 12);
 
         $qr = QrCode::where('qr_token', $qrToken)
-            ->WhereRaw('TIMESTAMPADD(HOUR, ?, updated_at) > NOW()', [$hours])
+            ->whereRaw('TIMESTAMPADD(HOUR, ?, updated_at) > NOW()', [$hours])
             ->first();
 
-
-
-        if (!$qr) {
-            return response()->json(['error' => 'QR not valid or expired'], 401);
+        if (!$qr || $qr->status === 'checked_in') {
+            return $this->emptyBatch();
         }
-        $user = $qr->user ?? null;
 
-        if(!is_null($user)) {
+        $user = $qr->user;
+        if (!$user || is_null($user->current_subscription)) {
+            return $this->emptyBatch();
+        }
 
+        /* =========================
+         |  Visitor limits
+         ========================= */
+        if ($qr->type === 'visitor' && $qr->status === 'pending') {
 
-            if (is_null($user->current_subscription)) {
-                return response()->json(['error' => 'Subscription Expired'], 401);
-
-            }
-            if ($qr->type == "visitor" and $qr->status == "pending") {
-                $user->subscription->increment('used_guests');
-                if ($user->subscription->last_guests_limit > 0) {
-                    $user->subscription->decrement('last_guests_limit');
-                }                if ($user->subscription->last_guests_limit <= 0) {
-                    return response()->json(['error' => 'QR not valid or expired'], 401);
-
-                }
+            if ($user->subscription->last_guests_limit <= 0) {
+                return $this->emptyBatch();
             }
 
-
-            $updated = $qr->update(['status' => 'checked_in']);
-
-
-            $user->visitHistories()->create([]);
+            $user->subscription->increment('used_guests');
+            $user->subscription->decrement('last_guests_limit');
         }
+
+        /* =========================
+         |  Update QR + history
+         ========================= */
+        $qr->update(['status' => 'checked_in']);
+        $user->visitHistories()->create([]);
+
+        /* =========================
+         |  Build device commands
+         ========================= */
+        $sInsPwd = env('KAPRI_INS_PWD');
 
         $listBatch = [];
 
-        if (($event['msgType'] ?? '') === 'on_uart_receive') {
+        // Relay (open door)
+        $listBatch[] = [
+            'msgType' => 'ins_inout_relay_operate',
+            'msgArg'  => [
+                'sPosition'  => 'main',
+                'sMode'      => 'on',
+                'ucRelayNum' => 0,
+                'ucTime_ds'  => 50,
+            ]
+        ];
 
-            // If you configured an instruction password on the device (interface_ins_pwd),
-        //  you MUST include it in each instruction's msgArg as "sInsPwd": "<your_password>".
-//  Remove the line if you didn’t set that parameter.
-            $sInsPwd = env('KAPRI_INS_PWD'); // or null if not used
+        // Buzzer (short beep)
+        $listBatch[] = [
+            'msgType' => 'ins_inout_buzzer_operate',
+            'msgArg'  => array_filter([
+                'sPosition' => 'main',
+                'sMode'     => 'on',
+                'ucTime_ds' => 1,
+                'sInsPwd'   => $sInsPwd,
+            ])
+        ];
 
+        // Screen HTML (ONLY ONCE)
+        $welcome = 'Welcome ' . ($qr->type === 'visitor' ? 'Guest ' : '') . ($user->name ?? '');
 
-
-
-            // 3 sec buzzer
-            $listBatch[] = [
-                'msgType' => 'ins_inout_relay_operate',
-                'msgArg'  => [
-                    'sPosition' => 'main',
-                    'sMode'     => 'on',
-                    "ucRelayNum"=> 0,
-                    'ucTime_ds' => 50,
-                ]
-            ];
-
-            $buzzer = [
-                'msgType' => 'ins_inout_buzzer_operate',
-                'msgArg'  => array_filter([
-                    'sPosition' => 'main',
-                    'sMode'     => 'on',     // أو 'beep_50' لنبضات متقطعة
-                    'ucTime_ds' => 1,
-                    'sInsPwd'   => $sInsPwd,
-                ], fn($v) => $v !== null),
-            ];
-
-            $listBatch[] = $buzzer;
-
-            $welcome = "Welcome " . ($qr->type == "visitor" ? "Guest " : "") . ($user->name ?? "");
-
-
-            if (!empty($event['msgArg']['sData'])) {
-                $safe = e($event['msgArg']['sData']);
-                $html = <<<HTML
-            <html>
-              <body style="background-color:#000; text-align:center; font-family:Arial, sans-serif;">
-                <div style="margin-top:10px;">
-                <img src="boot.jpg" width="160" style="margin-top:10px;"/>
-                <h2 style="color:#333;">{$welcome}</h2>
-                  <div id="id_dt_hhmm" style="color:white; margin-top:5px; font-size:24px;"></div>
-                </div>
-              </body>
-            </html>
+        $html = <<<HTML
+<html>
+  <body style="background:#000; text-align:center; font-family:Arial;">
+    <img src="boot.jpg" width="160" style="margin-top:10px"/>
+    <h2 style="color:#fff;">{$welcome}</h2>
+    <div id="id_dt_hhmm" style="color:white; font-size:24px;"></div>
+  </body>
+</html>
 HTML;
 
-                $listBatch[] = [
-                    'msgType' => 'ins_screen_html_document_write',
-                    'msgArg'  => array_filter([
-                        'sHtml'   => $html,
-                        'sInsPwd' => $sInsPwd,
-                    ], fn($v) => $v !== null),
-                ];
+        $listBatch[] = [
+            'msgType' => 'ins_screen_html_document_write',
+            'msgArg'  => array_filter([
+                'sHtml'   => $html,
+                'sInsPwd' => $sInsPwd,
+            ])
+        ];
 
-
-                $restoreHtml = <<<HTML
-            <html>
-              <body style="background-color:#000; text-align:center; font-family:Arial, sans-serif;">
-                <img src="boot.jpg" width="160" style="margin-top:40px;"/>
-                <div id="id_dt_hhmm" style="color:white; margin-top:20px; font-size:24px;"></div>
-              </body>
-            </html>
-HTML;
-
-            }
-        }
-
-// Always return a valid ins_cloud_batch
-        $response = [
+        /* =========================
+         |  Final response
+         ========================= */
+        return response()->json([
             'msgType' => 'ins_cloud_batch',
             'msgArg'  => [
                 'bReply'    => true,
                 'listBatch' => $listBatch,
             ],
-        ];
-
-        return response()->json($response);
-
-
+        ]);
     }
+
+    /* =========================
+     |  Helper: empty batch
+     ========================= */
+    private function emptyBatch()
+    {
+        return response()->json([
+            'msgType' => 'ins_cloud_batch',
+            'msgArg'  => [
+                'bReply'    => true,
+                'listBatch' => [],
+            ],
+        ]);
+    }
+
     private function openGate()
     {
         $deviceIp = "192.168.1.100";
