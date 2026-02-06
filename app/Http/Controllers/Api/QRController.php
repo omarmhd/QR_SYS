@@ -7,7 +7,6 @@ use App\Jobs\SendRestoreScreenJob;
 use App\Models\QRCode;
 use App\Models\Subscription;
 use App\Models\User;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -130,63 +129,6 @@ class QRController extends Controller
         ]);
     }
 
-    private function respondWithError($message)
-    {
-        // شاشة حمراء للخطأ
-        $html = $this->generateHtmlResponse("ACCESS DENIED<br><small>$message</small>", '#300000', '#e74c3c');
-
-        $listBatch = [];
-
-        // 1. صوت خطأ (3 نغمات متقطعة أو طويلة)
-        $listBatch[] = [
-            'msgType' => 'ins_inout_buzzer_operate',
-            'msgArg'  => $this->filterArgs([
-                'sPosition' => 'main',
-                'sMode'     => 'beep_50', // نمط تنبيه
-                'ucTime_ds' => 10, // 1 ثانية
-            ]),
-        ];
-
-        // 2. عرض رسالة الخطأ
-        $listBatch[] = [
-            'msgType' => 'ins_screen_html_document_write',
-            'msgArg'  => $this->filterArgs(['sHtml' => $html]),
-        ];
-
-        // ملاحظة: نرجع JSON صحيح للجهاز حتى لو كان خطأ، لكي ينفذ الأوامر
-        return response()->json([
-            'msgType' => 'ins_cloud_batch',
-            'msgArg'  => ['bReply' => true, 'listBatch' => $listBatch],
-        ]);
-    }
-
-    /**
-     * تصميم شاشة HTML
-     */
-    private function generateHtmlResponse($message, $bgColor, $textColor)
-    {
-        return <<<HTML
-        <html>
-          <body style="background-color:{$bgColor}; text-align:center; font-family:Arial, sans-serif; padding-top: 20px;">
-            <div style="border: 2px solid {$textColor}; padding: 10px; border-radius: 10px; margin: 10px;">
-                <h2 style="color:{$textColor}; margin:0;">{$message}</h2>
-            </div>
-            <div id="id_dt_hhmm" style="color:white; margin-top:15px; font-size:20px;"></div>
-          </body>
-        </html>
-HTML;
-    }
-
-    /**
-     * فلترة المعاملات وإضافة كلمة المرور إن وجدت
-     */
-    private function filterArgs($args)
-    {
-        if ($this->insPwd) {
-            $args['sInsPwd'] = $this->insPwd;
-        }
-        return $args;
-    }
 
     public function storeQR(Request $request){
         $validated = $request->validate([
@@ -381,152 +323,146 @@ HTML;
 //        return $returnBatch($listBatch);
 //    }
 
-    public function handle(Request $request)
+    public function handle3(Request $request)
     {
         $event = $request->all();
-        \Log::debug('Kapri Event Received', $event);
+        \Log::info('Kapri Event Received:', $event);
 
-        /* =========================
-         |  Basic validation
-         ========================= */
+
         if (($event['msgArg']['sToken'] ?? '') !== 'test-123456789') {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
-
-        if (($event['msgType'] ?? '') !== 'on_uart_receive') {
-            return $this->emptyBatch();
-        }
-
-        $qrToken  = $event['msgArg']['sData'] ?? null;
-        $deviceId = $event['msgArg']['sEUI64'] ?? 'unknown';
+        $qrToken = $event['msgArg']['sData'] ?? null;
 
         if (!$qrToken) {
-            return $this->emptyBatch();
+            return response()->json(['error' => 'QR token missing'], 400);
         }
 
-        /* =========================
-         |  Device LOCK (VERY IMPORTANT)
-         ========================= */
-        $deviceLockKey = 'kapri_device_lock_' . $deviceId;
 
-        if (\Cache::has($deviceLockKey)) {
-            return $this->emptyBatch(); // device busy
-        }
-
-        \Cache::put($deviceLockKey, true, now()->addSeconds(3));
-
-        /* =========================
-         |  QR validation
-         ========================= */
         $hours = getSetting('qr_expiration_hours', 12);
 
         $qr = QrCode::where('qr_token', $qrToken)
-            ->whereRaw('TIMESTAMPADD(HOUR, ?, updated_at) > NOW()', [$hours])
+            ->WhereRaw('TIMESTAMPADD(HOUR, ?, updated_at) > NOW()', [$hours])
             ->first();
 
-        if (!$qr || $qr->status === 'checked_in') {
-            return $this->emptyBatch();
+
+
+        if (!$qr) {
+            return response()->json(['error' => 'QR not valid or expired'], 401);
         }
+        $user = $qr->user ?? null;
 
-        $user = $qr->user;
-        if (!$user || is_null($user->current_subscription)) {
-            return $this->emptyBatch();
-        }
+        if(!is_null($user)) {
 
-        /* =========================
-         |  Visitor limits
-         ========================= */
-        if ($qr->type === 'visitor' && $qr->status === 'pending') {
 
-            if ($user->subscription->last_guests_limit <= 0) {
-                return $this->emptyBatch();
+            if (is_null($user->current_subscription)) {
+                return response()->json(['error' => 'Subscription Expired'], 401);
+
+            }
+            if ($qr->type == "visitor" and $qr->status == "pending") {
+                $user->subscription->increment('used_guests');
+                if ($user->subscription->last_guests_limit > 0) {
+                    $user->subscription->decrement('last_guests_limit');
+                }                if ($user->subscription->last_guests_limit <= 0) {
+                    return response()->json(['error' => 'QR not valid or expired'], 401);
+
+                }
             }
 
-            $user->subscription->increment('used_guests');
-            $user->subscription->decrement('last_guests_limit');
+
+            $updated = $qr->update(['status' => 'checked_in']);
+
+
+            $user->visitHistories()->create([]);
         }
-
-        /* =========================
-         |  Update QR + history
-         ========================= */
-        $qr->update(['status' => 'checked_in']);
-        $user->visitHistories()->create([]);
-
-        /* =========================
-         |  Build device commands
-         ========================= */
-        $sInsPwd = env('KAPRI_INS_PWD');
 
         $listBatch = [];
 
-        // Relay (open door)
-        $listBatch[] = [
-            'msgType' => 'ins_inout_relay_operate',
-            'msgArg'  => [
-                'sPosition'  => 'main',
-                'sMode'      => 'on',
-                'ucRelayNum' => 0,
-                'ucTime_ds'  => 50,
-            ]
-        ];
+        if (($event['msgType'] ?? '') === 'on_uart_receive') {
 
-        // Buzzer (short beep)
-        $listBatch[] = [
-            'msgType' => 'ins_inout_buzzer_operate',
-            'msgArg'  => array_filter([
-                'sPosition' => 'main',
-                'sMode'     => 'on',
-                'ucTime_ds' => 1,
-                'sInsPwd'   => $sInsPwd,
-            ])
-        ];
+            // If you configured an instruction password on the device (interface_ins_pwd),
+        //  you MUST include it in each instruction's msgArg as "sInsPwd": "<your_password>".
+//  Remove the line if you didn’t set that parameter.
+            $sInsPwd = env('KAPRI_INS_PWD'); // or null if not used
 
-        // Screen HTML (ONLY ONCE)
-        $welcome = 'Welcome ' . ($qr->type === 'visitor' ? 'Guest ' : '') . ($user->name ?? '');
 
-        $html = <<<HTML
-<html>
-  <body style="background:#000; text-align:center; font-family:Arial;">
-    <img src="boot.jpg" width="160" style="margin-top:10px"/>
-    <h2 style="color:#fff;">{$welcome}</h2>
-    <div id="id_dt_hhmm" style="color:white; font-size:24px;"></div>
-  </body>
-</html>
+
+
+            // 3 sec buzzer
+            $listBatch[] = [
+                'msgType' => 'ins_inout_relay_operate',
+                'msgArg'  => [
+                    'sPosition' => 'main',
+                    'sMode'     => 'on',
+                    "ucRelayNum"=> 0,
+                    'ucTime_ds' => 50,
+                ]
+            ];
+
+            $buzzer = [
+                'msgType' => 'ins_inout_buzzer_operate',
+                'msgArg'  => array_filter([
+                    'sPosition' => 'main',
+                    'sMode'     => 'on',     // أو 'beep_50' لنبضات متقطعة
+                    'ucTime_ds' => 1,
+                    'sInsPwd'   => $sInsPwd,
+                ], fn($v) => $v !== null),
+            ];
+
+            $listBatch[] = $buzzer;
+
+            $welcome = "Welcome " . ($qr->type == "visitor" ? "Guest " : "") . ($user->name ?? "");
+
+
+            if (!empty($event['msgArg']['sData'])) {
+                $safe = e($event['msgArg']['sData']);
+                $html = <<<HTML
+            <html>
+              <body style="background-color:#000; text-align:center; font-family:Arial, sans-serif;">
+                <div style="margin-top:10px;">
+                <img src="boot.jpg" width="160" style="margin-top:10px;"/>
+                <h2 style="color:#333;">{$welcome}</h2>
+                  <div id="id_dt_hhmm" style="color:white; margin-top:5px; font-size:24px;"></div>
+                </div>
+              </body>
+            </html>
 HTML;
 
-        $listBatch[] = [
-            'msgType' => 'ins_screen_html_document_write',
-            'msgArg'  => array_filter([
-                'sHtml'   => $html,
-                'sInsPwd' => $sInsPwd,
-            ])
-        ];
+                $listBatch[] = [
+                    'msgType' => 'ins_screen_html_document_write',
+                    'msgArg'  => array_filter([
+                        'sHtml'   => $html,
+                        'sInsPwd' => $sInsPwd,
+                    ], fn($v) => $v !== null),
+                ];
 
-        /* =========================
-         |  Final response
-         ========================= */
-        return response()->json([
+
+                $restoreHtml = <<<HTML
+            <html>
+              <body style="background-color:#000; text-align:center; font-family:Arial, sans-serif;">
+                <img src="boot.jpg" width="160" style="margin-top:40px;"/>
+                <div id="id_dt_hhmm" style="color:white; margin-top:20px; font-size:24px;"></div>
+              </body>
+            </html>
+HTML;
+
+            }
+        }
+
+// Always return a valid ins_cloud_batch
+        $response = [
             'msgType' => 'ins_cloud_batch',
             'msgArg'  => [
                 'bReply'    => true,
                 'listBatch' => $listBatch,
             ],
-        ]);
+        ];
+
+        return response()->json($response);
+
+
     }
 
-    /* =========================
-     |  Helper: empty batch
-     ========================= */
-    private function emptyBatch()
-    {
-        return response()->json([
-            'msgType' => 'ins_cloud_batch',
-            'msgArg'  => [
-                'bReply'    => true,
-                'listBatch' => [],
-            ],
-        ]);
-    }
 
     private function openGate()
     {
@@ -542,4 +478,179 @@ HTML;
         ];
 
         Http::post($url, $instruction);
-    } }
+    }
+
+    public function handle(Request $request)
+    {
+        // 1. التقاط البيانات وبدء مصفوفة الأوامر فارغة
+        $event = $request->all();
+        $listBatch = [];
+        $sInsPwd = env('KAPRI_INS_PWD', null); // كلمة سر الجهاز إن وجدت
+
+        // يفضل تسجيل اللوج فقط عند الحاجة لتقليل الضغط
+        // Log::info('Kapri Event:', $event);
+
+        try {
+            // ---------------------------------------------------------
+            // 2. التحقق من التوكن (Security Check)
+            // ---------------------------------------------------------
+            if (($event['msgArg']['sToken'] ?? '') !== 'test-123456789') {
+                throw new \Exception("Unauthorized Device");
+            }
+
+            // 3. التحقق من وجود بيانات QR
+            $qrToken = $event['msgArg']['sData'] ?? null;
+            if (!$qrToken) {
+                throw new \Exception("QR Missing");
+            }
+
+            // ---------------------------------------------------------
+            // 4. استعلام قاعدة البيانات (محسن للأداء)
+            // ---------------------------------------------------------
+            // نستخدم Carbon بدلاً من Raw SQL لسرعة أعلى واستفادة من الكاش الداخلي
+            $hours = getSetting('qr_expiration_hours', 12);
+
+            $qr = QrCode::with('user.current_subscription') // Eager Loading
+            ->where('qr_token', $qrToken)
+                ->where('updated_at', '>', Carbon::now()->subHours($hours))
+                ->first();
+
+            if (!$qr) {
+                throw new \Exception("Invalid or Expired QR");
+            }
+
+            $user = $qr->user;
+            if (!$user) {
+                throw new \Exception("User Not Found");
+            }
+
+            // ---------------------------------------------------------
+            // 5. منطق العمل (Business Logic)
+            // ---------------------------------------------------------
+
+            // التحقق من الاشتراك
+            if (!$user->current_subscription) {
+                throw new \Exception("Subscription Expired");
+            }
+
+            // منطق خصم الرصيد (تم إصلاح ترتيب العمليات)
+            if ($qr->type == "visitor" && $qr->status == "pending") {
+                $sub = $user->current_subscription;
+
+                // تحقق قبل الخصم!
+                if ($sub->last_guests_limit <= 0) {
+                    throw new \Exception("Guest Limit Reached");
+                }
+
+                // تنفيذ الخصم
+                $sub->increment('used_guests');
+                $sub->decrement('last_guests_limit');
+            }
+
+            // تحديث حالة QR
+            if ($qr->status !== 'checked_in') {
+                $qr->update(['status' => 'checked_in']);
+            }
+
+            // تسجيل الدخول
+            $user->visitHistories()->create([]);
+
+            // ---------------------------------------------------------
+            // 6. تجهيز أوامر النجاح (فتح الباب)
+            // ---------------------------------------------------------
+
+            // أ. تشغيل الريلاي (فتح الباب)
+            $listBatch[] = [
+                'msgType' => 'ins_inout_relay_operate',
+                'msgArg'  => [
+                    'sPosition' => 'main',
+                    'sMode'     => 'on',
+                    "ucRelayNum"=> 0,
+                    'ucTime_ds' => 50, // 5 ثواني
+                ]
+            ];
+
+            // ب. صوت ترحيب (نغمة قصيرة)
+            $listBatch[] = [
+                'msgType' => 'ins_inout_buzzer_operate',
+                'msgArg'  => $this->filterArgs([
+                    'sPosition' => 'main',
+                    'sMode'     => 'on',
+                    'ucTime_ds' => 2, // 0.2 ثانية
+                    'sInsPwd'   => $sInsPwd
+                ]),
+            ];
+
+            // ج. شاشة الترحيب
+            $welcomeMsg = "Welcome " . ($qr->type == "visitor" ? "Guest" : "") . "<br>" . e($user->name);
+            $html = $this->getHtml($welcomeMsg, '#000000', '#2ecc71'); // خلفية سوداء، نص أخضر
+
+            $listBatch[] = [
+                'msgType' => 'ins_screen_html_document_write',
+                'msgArg'  => $this->filterArgs([
+                    'sHtml'   => $html,
+                    'sInsPwd' => $sInsPwd
+                ]),
+            ];
+
+        } catch (\Exception $e) {
+            // ---------------------------------------------------------
+            // 7. معالجة الأخطاء (بدلاً من 401، نرسل أوامر رفض للجهاز)
+            // ---------------------------------------------------------
+
+            // أ. صوت خطأ (طويل ومتقطع)
+            $listBatch[] = [
+                'msgType' => 'ins_inout_buzzer_operate',
+                'msgArg'  => $this->filterArgs([
+                    'sPosition' => 'main',
+                    'sMode'     => 'beep_50',
+                    'ucTime_ds' => 10, // 1 ثانية
+                    'sInsPwd'   => $sInsPwd
+                ]),
+            ];
+
+            // ب. شاشة حمراء توضح الخطأ
+            $errorMsg = "ACCESS DENIED<br><small>" . $e->getMessage() . "</small>";
+            $html = $this->getHtml($errorMsg, '#500000', '#ff4d4d'); // خلفية حمراء داكنة
+
+            $listBatch[] = [
+                'msgType' => 'ins_screen_html_document_write',
+                'msgArg'  => $this->filterArgs([
+                    'sHtml'   => $html,
+                    'sInsPwd' => $sInsPwd
+                ]),
+            ];
+        }
+
+        // 8. الرد النهائي (دائماً 200 OK لتجنب تعليق الجهاز)
+        return response()->json([
+            'msgType' => 'ins_cloud_batch',
+            'msgArg'  => [
+                'bReply'    => true,
+                'listBatch' => $listBatch,
+            ],
+        ]);
+    }
+
+    // دالة مساعدة لتنظيف HTML
+    private function getHtml($message, $bgColor, $textColor)
+    {
+        // قمت بإزالة الصورة مؤقتاً لأن تحميل الصور الثقيلة قد يسبب تعليق الجهاز أحياناً
+        // يمكنك إعادتها إذا كانت الصورة مخزنة محلياً داخل الجهاز وصغيرة جداً
+        return <<<HTML
+            <html>
+              <body style="background-color:{$bgColor}; text-align:center; font-family:Arial, sans-serif; margin:0; padding-top:20px;">
+                <h2 style="color:{$textColor}; font-size:26px;">{$message}</h2>
+                <div id="id_dt_hhmm" style="color:#cccccc; margin-top:20px; font-size:20px;"></div>
+              </body>
+            </html>
+HTML;
+    }
+
+    private function filterArgs($args)
+    {
+        return array_filter($args, fn($v) => $v !== null);
+    }
+
+
+}
