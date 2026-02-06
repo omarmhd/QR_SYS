@@ -637,11 +637,9 @@ HTML;
     public function handle(Request $request)
     {
         $event = $request->all();
+        Log::info('Kapri Event:', ['data' => $event]);
 
-        // تسجيل الحدث للمراقبة
-       Log::info('Kapri Event:', ['data' => $event]);
-
-        // 1. تجاهل رسائل النظام (Heartbeat) التي لا تحتوي كود
+        // 1. تجاهل الهارت بيت
         if (empty($event['msgArg']['sData'])) {
             return response()->json([
                 'msgType' => 'ins_cloud_batch',
@@ -653,7 +651,7 @@ HTML;
         $errorMessage = null;
         $listBatch = [];
 
-        // 2. التحقق من جهاز Kapri
+        // 2. التحقق من الجهاز
         if (($event['msgArg']['sToken'] ?? '') !== 'test-123456789') {
             $errorMessage = 'Unauthorized Device';
         }
@@ -662,11 +660,10 @@ HTML;
         $qr = null;
         $user = null;
 
-        // 3. البحث عن الكود والتحقق من صلاحية الوقت
+        // 3. البحث عن الكود
         if (!$errorMessage) {
             $hours = getSetting('qr_expiration_hours', 12);
 
-            // الشرط: الكود موجود + (وقت التحديث + الساعات المسموحة) أكبر من الوقت الحالي
             $qr = QrCode::where('qr_token', $qrToken)
                 ->whereRaw('TIMESTAMPADD(HOUR, ?, updated_at) > NOW()', [$hours])
                 ->first();
@@ -678,48 +675,46 @@ HTML;
             }
         }
 
-        // 4. المعالجة المنطقية (فقط إذا لم يكن هناك خطأ سابقاً)
-        if (!$errorMessage) {
+        // 4. المعالجة المنطقية (User & Subscription)
+        if (!$errorMessage && $user) {
 
-            // --- السيناريو أ: الكود مرتبط بمستخدم ---
-            if ($user) {
-                // تحقق من اشتراك المستخدم
-                if (is_null($user->current_subscription)) {
-                    $errorMessage = 'Subscription Expired';
-                }
-                // منطق الزوار (يتم تنفيذه فقط عند أول استخدام وهو pending)
-                elseif ($qr->type == "visitor" && $qr->status == "pending") {
-                    if ($user->subscription->last_guests_limit <= 0) {
-                        $errorMessage = 'Guest Limit Reached';
-                    } else {
-                        $user->subscription->increment('used_guests');
-                        $user->subscription->decrement('last_guests_limit');
-                    }
+            // جلب الاشتراك الحالي في متغير لضمان التعامل معه
+            $activeSub = $user->current_subscription;
+
+            if (!$activeSub) {
+                $errorMessage = 'Subscription Expired';
+            }
+            // منطق الزوار
+            elseif ($qr->type == "visitor" && $qr->status == "pending") {
+
+                // نستخدم المتغير activeSub الذي جلبناه للتو
+                if ($activeSub->last_guests_limit <= 0) {
+                    $errorMessage = 'Guest Limit Reached';
+                } else {
+                    // التعديل اليدوي والحفظ الصريح لضمان العمل
+                    $activeSub->used_guests += 1;
+                    $activeSub->last_guests_limit -= 1;
+                    $activeSub->save(); // <--- حفظ التغييرات في قاعدة البيانات فوراً
                 }
             }
-
-            // --- السيناريو ب: الكود ليس له مستخدم (عام) ---
-            // لا نحتاج لكتابة كود هنا، لأنه سيمر بسلام طالما $errorMessage فارغ
         }
 
-        // 5. تحديث حالة الكود (مهم جداً لضبط التوقيت)
-        // نحدث الحالة فقط إذا كانت Pending، لكي يبدأ عد الـ 12 ساعة من هذه اللحظة
-        // إذا كان Checked_in لا نحدثه، لكي لا يتجدد الوقت مع كل دخول
+        // 5. تحديث حالة الكود
         if (!$errorMessage && $qr && $qr->status == 'pending') {
-            $qr->update(['status' => 'checked_in']);
 
-            // تسجيل الدخول في الهيستوري (فقط إذا كان هناك يوزر)
+            // التحديث الصريح
+            $qr->status = 'checked_in';
+            $qr->save(); // <--- نستخدم save بدلاً من update لتجنب مشاكل الـ fillable أحياناً
+
             if ($user) {
                 $user->visitHistories()->create([]);
             }
         }
 
-        // ============================================================
+        // ... (باقي كود بناء الرد listBatch كما هو تماماً) ...
         // بناء الرد النهائي
-        // ============================================================
 
         if ($errorMessage) {
-            // --- حالة الرفض ---
             $safeError = e($errorMessage);
             $htmlError = <<<HTML
         <html><body style="background-color:#000; text-align:center; font-family:Arial;">
@@ -737,21 +732,16 @@ HTML;
             ];
 
         } else {
-            // --- حالة النجاح (فتح الباب) ---
-
-            // 1. أمر الريلاي
             $listBatch[] = [
                 'msgType' => 'ins_inout_relay_operate',
                 'msgArg'  => ['sPosition' => 'main', 'sMode' => 'on', "ucRelayNum"=> 0, 'ucTime_ds' => 50, 'sInsPwd' => $sInsPwd]
             ];
-            // 2. أمر الصوت
             $listBatch[] = [
                 'msgType' => 'ins_inout_buzzer_operate',
                 'msgArg'  => ['sPosition' => 'main', 'sMode' => 'on', 'ucTime_ds' => 1, 'sInsPwd' => $sInsPwd]
             ];
 
-            // 3. تجهيز رسالة الترحيب
-            $userNameDisplay = $user ? $user->name : "Visitor"; // إذا لم يوجد اسم نعرض Visitor
+            $userNameDisplay = $user ? $user->name : "Visitor";
             $welcomeText = "Welcome " . e($userNameDisplay);
 
             $htmlSuccess = <<<HTML
