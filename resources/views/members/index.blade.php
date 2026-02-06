@@ -210,7 +210,14 @@
 
                                 <div class="mb-2"><span class="text-muted text-yellow">Total : ${member.plan?.guest_passes_per_year}</span></div>
                                 <div class="mb-2"><span class="text-muted  text-yellow">Coming:  ${member.subscription?.last_guests_limit ?? 0}</span></div>
-                                <div class="mb-2"><span class="text-muted  text-yellow">Remaining: ${member.plan?.guest_passes_per_year-(member.subscription?.used_guests ?? 0)}</span></div>
+                                <div class="mb-2">
+                                  <span class="text-muted text-yellow">
+                                    Remaining: ${Math.max(
+                                                        0,
+                                                        member.plan?.guest_passes_per_year - (member.subscription?.used_guests ?? 0)
+                                                    )}
+                                  </span>
+                                </div>
                                 <div class="mb-2"><span class="text-muted  text-yellow">No of Guests: ${(member.subscription?.used_guests ?? 0)}</span></div>
 
                             </div>

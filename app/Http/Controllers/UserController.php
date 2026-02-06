@@ -271,9 +271,7 @@ class  UserController extends Controller
             return redirect()->back()->with('error', $e->getMessage())->withInput();
         }
     }
-    /**
-     * Remove the specified resource from storage.
-     */
+
     public function destroy(User $user)
     {
     $user->delete();

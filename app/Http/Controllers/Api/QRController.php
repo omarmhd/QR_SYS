@@ -45,7 +45,7 @@ class QRController extends Controller
 
         $user = auth()->user();
 
-        if ($user->subscription) {
+        if ($user->subscription and $user->plan->used_guests<=$user->plan->guest_passes_per_year) {
             $user->subscription->update([
                 'last_guests_limit' => $validated['guests_count']
             ]);
@@ -57,6 +57,11 @@ class QRController extends Controller
                     'last_guests_limit' => $validated['guests_count']
                 ]
             ], 200);
+        }else{
+            return response()->json([
+                'status' => false,
+                'message' => 'The number of guests available for the plan has been consumed.'
+            ], 404);
         }
 
         return response()->json([
