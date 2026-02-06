@@ -13,6 +13,180 @@ use Illuminate\Support\Facades\Log;
 
 class QRController extends Controller
 {
+
+    // إعدادات الجهاز
+    private $insPwd;
+
+    public function __construct()
+    {
+        // يفضل وضع هذا في env بدلاً من الكود
+        $this->insPwd = env('KAPRI_INS_PWD', null);
+    }
+
+    public function handle(Request $request)
+    {
+        $event = $request->all();
+
+        // 1. تحقق سريع من التوكن الخاص بالجهاز (Security)
+        if (($event['msgArg']['sToken'] ?? '') !== config('app.kapri_token', 'test-123456789')) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        // 2. التحقق من وجود البيانات
+        $qrToken = $event['msgArg']['sData'] ?? null;
+        if (!$qrToken) {
+            return $this->respondWithError("QR Token Missing");
+        }
+
+        // 3. البحث عن الـ QR واليوزر واشتراكه باستعلام واحد (Performance Boost)
+        $hours = getSetting('qr_expiration_hours', 12);
+
+        $qr = QrCode::with(['user.current_subscription']) // جلب العلاقات فوراً
+        ->where('qr_token', $qrToken)
+            ->where('updated_at', '>', Carbon::now()->subHours($hours)) // أسرع من Raw SQL
+            ->first();
+
+        // 4. سيناريوهات الرفض (Validation)
+        if (!$qr) {
+            return $this->respondWithError("Expired or Invalid QR");
+        }
+
+        $user = $qr->user;
+        if (!$user) {
+            return $this->respondWithError("User Not Found");
+        }
+
+        if (!$user->current_subscription) {
+            return $this->respondWithError("Subscription Expired");
+        }
+
+        // 5. معالجة المنطق (Business Logic) داخل Transaction لضمان سلامة البيانات
+        try {
+            DB::transaction(function () use ($qr, $user) {
+                if ($qr->type == "visitor" && $qr->status == "pending") {
+                    $subscription = $user->current_subscription;
+
+                    if ($subscription->last_guests_limit <= 0) {
+                        throw new \Exception("Guest Limit Reached");
+                    }
+
+                    $subscription->increment('used_guests');
+                    $subscription->decrement('last_guests_limit');
+                }
+
+                // تحديث الحالة وتسجيل الزيارة
+                $qr->update(['status' => 'checked_in']);
+                $user->visitHistories()->create([]);
+            });
+        } catch (\Exception $e) {
+            // التقاط الخطأ من داخل الترانزاكشن (مثل انتهاء رصيد الضيوف)
+            return $this->respondWithError($e->getMessage());
+        }
+
+        // 6. الرد بالنجاح وفتح الباب
+        return $this->respondWithSuccess($user, $qr->type);
+    }
+
+    private function respondWithSuccess($user, $type)
+    {
+        $welcomeText = "Welcome " . ($type == "visitor" ? "Guest" : "") . "<br>" . e($user->name);
+
+        // شاشة خضراء أو سوداء للترحيب
+        $html = $this->generateHtmlResponse($welcomeText, '#000000', '#2ecc71');
+
+        $listBatch = [];
+
+        // 1. تشغيل الريلاي (فتح الباب)
+        $listBatch[] = [
+            'msgType' => 'ins_inout_relay_operate',
+            'msgArg'  => [
+                'sPosition' => 'main',
+                'sMode'     => 'on',
+                "ucRelayNum"=> 0,
+                'ucTime_ds' => 50, // 5 ثواني
+            ]
+        ];
+
+        // 2. صوت نجاح (نغمة قصيرة)
+        $listBatch[] = [
+            'msgType' => 'ins_inout_buzzer_operate',
+            'msgArg'  => $this->filterArgs([
+                'sPosition' => 'main',
+                'sMode'     => 'on',
+                'ucTime_ds' => 2, // 0.2 ثانية
+            ]),
+        ];
+
+        // 3. عرض رسالة الترحيب
+        $listBatch[] = [
+            'msgType' => 'ins_screen_html_document_write',
+            'msgArg'  => $this->filterArgs(['sHtml' => $html]),
+        ];
+
+        return response()->json([
+            'msgType' => 'ins_cloud_batch',
+            'msgArg'  => ['bReply' => true, 'listBatch' => $listBatch],
+        ]);
+    }
+
+    private function respondWithError($message)
+    {
+        // شاشة حمراء للخطأ
+        $html = $this->generateHtmlResponse("ACCESS DENIED<br><small>$message</small>", '#300000', '#e74c3c');
+
+        $listBatch = [];
+
+        // 1. صوت خطأ (3 نغمات متقطعة أو طويلة)
+        $listBatch[] = [
+            'msgType' => 'ins_inout_buzzer_operate',
+            'msgArg'  => $this->filterArgs([
+                'sPosition' => 'main',
+                'sMode'     => 'beep_50', // نمط تنبيه
+                'ucTime_ds' => 10, // 1 ثانية
+            ]),
+        ];
+
+        // 2. عرض رسالة الخطأ
+        $listBatch[] = [
+            'msgType' => 'ins_screen_html_document_write',
+            'msgArg'  => $this->filterArgs(['sHtml' => $html]),
+        ];
+
+        // ملاحظة: نرجع JSON صحيح للجهاز حتى لو كان خطأ، لكي ينفذ الأوامر
+        return response()->json([
+            'msgType' => 'ins_cloud_batch',
+            'msgArg'  => ['bReply' => true, 'listBatch' => $listBatch],
+        ]);
+    }
+
+    /**
+     * تصميم شاشة HTML
+     */
+    private function generateHtmlResponse($message, $bgColor, $textColor)
+    {
+        return <<<HTML
+        <html>
+          <body style="background-color:{$bgColor}; text-align:center; font-family:Arial, sans-serif; padding-top: 20px;">
+            <div style="border: 2px solid {$textColor}; padding: 10px; border-radius: 10px; margin: 10px;">
+                <h2 style="color:{$textColor}; margin:0;">{$message}</h2>
+            </div>
+            <div id="id_dt_hhmm" style="color:white; margin-top:15px; font-size:20px;"></div>
+          </body>
+        </html>
+HTML;
+    }
+
+    /**
+     * فلترة المعاملات وإضافة كلمة المرور إن وجدت
+     */
+    private function filterArgs($args)
+    {
+        if ($this->insPwd) {
+            $args['sInsPwd'] = $this->insPwd;
+        }
+        return $args;
+    }
+
     public function storeQR(Request $request){
         $validated = $request->validate([
             "qr_token" => "required"]);
@@ -206,7 +380,7 @@ class QRController extends Controller
 //        return $returnBatch($listBatch);
 //    }
 
-    public function handle(Request $request)
+    public function handle2(Request $request)
     {
         $event = $request->all();
         \Log::info('Kapri Event Received:', $event);
