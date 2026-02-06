@@ -24,7 +24,7 @@ class QRController extends Controller
         $this->insPwd = env('KAPRI_INS_PWD', null);
     }
 
-    public function handle(Request $request)
+    public function handle2(Request $request)
     {
         $event = $request->all();
 
@@ -381,7 +381,7 @@ HTML;
 //        return $returnBatch($listBatch);
 //    }
 
-    public function handle2(Request $request)
+    public function handle(Request $request)
     {
         $event = $request->all();
         \Log::info('Kapri Event Received:', $event);
