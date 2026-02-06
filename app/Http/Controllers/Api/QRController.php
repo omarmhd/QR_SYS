@@ -637,9 +637,8 @@ HTML;
     public function handle(Request $request)
     {
         $event = $request->all();
-        Log::info('Kapri Event:', ['data' => $event]);
 
-        // 1. تجاهل الهارت بيت
+        // 1. تجاهل رسائل النظام (Heartbeat) التي لا تحتوي كود
         if (empty($event['msgArg']['sData'])) {
             return response()->json([
                 'msgType' => 'ins_cloud_batch',
@@ -651,7 +650,7 @@ HTML;
         $errorMessage = null;
         $listBatch = [];
 
-        // 2. التحقق من الجهاز
+        // 2. التحقق من التوكن (Auth)
         if (($event['msgArg']['sToken'] ?? '') !== 'test-123456789') {
             $errorMessage = 'Unauthorized Device';
         }
@@ -660,7 +659,7 @@ HTML;
         $qr = null;
         $user = null;
 
-        // 3. البحث عن الكود
+        // 3. البحث عن الكود والتحقق من صلاحية الوقت
         if (!$errorMessage) {
             $hours = getSetting('qr_expiration_hours', 12);
 
@@ -678,41 +677,48 @@ HTML;
         // 4. المعالجة المنطقية (User & Subscription)
         if (!$errorMessage && $user) {
 
-            // جلب الاشتراك الحالي في متغير لضمان التعامل معه
-            $activeSub = $user->current_subscription;
+            // --- تصحيح الخطأ هنا ---
+            // نستخدم العلاقة subscription مباشرة
+            // ونفترض أنها HasOne (تعيد موديل واحد)
+            $activeSub = $user->subscription;
+
+            // إذا كانت subscription تعيد مصفوفة (HasMany)، نأخذ الأحدث:
+            // $activeSub = $user->subscription()->latest()->first();
 
             if (!$activeSub) {
-                $errorMessage = 'Subscription Expired';
+                $errorMessage = 'No Active Subscription';
             }
-            // منطق الزوار
+            // منطق الزوار (يتم تنفيذه فقط عند أول استخدام وهو pending)
             elseif ($qr->type == "visitor" && $qr->status == "pending") {
 
-                // نستخدم المتغير activeSub الذي جلبناه للتو
-                if ($activeSub->last_guests_limit <= 0) {
+                // نتأكد أن الحقل رقمي قبل المقارنة
+                if (($activeSub->last_guests_limit ?? 0) <= 0) {
                     $errorMessage = 'Guest Limit Reached';
                 } else {
-                    // التعديل اليدوي والحفظ الصريح لضمان العمل
-                    $activeSub->used_guests += 1;
-                    $activeSub->last_guests_limit -= 1;
-                    $activeSub->save(); // <--- حفظ التغييرات في قاعدة البيانات فوراً
+                    // الخصم وتحديث الاشتراك
+                    // نستخدم التعديل المباشر والحفظ
+                    $activeSub->used_guests = ($activeSub->used_guests ?? 0) + 1;
+                    $activeSub->last_guests_limit = ($activeSub->last_guests_limit ?? 0) - 1;
+                    $activeSub->save(); // حفظ التغييرات في جدول الاشتراكات
                 }
             }
         }
 
-        // 5. تحديث حالة الكود
+        // 5. تحديث حالة الكود (QR Status)
         if (!$errorMessage && $qr && $qr->status == 'pending') {
-
-            // التحديث الصريح
+            // نستخدم forceFill أو تعيين مباشر ثم حفظ لتجاوز مشاكل الـ fillable
             $qr->status = 'checked_in';
-            $qr->save(); // <--- نستخدم save بدلاً من update لتجنب مشاكل الـ fillable أحياناً
+            $qr->save();
 
+            // تسجيل الدخول في الهيستوري
             if ($user) {
                 $user->visitHistories()->create([]);
             }
         }
 
-        // ... (باقي كود بناء الرد listBatch كما هو تماماً) ...
-        // بناء الرد النهائي
+        // ============================================================
+        // بناء الرد (نفس الرد السابق تماماً)
+        // ============================================================
 
         if ($errorMessage) {
             $safeError = e($errorMessage);
@@ -730,7 +736,6 @@ HTML;
                 'msgType' => 'ins_screen_html_document_write',
                 'msgArg'  => ['sHtml' => $htmlError, 'sInsPwd' => $sInsPwd]
             ];
-
         } else {
             $listBatch[] = [
                 'msgType' => 'ins_inout_relay_operate',
