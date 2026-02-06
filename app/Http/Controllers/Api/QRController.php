@@ -523,32 +523,24 @@ HTML;
         }
 
         // 4. التحقق من اليوزر والاشتراك
-        if (!$errorMessage && $user) {
+        if (!$errorMessage) {
 
-            if (is_null($user->current_subscription)) {
-                $errorMessage = 'Subscription Expired';
-            }
-            else {
-                // منطق الزائر
-                if ($qr->type == "visitor" && $qr->status == "pending") {
+            // --- السيناريو أ: الكود مرتبط بمستخدم ---
+            if ($user) {
+                // تحقق من اشتراك المستخدم
+                if (is_null($user->current_subscription)) {
+                    $errorMessage = 'Subscription Expired';
+                } // منطق الزوار (يتم تنفيذه فقط عند أول استخدام وهو pending)
+                elseif ($qr->type == "visitor" && $qr->status == "pending") {
                     if ($user->subscription->last_guests_limit <= 0) {
                         $errorMessage = 'Guest Limit Reached';
                     } else {
                         $user->subscription->increment('used_guests');
                         $user->subscription->decrement('last_guests_limit');
-                        // تحديث الحالة لمرة واحدة فقط
-                        $qr->update(['status' => 'checked_in']);
                     }
                 }
-
-                if (!$errorMessage) {
-                    $user->visitHistories()->create([]);
-                }
             }
-        } elseif (!$errorMessage && !$user) {
-            $errorMessage = 'User Not Found';
         }
-
         // ============================================================
         // بناء الرد (خطأ أو نجاح)
         // ============================================================
