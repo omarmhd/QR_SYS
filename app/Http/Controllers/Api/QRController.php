@@ -323,10 +323,10 @@ class QRController extends Controller
 //            }
 //        }
 //
-//        return $returnBatch($listBatch);
+//          return $returnBatch($listBatch);
 //    }
 
-    public function handle3(Request $request)
+    public function handle_ORIGINAL(Request $request)
     {
         $event = $request->all();
         \Log::info('Kapri Event Received:', $event);
@@ -465,7 +465,180 @@ HTML;
 
 
     }
+    public function handle(Request $request)
+    {
+        $event = $request->all();
+        \Log::info('Kapri Event Received:', $event);
 
+        // تجهيز متغيرات الرد الافتراضية
+        $sInsPwd = env('KAPRI_INS_PWD'); // كلمة مرور الجهاز إن وجدت
+        $listBatch = []; // قائمة الأوامر
+        $errorMessage = null; // لتخزين رسالة الخطأ إن وجدت
+
+        // 1. التحقق من التوكن (Auth)
+        if (($event['msgArg']['sToken'] ?? '') !== 'test-123456789') {
+            $errorMessage = 'Unauthorized Device';
+        }
+
+        // 2. التحقق من وجود بيانات الكود
+        $qrToken = $event['msgArg']['sData'] ?? null;
+        if (!$errorMessage && !$qrToken) {
+            $errorMessage = 'QR Missing';
+        }
+
+        // 3. جلب الإعدادات والبحث عن الكود وصلاحية الوقت
+        $qr = null;
+        $user = null;
+
+        if (!$errorMessage) {
+            $hours = getSetting('qr_expiration_hours', 12);
+
+            // الشرط هنا يتحقق أن الوقت الحالي أقل من (وقت التحديث + الساعات المسموحة)
+            // هذا يسمح بالدخول المتكرر طالما المعادلة صحيحة
+            $qr = QrCode::where('qr_token', $qrToken)
+                ->whereRaw('TIMESTAMPADD(HOUR, ?, updated_at) > NOW()', [$hours])
+                ->first();
+
+            if (!$qr) {
+                $errorMessage = 'QR Expired or Invalid';
+            } else {
+                $user = $qr->user ?? null;
+            }
+        }
+
+        // 4. التحقق من اليوزر والاشتراك ومنطق الزوار
+        if (!$errorMessage && $user) {
+
+            if (is_null($user->current_subscription)) {
+                $errorMessage = 'Subscription Expired';
+            }
+            else {
+                // منطق الزائر (يتم الخصم فقط إذا كانت الحالة Pending)
+                // إذا كانت الحالة Checked_in يمرر الكود ولا يخصم مرة أخرى (وهذا يسمح بالدخول والخروج)
+                if ($qr->type == "visitor" && $qr->status == "pending") {
+
+                    // تحقق من الرصيد قبل الخصم
+                    if ($user->subscription->last_guests_limit <= 0) {
+                        $errorMessage = 'Guest Limit Reached';
+                    } else {
+                        // الخصم وتحديث الحالة
+                        $user->subscription->increment('used_guests');
+                        $user->subscription->decrement('last_guests_limit');
+
+                        // تحديث الحالة إلى checked_in
+                        // ملاحظة مهمة: هذا التحديث سيغير updated_at وبالتالي سيبدأ عد الـ 12 ساعة من هذه اللحظة
+                        $qr->update(['status' => 'checked_in']);
+                    }
+                }
+
+                // تسجيل تاريخ الزيارة (Log)
+                if (!$errorMessage) {
+                    $user->visitHistories()->create([]);
+                }
+            }
+        } elseif (!$errorMessage && !$user) {
+            $errorMessage = 'User Not Found';
+        }
+
+        // ============================================================
+        // مرحلة بناء الرد (لن نستخدم 401 أبداً لتجنب التعليق)
+        // ============================================================
+
+        if ($errorMessage) {
+            // --- حالة الخطأ/الرفض ---
+            // نرسل أوامر للجهاز: شغل صوت خطأ + اعرض رسالة الرفض
+
+            $safeError = e($errorMessage);
+            $htmlError = <<<HTML
+        <html>
+          <body style="background-color:#000; text-align:center; font-family:Arial, sans-serif;">
+            <div style="margin-top:40px;">
+                <h1 style="color:red; font-size:50px;">X</h1>
+                <h3 style="color:white;">{$safeError}</h3>
+            </div>
+          </body>
+        </html>
+HTML;
+
+            $listBatch[] = [
+                'msgType' => 'ins_inout_buzzer_operate',
+                'msgArg'  => [
+                    'sPosition' => 'main',
+                    'sMode'     => 'beep_error', // نغمة خطأ
+                    'ucTime_ds' => 5,
+                    'sInsPwd'   => $sInsPwd,
+                ]
+            ];
+
+            $listBatch[] = [
+                'msgType' => 'ins_screen_html_document_write',
+                'msgArg'  => [
+                    'sHtml'   => $htmlError,
+                    'sInsPwd' => $sInsPwd,
+                ]
+            ];
+
+        } else {
+            // --- حالة النجاح ---
+            // نرسل أوامر: فتح الباب + صوت نجاح + ترحيب
+
+            // 1. فتح الريلاي
+            $listBatch[] = [
+                'msgType' => 'ins_inout_relay_operate',
+                'msgArg'  => [
+                    'sPosition' => 'main',
+                    'sMode'     => 'on',
+                    "ucRelayNum"=> 0,
+                    'ucTime_ds' => 50, // 5 ثواني
+                    'sInsPwd'   => $sInsPwd,
+                ]
+            ];
+
+            // 2. صوت صفارة
+            $listBatch[] = [
+                'msgType' => 'ins_inout_buzzer_operate',
+                'msgArg'  => [
+                    'sPosition' => 'main',
+                    'sMode'     => 'on',
+                    'ucTime_ds' => 1,
+                    'sInsPwd'   => $sInsPwd,
+                ]
+            ];
+
+            // 3. الشاشة
+            $welcome = "Welcome " . ($qr->type == "visitor" ? "Guest " : "") . ($user->name ?? "");
+            $safeWelcome = e($welcome);
+
+            $htmlSuccess = <<<HTML
+        <html>
+          <body style="background-color:#000; text-align:center; font-family:Arial, sans-serif;">
+            <div style="margin-top:10px;">
+            <img src="boot.jpg" width="160" style="margin-top:10px;"/>
+            <h2 style="color:#2ecc71;">{$safeWelcome}</h2>
+              <div id="id_dt_hhmm" style="color:white; margin-top:5px; font-size:24px;"></div>
+            </div>
+          </body>
+        </html>
+HTML;
+
+            $listBatch[] = [
+                'msgType' => 'ins_screen_html_document_write',
+                'msgArg'  => [
+                    'sHtml'   => $htmlSuccess,
+                    'sInsPwd' => $sInsPwd,
+                ]
+            ];
+        }
+
+        // إرجاع الرد النهائي بصيغة JSON 200 OK دائماً
+        return response()->json([
+            'msgType' => 'ins_cloud_batch',
+            'msgArg'  => [
+                'bReply'    => true,
+                'listBatch' => $listBatch,
+            ],
+        ]);
+    }
 
     private function openGate()
     {
@@ -656,7 +829,7 @@ HTML;
     }
 
 
-    public function handle(Request $request)
+    public function handle33(Request $request)
     {
         $event = $request->all();
         \Log::info('Kapri Event Received:', $event);
@@ -774,5 +947,10 @@ HTML;
         \Log::info('Kapri Response Sent:', $response);
         return response()->json($response);
     }
+
+
+
+
+
 
 }

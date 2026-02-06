@@ -8,7 +8,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
-class ApprovalMail extends Mailable
+class   ApprovalMail extends Mailable
 {
     use Queueable, SerializesModels;
 
